@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dynamic Satellite Orbit Change</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cesium/1.105.0/Cesium.js"></script>
+  <script src="CONFIG.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cesium/1.105.0/Widgets/widgets.min.css" rel="stylesheet">
+  <link href="main.css" rel="stylesheet">
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <div class="control-panel">
+    <h3>Satellite Orbit Control</h3>
+  </div>
+
+  <script>
+    // Cesium Viewer Initialization
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YTkwNzk4NC04NjkzLTQ3MjAtOTRiNC1jMzdmMGJjNmJmZjAiLCJpZCI6Mjc4NzMxLCJpYXQiOjE3NDA0MTAyNTB9.oMFuN-pmxQfzZz3_p5SdB_JLhd-M5Bl-Iw5Lh25BJ5I';
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+        animation: false,
+        timeline: false
+    });
+
+    viewer.cesiumWidget.creditContainer.style.display = "none";
+    /* Start the animation loop without Animation Clock manual triggering */
+    viewer.clock.shouldAnimate = true; 
+
+    /** Main Satellite Orbital Testing **/
+    //////////////////////////////////////
+
+    let currentAltitude = 600; let dataSource;
+    
+    function calculateSatelliteOrbitalTrajectory(altitude) {
+      const earthRadius = 6371;
+      const semiMajorAxis = earthRadius + altitude;
+      const semiMajorAxisMeters = semiMajorAxis * 1000;
+      const eccentricity = 0;
+      const inclination = 51.6; 
+      const longitudeOfAscendingNode = 0;
+      const argumentOfPeriapsis = 0;
+
+      // Position Samples to interpolate
+      // Orbital period in seconds
+      const GM = 3.986004418e14; // Earth's gravitational parameter (m^3/s^2)
+      const periodSeconds = 2 * Math.PI * Math.sqrt(Math.pow(semiMajorAxisMeters, 3) / GM);
+      
+      // Generate positions for one complete orbit
+      const numSamples = 120; // Number of samples for one orbit
+      const timeStepSeconds = periodSeconds / numSamples;
+      
+      // Array to hold all cartesian values for the CZML
+      const cartesianValues = [];
+      
+      for (let i = 0; i <= numSamples; i++) {
+        // Time in seconds from epoch
+        const timeSeconds = i * timeStepSeconds;
+        
+        // Mean anomaly at this time
+        const meanAnomaly = (i / numSamples) * 2 * Math.PI;
+        
+        // For a circular orbit, true anomaly equals mean anomaly
+        const trueAnomaly = meanAnomaly;
+        
+        // Position in orbital plane (perifocal coordinates)
+        // For a circular orbit (e=0), the radius is constant
+        const radius = semiMajorAxisMeters;
+        
+        // Position in orbital plane
+        const x = radius * Math.cos(trueAnomaly);
+        const y = radius * Math.sin(trueAnomaly);
+        
+        // Convert inclination to radians
+        const inclinationRad = Cesium.Math.toRadians(inclination);
+        const lonAscNodeRad = Cesium.Math.toRadians(longitudeOfAscendingNode);
+        const argPeriapsisRad = Cesium.Math.toRadians(argumentOfPeriapsis);
+        
+        // First rotate by argument of periapsis
+        let xTemp = x * Math.cos(argPeriapsisRad) - y * Math.sin(argPeriapsisRad);
+        let yTemp = x * Math.sin(argPeriapsisRad) + y * Math.cos(argPeriapsisRad);
+        
+        // Then by inclination
+        let xNew = xTemp;
+        let yNew = yTemp * Math.cos(inclinationRad);
+        let z = yTemp * Math.sin(inclinationRad);
+        
+        // Finally by longitude of ascending node
+        let xFinal = xNew * Math.cos(lonAscNodeRad) - yNew * Math.sin(lonAscNodeRad);
+        let yFinal = xNew * Math.sin(lonAscNodeRad) + yNew * Math.cos(lonAscNodeRad);
+        
+        // Add time and position to the cartesian array
+        cartesianValues.push(timeSeconds, xFinal, yFinal, z);
+      }
+      
+      return cartesianValues;
+    }
+
+
+    function generateSatelliteCzml() {
+      const now = Cesium.JulianDate.now();
+      // console.log("now", now);
+      const start = now;
+      const stop = Cesium.JulianDate.addHours(now, 2, new Cesium.JulianDate());
+      
+      // Create the CZML document
+      const czml = [
+        {
+          id: "document",
+          name: "CZML Satellite Orbit",
+          version: "1.0",
+          clock: {
+            interval: `${Cesium.JulianDate.toIso8601(start)}/${Cesium.JulianDate.toIso8601(stop)}`,
+            currentTime: Cesium.JulianDate.toIso8601(start),
+            multiplier: 1
+          }
+        },
+        {
+          id: "Satellite",
+          name: `ISDA-K89`,
+          availability: `${Cesium.JulianDate.toIso8601(start)}/${Cesium.JulianDate.toIso8601(stop)}`,
+          description: `Initial testing satellite (${currentAltitude}km altitude orbit)`,
+            billboard:{
+                eyeOffset:{
+                    "cartesian":[
+                    0,0,0
+                    ]
+                },
+                horizontalOrigin:"CENTER",
+                image:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII=",
+                pixelOffset:{
+                    cartesian2:[
+                    0,0
+                    ]
+                },
+                scale:2,
+                show:true,
+                verticalOrigi:"CENTER"
+            },
+          path: {
+            show: true,
+            width: 2,
+            material: {
+              solidColor: {
+                color: {
+                  rgba: [255, 255, 0, 255]
+                }
+              }
+            },
+            resolution: 120
+          },
+          position: {
+            interpolationAlgorithm: "LAGRANGE",
+            interpolationDegree: 5,
+            referenceFrame: "INERTIAL",
+            epoch: Cesium.JulianDate.toIso8601(start),
+            cartesian: []
+          }
+        }
+      ];
+      
+      czml[1].position.cartesian = calculateSatelliteOrbitalTrajectory(currentAltitude);
+      return czml;
+    }
+
+    function loadSatellite() {
+      // Generate CZML for initial altitude
+      const czml = generateSatelliteCzml();
+      
+      // Load the CZML document
+      dataSource = new Cesium.CzmlDataSource();
+      dataSource.load(czml).then(function() {
+        // Add to viewer
+        viewer.dataSources.add(dataSource);
+        
+        // Set the camera to track the satellite
+        const satellite = dataSource.entities.getById("Satellite");
+        viewer.trackedEntity = satellite;
+      });
+    }
+
+    // Change the orbit altitude
+    function changeOrbit(newAltitude) {
+      // Update current altitude
+      currentAltitude = newAltitude;
+      
+      // Remove current data source
+      viewer.dataSources.remove(dataSource, true);
+      
+      // Load new satellite orbit
+      loadSatellite();
+    }
+
+    // Load initial satellite
+    loadSatellite();
+  </script>
+</body>
+</html>

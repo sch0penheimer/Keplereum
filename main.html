@@ -49,7 +49,7 @@
       const GM = 3.986004418e14;                                                                /* (m^3/s^2) */
       const periodSeconds = 2 * Math.PI * Math.sqrt(Math.pow(semiMajorAxisMeters, 3) / GM);
       
-      const numSamples = 120;
+      const numSamples = 240;
       const timeStepSeconds = periodSeconds / numSamples;
       
       const cartesianValues = [];
@@ -102,14 +102,13 @@
         
         cartesianValues.push(timeSeconds, xFinal, yFinal, z);
       }
-      
+
       return cartesianValues;
     }
 
 
     function generateSatelliteCzml() {
       const now = Cesium.JulianDate.now();
-      // console.log("now", now);
       const start = now;
       const stop = Cesium.JulianDate.addHours(now, 4000, new Cesium.JulianDate());
       
@@ -169,11 +168,19 @@
         }
       ];
       
-      czml[1].position.cartesian = calculateSatelliteOrbitalTrajectory(currentAltitude, 0.8, 51, 0, 0);
+      czml[1].position.cartesian = calculateSatelliteOrbitalTrajectory(currentAltitude, 0.3, 51, 0, 0);
       return czml;
     }
 
-    function loadSatellite() {
+    /**
+     * Loads the satellite data source into the Cesium viewer.
+     */
+     function loadSatellite() {
+      // Clear the existing data source
+      viewer.dataSources.remove(dataSource, true);
+
+      // Load the new CZML data
+      dataSource = new Cesium.CzmlDataSource();
       dataSource.load(czml).then(function() {
         // Add to viewer
         viewer.dataSources.add(dataSource);
@@ -186,7 +193,6 @@
       currentAltitude = newAltitude;
       
       czml[1].position.cartesian = calculateSatelliteOrbitalTrajectory(currentAltitude, 0.5, 51, 0, 0);
-      
       // Load new satellite orbit
       loadSatellite();
     }
@@ -199,6 +205,33 @@
     
     // Load initial satellite
     loadSatellite();
+
+    // (ADDED SECTION) Calculate the orbital path //
+    /**
+     * Converts an array of positions to Cartesian3 coordinates.
+     * @param {Array} positions - The array of positions.
+     * @returns {Array} An array of Cartesian3 coordinates.
+     */
+     function convertToCartesian3(positions) {
+      const cartesian3Positions = [];
+      for (let i = 1; i < positions.length; i += 4) {
+        cartesian3Positions.push(new Cesium.Cartesian3(positions[i], positions[i+1], positions[i+2]));
+      }
+      return cartesian3Positions;
+    }
+
+    // Convert the orbital path to Cartesian3 coordinates
+    const cartesian3OrbitalPath = convertToCartesian3(calculateSatelliteOrbitalTrajectory(2000, 0.7, 45, 0, 0));
+
+    // Create a polyline entity for the orbital path
+    viewer.entities.add({
+      polyline: {
+        positions: cartesian3OrbitalPath,
+        width: 2,
+        material: Cesium.Color.RED
+      }
+    });
+
   </script>
 </body>
 </html>

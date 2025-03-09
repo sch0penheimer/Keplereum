@@ -12,83 +12,94 @@
   <div id="cesiumContainer"></div>
   <div class="control-panel">
     <h3>Satellite Orbit Control</h3>
+    <button onclick="changeOrbit(8600)">Change Orbit to 1000km</button>
   </div>
 
   <script>
-    // Cesium Viewer Initialization
+    // Cesium Viewer Initialization //
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2YTkwNzk4NC04NjkzLTQ3MjAtOTRiNC1jMzdmMGJjNmJmZjAiLCJpZCI6Mjc4NzMxLCJpYXQiOjE3NDA0MTAyNTB9.oMFuN-pmxQfzZz3_p5SdB_JLhd-M5Bl-Iw5Lh25BJ5I';
     const viewer = new Cesium.Viewer('cesiumContainer', {
-        animation: false,
+        animation: true,
         timeline: false
     });
 
     viewer.cesiumWidget.creditContainer.style.display = "none";
-    /* Start the animation loop without Animation Clock manual triggering */
     viewer.clock.shouldAnimate = true; 
+
 
     /** Main Satellite Orbital Testing **/
     //////////////////////////////////////
 
-    let currentAltitude = 600; let dataSource;
+    let currentAltitude = 1000; let dataSource;
     
-    function calculateSatelliteOrbitalTrajectory(altitude) {
+    /**
+     * Calculates the satellite orbital trajectory using Kepler's formulas.
+     * @param {number} perigeeAltitude - The altitude at the perigee (closest point to Earth) in kilometers.
+     * @param {number} eccentricity - The eccentricity of the orbit.
+     * @param {number} inclination - The inclination of the orbit in degrees.
+     * @param {number} longitudeOfAscendingNode - The longitude of the ascending node in degrees.
+     * @param {number} argumentOfPeriapsis - The argument of periapsis in degrees.
+     * @returns {Array} An array of cartesian coordinates representing the satellite's trajectory.
+     */
+    function calculateSatelliteOrbitalTrajectory(perigeeAltitude, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis) {
       const earthRadius = 6371;
-      const semiMajorAxis = earthRadius + altitude;
+      const perigeeRadius = earthRadius + perigeeAltitude;
+      const semiMajorAxis = perigeeRadius / (1 - eccentricity);
       const semiMajorAxisMeters = semiMajorAxis * 1000;
-      const eccentricity = 0;
-      const inclination = 51.6; 
-      const longitudeOfAscendingNode = 0;
-      const argumentOfPeriapsis = 0;
-
-      // Position Samples to interpolate
-      // Orbital period in seconds
-      const GM = 3.986004418e14; // Earth's gravitational parameter (m^3/s^2)
+      const GM = 3.986004418e14;                                                                /* (m^3/s^2) */
       const periodSeconds = 2 * Math.PI * Math.sqrt(Math.pow(semiMajorAxisMeters, 3) / GM);
       
-      // Generate positions for one complete orbit
-      const numSamples = 120; // Number of samples for one orbit
+      const numSamples = 120;
       const timeStepSeconds = periodSeconds / numSamples;
       
-      // Array to hold all cartesian values for the CZML
       const cartesianValues = [];
       
       for (let i = 0; i <= numSamples; i++) {
-        // Time in seconds from epoch
         const timeSeconds = i * timeStepSeconds;
-        
-        // Mean anomaly at this time
         const meanAnomaly = (i / numSamples) * 2 * Math.PI;
         
-        // For a circular orbit, true anomaly equals mean anomaly
-        const trueAnomaly = meanAnomaly;
+        // Kepler's Equation for Eccentric Anomaly //
+        let eccentricAnomaly = meanAnomaly;
+        let delta = 1e-6;
+        for (let j = 0; j < 50; j++) {
+          let newEccentricAnomaly = meanAnomaly + eccentricity * Math.sin(eccentricAnomaly);
+          if (Math.abs(newEccentricAnomaly - eccentricAnomaly) < delta) {
+            break;
+          }
+          eccentricAnomaly = newEccentricAnomaly;
+        }
         
-        // Position in orbital plane (perifocal coordinates)
-        // For a circular orbit (e=0), the radius is constant
-        const radius = semiMajorAxisMeters;
+        // True Anomaly //
+        const trueAnomaly = 2 * Math.atan2(
+          Math.sqrt(1 + eccentricity) * Math.sin(eccentricAnomaly / 2),
+          Math.sqrt(1 - eccentricity) * Math.cos(eccentricAnomaly / 2)
+        );
         
-        // Position in orbital plane
+        // Radius //
+        const radius = semiMajorAxisMeters * (1 - eccentricity * Math.cos(eccentricAnomaly));
+        
+        // Cartesian Position in orbital plane // 
         const x = radius * Math.cos(trueAnomaly);
         const y = radius * Math.sin(trueAnomaly);
         
-        // Convert inclination to radians
+        // Inclination -> Radians //
         const inclinationRad = Cesium.Math.toRadians(inclination);
         const lonAscNodeRad = Cesium.Math.toRadians(longitudeOfAscendingNode);
         const argPeriapsisRad = Cesium.Math.toRadians(argumentOfPeriapsis);
         
-        // First rotate by argument of periapsis
+        // 1- Rotate by argument of periapsis //
         let xTemp = x * Math.cos(argPeriapsisRad) - y * Math.sin(argPeriapsisRad);
         let yTemp = x * Math.sin(argPeriapsisRad) + y * Math.cos(argPeriapsisRad);
         
-        // Then by inclination
+        // 2- Rotate by inclination //
         let xNew = xTemp;
         let yNew = yTemp * Math.cos(inclinationRad);
         let z = yTemp * Math.sin(inclinationRad);
         
-        // Finally by longitude of ascending node
+        // 3- Rotate by longitude of ascending node //
         let xFinal = xNew * Math.cos(lonAscNodeRad) - yNew * Math.sin(lonAscNodeRad);
         let yFinal = xNew * Math.sin(lonAscNodeRad) + yNew * Math.cos(lonAscNodeRad);
         
-        // Add time and position to the cartesian array
         cartesianValues.push(timeSeconds, xFinal, yFinal, z);
       }
       
@@ -100,7 +111,7 @@
       const now = Cesium.JulianDate.now();
       // console.log("now", now);
       const start = now;
-      const stop = Cesium.JulianDate.addHours(now, 2, new Cesium.JulianDate());
+      const stop = Cesium.JulianDate.addHours(now, 4000, new Cesium.JulianDate());
       
       // Create the CZML document
       const czml = [
@@ -151,30 +162,21 @@
           position: {
             interpolationAlgorithm: "LAGRANGE",
             interpolationDegree: 5,
-            referenceFrame: "INERTIAL",
+            referenceFrame: "FIXED",
             epoch: Cesium.JulianDate.toIso8601(start),
             cartesian: []
           }
         }
       ];
       
-      czml[1].position.cartesian = calculateSatelliteOrbitalTrajectory(currentAltitude);
+      czml[1].position.cartesian = calculateSatelliteOrbitalTrajectory(currentAltitude, 0.8, 51, 0, 0);
       return czml;
     }
 
     function loadSatellite() {
-      // Generate CZML for initial altitude
-      const czml = generateSatelliteCzml();
-      
-      // Load the CZML document
-      dataSource = new Cesium.CzmlDataSource();
       dataSource.load(czml).then(function() {
         // Add to viewer
         viewer.dataSources.add(dataSource);
-        
-        // Set the camera to track the satellite
-        const satellite = dataSource.entities.getById("Satellite");
-        viewer.trackedEntity = satellite;
       });
     }
 
@@ -183,13 +185,18 @@
       // Update current altitude
       currentAltitude = newAltitude;
       
-      // Remove current data source
-      viewer.dataSources.remove(dataSource, true);
+      czml[1].position.cartesian = calculateSatelliteOrbitalTrajectory(currentAltitude, 0.5, 51, 0, 0);
       
       // Load new satellite orbit
       loadSatellite();
     }
 
+    // Generate CZML for initial altitude
+    const czml = generateSatelliteCzml();
+    
+    // Load the CZML document
+    dataSource = new Cesium.CzmlDataSource();
+    
     // Load initial satellite
     loadSatellite();
   </script>

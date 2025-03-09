@@ -46,7 +46,7 @@
       const perigeeRadius = earthRadius + perigeeAltitude;
       const semiMajorAxis = perigeeRadius / (1 - eccentricity);
       const semiMajorAxisMeters = semiMajorAxis * 1000;
-      const GM = 3.986004418e14;                                                                /* (m^3/s^2) */
+      const GM = 3.986004418e14;
       const periodSeconds = 2 * Math.PI * Math.sqrt(Math.pow(semiMajorAxisMeters, 3) / GM);
       
       const numSamples = 240;
@@ -69,15 +69,14 @@
           eccentricAnomaly = newEccentricAnomaly;
         }
         
-        // True Anomaly //
+
         const trueAnomaly = 2 * Math.atan2(
           Math.sqrt(1 + eccentricity) * Math.sin(eccentricAnomaly / 2),
           Math.sqrt(1 - eccentricity) * Math.cos(eccentricAnomaly / 2)
         );
-        
-        // Radius //
         const radius = semiMajorAxisMeters * (1 - eccentricity * Math.cos(eccentricAnomaly));
         
+
         // Cartesian Position in orbital plane // 
         const x = radius * Math.cos(trueAnomaly);
         const y = radius * Math.sin(trueAnomaly);
@@ -106,13 +105,16 @@
       return cartesianValues;
     }
 
-
+    /**
+     * Generates a CZML document for the satellite.
+     * @returns {Array} The CZML document as an array.
+     */
     function generateSatelliteCzml() {
       const now = Cesium.JulianDate.now();
       const start = now;
       const stop = Cesium.JulianDate.addHours(now, 4000, new Cesium.JulianDate());
       
-      // Create the CZML document
+      // CZML JSON Array //
       const czml = [
         {
           id: "document",
@@ -176,39 +178,15 @@
      * Loads the satellite data source into the Cesium viewer.
      */
      function loadSatellite() {
-      // Clear the existing data source
       viewer.dataSources.remove(dataSource, true);
-
-      // Load the new CZML data
       dataSource = new Cesium.CzmlDataSource();
       dataSource.load(czml).then(function() {
-        // Add to viewer
         viewer.dataSources.add(dataSource);
       });
     }
 
-    // Change the orbit altitude
-    function changeOrbit(newAltitude) {
-      // Update current altitude
-      currentAltitude = newAltitude;
-      
-      czml[1].position.cartesian = calculateSatelliteOrbitalTrajectory(currentAltitude, 0.5, 51, 0, 0);
-      // Load new satellite orbit
-      loadSatellite();
-    }
-
-    // Generate CZML for initial altitude
-    const czml = generateSatelliteCzml();
-    
-    // Load the CZML document
-    dataSource = new Cesium.CzmlDataSource();
-    
-    // Load initial satellite
-    loadSatellite();
-
-    // (ADDED SECTION) Calculate the orbital path //
     /**
-     * Converts an array of positions to Cartesian3 coordinates.
+     * Converts an array of positions to Cartesian3 coordinates (For Polygon Generation)
      * @param {Array} positions - The array of positions.
      * @returns {Array} An array of Cartesian3 coordinates.
      */
@@ -220,17 +198,70 @@
       return cartesian3Positions;
     }
 
-    // Convert the orbital path to Cartesian3 coordinates
-    const cartesian3OrbitalPath = convertToCartesian3(calculateSatelliteOrbitalTrajectory(2000, 0.7, 45, 0, 0));
-
-    // Create a polyline entity for the orbital path
-    viewer.entities.add({
-      polyline: {
-        positions: cartesian3OrbitalPath,
-        width: 2,
-        material: Cesium.Color.RED
+    /**
+     * Interpolates between two sets of Cartesian coordinates.
+     * @param {Array} initial - The initial set of Cartesian coordinates.
+     * @param {Array} final - The final set of Cartesian coordinates.
+     * @param {number} t - The interpolation factor (0 to 1).
+     * @returns {Array} The interpolated Cartesian coordinates.
+     */
+     function interpolateCartesian(initial, final, t) {
+      const interpolated = [];
+      for (let i = 0; i < initial.length; i+=4) {
+        const temp = (1 - t) * initial[i] + t * final[i];
+        const x = (1 - t) * initial[i+1] + t * final[i+1];
+        const y = (1 - t) * initial[i+2] + t * final[i+2];
+        const z = (1 - t) * initial[i+3] + t * final[i+3];
+        interpolated.push(temp, x, y, z);
       }
-    });
+      return interpolated;
+    }
+
+    /**
+     * Changes the orbit altitude of the satellite.
+     * @param {number} newAltitude - The new altitude for the satellite's orbit.
+     */
+     function changeOrbit(newAltitude) {
+      // Initial and final orbits //
+      const initialOrbit = czml[1].position.cartesian;
+      const finalOrbit = calculateSatelliteOrbitalTrajectory(newAltitude, 0.6, 51, 0, 0);
+
+      // Final orbital rendering (red polyline) //
+      viewer.entities.add({
+        polyline: {
+          positions: convertToCartesian3(finalOrbit),
+          width: 1,
+          material: Cesium.Color.RED
+        }
+      });
+
+      let t = 0;
+      const duration = 10;
+      const step = 0.01;
+
+      function interpolate() {
+        if (t < 1) {
+          t += step / duration;
+          const interpolatedOrbit = interpolateCartesian(initialOrbit, finalOrbit, t);
+          czml[1].position.cartesian = interpolatedOrbit;
+          loadSatellite();
+          setTimeout(interpolate, step * 2000);
+        }
+      }
+      interpolate();
+    }
+
+    /*************************************************************************************************************/
+    /*************************************************************************************************************/
+
+    // CZML Generation //
+    const czml = generateSatelliteCzml();
+    
+    // CZML Document Loading //
+    dataSource = new Cesium.CzmlDataSource();
+    
+    // Satellite Initialization //
+    loadSatellite();
 
   </script>
 </body>

@@ -131,22 +131,27 @@
           name: `ISDA-K89`,
           availability: `${Cesium.JulianDate.toIso8601(start)}/${Cesium.JulianDate.toIso8601(stop)}`,
           description: `Initial testing satellite (${currentAltitude}km altitude orbit)`,
-            billboard:{
-                eyeOffset:{
-                    "cartesian":[
-                    0,0,0
-                    ]
-                },
-                horizontalOrigin:"CENTER",
-                image:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII=",
-                pixelOffset:{
-                    cartesian2:[
-                    0,0
-                    ]
-                },
-                scale:2,
-                show:true,
-                verticalOrigi:"CENTER"
+            // billboard:{
+                // eyeOffset:{
+                //     "cartesian":[
+                //     0,0,0
+                //     ]
+                // },
+                // horizontalOrigin:"CENTER",
+            //     image:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII=",
+            //     pixelOffset:{
+            //         cartesian2:[
+            //         0,0
+            //         ]
+            //     },
+            //     scale:2,
+            //     show:true,
+            //     verticalOrigi:"CENTER"
+            // },
+            model: {
+              gltf: "./Assets/Aura.glb",
+              scale: 2.0,
+              minimumPixelSize: 128,
             },
           path: {
             show: true,

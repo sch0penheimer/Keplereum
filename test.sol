@@ -20,6 +20,13 @@ contract SatelliteRegistry {
     event SatelliteStatusChanged(bytes32 indexed satelliteId, bool active);
     event PositionUpdated(bytes32 indexed satelliteId, bytes32 position);
     
+
+    // Add this function to the SatelliteRegistry contract to allow accessing the publicKey
+    function getPublicKey(bytes32 satelliteId) public view returns (address) {
+        return satellites[satelliteId].publicKey;
+    }
+
+
     // Register a new satellite
     function registerSatellite(bytes32 satelliteId) public {
         require(satellites[satelliteId].publicKey == address(0), "Satellite already registered");
@@ -111,6 +118,11 @@ contract AlertSystem {
     constructor(address _registryAddress) {
         satelliteRegistry = SatelliteRegistry(_registryAddress);
     }
+
+
+    function getAlertSatelliteId(bytes32 alertId) public view returns (bytes32) {
+        return alerts[alertId].satelliteId;
+    }
     
     // Create a new alert
     function createAlert(
@@ -183,7 +195,8 @@ contract AlertSystem {
         
         for (uint i = 0; i < activeSats.length; i++) {
             bytes32 satId = activeSats[i];
-            address satAddress = satelliteRegistry.satellites(satId).publicKey;
+            address satAddress = satelliteRegistry.getPublicKey(satId);
+
             
             if (satAddress == satelliteAddress) {
                 return satId;
@@ -226,7 +239,7 @@ contract OrbitalManeuverSystem {
     // Create and execute a maneuver based on alert
     function executeManeuver(bytes32 alertId, bytes calldata parameters) public {
         // Verify caller is authorized (in production would be restricted)
-        bytes32 satelliteId = alertSystem.alerts(alertId).satelliteId;
+        bytes32 satelliteId = alertSystem.getAlertSatelliteId(alertId);
         require(satelliteId != bytes32(0), "Invalid alert");
         require(alertSystem.meetsValidationThreshold(alertId), "Alert not validated");
         
@@ -254,7 +267,7 @@ contract OrbitalManeuverSystem {
         
         // In production, this would verify the satellite is who it says it is
         bytes32 satelliteId = maneuver.satelliteId;
-        require(satelliteRegistry.satellites(satelliteId).publicKey == msg.sender, "Unauthorized");
+        require(satelliteRegistry.getPublicKey(satelliteId) == msg.sender, "Unauthorized");
         
         maneuver.completed = true;
         emit ManeuverCompleted(maneuverHash, block.timestamp);

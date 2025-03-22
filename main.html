@@ -131,11 +131,21 @@
           name: `ISDA-K89`,
           availability: `${Cesium.JulianDate.toIso8601(start)}/${Cesium.JulianDate.toIso8601(stop)}`,
           description: `Initial testing satellite (${currentAltitude}km altitude orbit)`,
-          model: {
-            gltf: "./Assets/Main-Sat.glb",
-            minimumPixelSize: 128,
-            maximumScale: 200000,
-          },
+            model: {
+              gltf: "./Assets/Messenger-Sat.glb",
+              minimumPixelSize: 64,
+              maximumScale: 20000
+            },
+            point: {
+              pixelSize: 5,
+              color: {
+                rgba: [255, 255, 255, 255]
+              },
+              outlineColor: {
+                rgba: [255, 255, 0, 255]
+              },
+              outlineWidth: 5
+            },
           path: {
             show: true,
             width: 2,
@@ -147,6 +157,25 @@
               }
             },
             resolution: 120
+          },
+          label:{
+            fillColor:{
+              rgba:[
+                255,255,0,255
+              ]
+            },
+            font: "11pt Lucida Console",
+            horizontalOrigin:"LEFT",
+            outlineWidth:2,
+            pixelOffset:{
+              cartesian2:[
+                12,0
+              ]
+            },
+            style : Cesium.LabelStyle.FILL_AND_OUTLINE,
+            show:true,
+            text:"InitTest-SAT-101",
+            verticalOrigin:"CENTER"
           },
           position: {
             interpolationAlgorithm: "LAGRANGE",
@@ -231,8 +260,10 @@
         if (t < 1) {
           t += step / duration;
           const interpolatedOrbit = interpolateCartesian(initialOrbit, finalOrbit, t);
-          czml[1].position.cartesian = interpolatedOrbit;
-          loadSatellite();
+          // Update the cartesian array of the satellite entity directly
+          const satelliteEntity = dataSource.entities.getById('Satellite');
+          satelliteEntity.position.setValue(Cesium.JulianDate.now(), interpolatedOrbit);
+          
           setTimeout(interpolate, step * 2000);
         }
       }

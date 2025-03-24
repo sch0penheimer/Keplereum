@@ -70,8 +70,9 @@
                 //** Scaling factor for visualization (Earth radius in scene units) **//
                 this.earthRadiusSceneUnits = 4;
                 //** Converting km to scene units **//
-                this.scaleFactor = this.earthRadiusSceneUnits / 6371;
-                
+                this.earthRadius = 6371;
+
+                this.scaleFactor = this.earthRadiusSceneUnits / this.earthRadius;
                 //** Default satellite model path **//
                 this.satelliteModelPath = './Assets/Messenger-Sat.glb';
                 
@@ -202,9 +203,7 @@
                 
                 const starsVertices = [];
                 for (let i = 0; i < 15000; i++) {
-                    const x = THREE.MathUtils.randFloatSpread(2000);
-                    const y = THREE.MathUtils.randFloatSpread(2000);
-                    const z = THREE.MathUtils.randFloatSpread(2000);
+                    const [x,y,z] = Array(3).fill().map(()=> THREE.MathUtils.randFloatSpread(2000));
                     starsVertices.push(x, y, z);
                 }
                 
@@ -241,7 +240,8 @@
                         inclination: 60,
                         longitudeOfAscendingNode: 120,
                         argumentOfPeriapsis: 45,
-                        speedMultiplier: 20
+                        speedMultiplier: 20,
+                        model:"./Assets/Main-Sat.glb"
                     },
                     {
                         id: "sat-3",
@@ -331,11 +331,12 @@
                 });
 
                 satellite.sensorCone = new THREE.Mesh(coneGeometry, coneMaterial);
-            
+                
                 //* Position the cone slightly below the satellite *//
                 satellite.sensorCone.position.set(0, -0.05, 0);
                 satellite.sensorCone.lookAt(0, 0, 0);
 
+               
                 satellite.group.add(satellite.sensorCone);
 
                 //** 3- Satellite label **//
@@ -639,7 +640,12 @@
             updateSensorCone(satellite) {
                 if (!satellite.sensorCone) return;
                 //** Update cone to always be underneath the satellite **//
-                satellite.sensorCone.position.set(0, 0, 0.5);
+                const satellitePosition = satellite.group.position;
+                const altitude = satellitePosition.length() - 4; // Altitude in scene units
+                
+                console.log(altitude)
+                satellite.sensorCone.scale.set(1,altitude<1 ?1:altitude,1);
+                satellite.sensorCone.position.set(0, 0, altitude<1 ? 0.5 : altitude*0.5);
             }
 
             /**

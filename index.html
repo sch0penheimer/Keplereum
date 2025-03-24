@@ -650,19 +650,14 @@
                 const altitude = satellitePosition.length() - 4;
 
                 //** Console log the altitude **//
-                console.log(satellite.id + " LENGTH: " + altitude);
+                console.log(satellite.id + " LENGTH: " + altitude/this.scaleFactor);
                 //** Console log the sensor radius **//
-                console.log(satellite.id + " RADIUS: " + satellite.sensorCone.scale.y);
+                console.log(satellite.id + " RADIUS: " + satellite.sensorCone.scale.y/this.scaleFactor);
 
                 // Calculate the base radius based on the ratio of maxSensorBaseRadius and maxSensorHeight
                 let baseRadius = (altitude / satellite.orbitParams.maxSensorHeight) * satellite.orbitParams.maxSensorBaseRadius;
                 let sensorHeight = altitude;
 
-                // Stop changing height and radius if altitude exceeds maxSensorHeight
-                if (altitude >= satellite.orbitParams.maxSensorHeight) {
-                    baseRadius = satellite.orbitParams.maxSensorBaseRadius;
-                    sensorHeight = satellite.orbitParams.maxSensorHeight;
-                }
 
                 // Update the scale of the sensor cone
                 satellite.sensorCone.scale.set(baseRadius, sensorHeight < 1 ? 1 : sensorHeight, baseRadius);

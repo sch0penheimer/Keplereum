@@ -229,7 +229,8 @@
                         longitudeOfAscendingNode: 0,
                         argumentOfPeriapsis: 0,
                         speedMultiplier: 20,
-                        model: "./Assets/Messenger-Sat.glb" //** Optional, Apps Constructor's this.satelliteModelPath default if not provided **//
+                        maxSensorBaseRadius: 0.9,
+                        maxSensorHeight: 2.3
                     },
                     {
                         id: "sat-2",
@@ -241,7 +242,8 @@
                         longitudeOfAscendingNode: 120,
                         argumentOfPeriapsis: 45,
                         speedMultiplier: 20,
-                        model:"./Assets/Main-Sat.glb"
+                        maxSensorBaseRadius: 0.9,
+                        maxSensorHeight: 3.5
                     },
                     {
                         id: "sat-3",
@@ -252,7 +254,9 @@
                         inclination: 30,
                         longitudeOfAscendingNode: 240,
                         argumentOfPeriapsis: 90,
-                        speedMultiplier: 20
+                        speedMultiplier: 20,
+                        maxSensorBaseRadius: 0.9,
+                        maxSensorHeight: 2.3
                     }
                 ];
                 
@@ -285,7 +289,9 @@
                         inclination: data.inclination,
                         longitudeOfAscendingNode: data.longitudeOfAscendingNode,
                         argumentOfPeriapsis: data.argumentOfPeriapsis,
-                        speedMultiplier: data.speedMultiplier
+                        speedMultiplier: data.speedMultiplier,
+                        maxSensorBaseRadius: data.maxSensorBaseRadius,
+                        maxSensorHeight: data.maxSensorHeight
                     },
                     animationParams: {
                         currentTime: 0,
@@ -322,7 +328,7 @@
 
                 //** 2- Sensor cone pointing to Earth **//
                 //* Height is 1 by default, should be passed with the satellite data along with the base radius *//
-                const coneGeometry = new THREE.ConeGeometry(0.3, 1, 64); 
+                const coneGeometry = new THREE.ConeGeometry(satellite.orbitParams.maxSensorBaseRadius, 1, 64); 
 
                 const coneMaterial = new THREE.MeshBasicMaterial({ 
                     color: satellite.color,
@@ -641,11 +647,26 @@
                 if (!satellite.sensorCone) return;
                 //** Update cone to always be underneath the satellite **//
                 const satellitePosition = satellite.group.position;
-                const altitude = satellitePosition.length() - 4; // Altitude in scene units
-                
-                console.log(altitude)
-                satellite.sensorCone.scale.set(1,altitude<1 ?1:altitude,1);
-                satellite.sensorCone.position.set(0, 0, altitude<1 ? 0.5 : altitude*0.5);
+                const altitude = satellitePosition.length() - 4;
+
+                //** Console log the altitude **//
+                console.log(satellite.id + " LENGTH: " + altitude);
+                //** Console log the sensor radius **//
+                console.log(satellite.id + " RADIUS: " + satellite.sensorCone.scale.y);
+
+                // Calculate the base radius based on the ratio of maxSensorBaseRadius and maxSensorHeight
+                let baseRadius = (altitude / satellite.orbitParams.maxSensorHeight) * satellite.orbitParams.maxSensorBaseRadius;
+                let sensorHeight = altitude;
+
+                // Stop changing height and radius if altitude exceeds maxSensorHeight
+                if (altitude >= satellite.orbitParams.maxSensorHeight) {
+                    baseRadius = satellite.orbitParams.maxSensorBaseRadius;
+                    sensorHeight = satellite.orbitParams.maxSensorHeight;
+                }
+
+                // Update the scale of the sensor cone
+                satellite.sensorCone.scale.set(baseRadius, sensorHeight < 1 ? 1 : sensorHeight, baseRadius);
+                satellite.sensorCone.position.set(0, 0, sensorHeight < 1 ? 0.5 : sensorHeight * 0.5);
             }
 
             /**

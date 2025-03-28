@@ -31,7 +31,7 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   private earthRadius = 6371;
   private earthRadiusSceneUnits = 4;
   private scaleFactor = this.earthRadiusSceneUnits / this.earthRadius;
-  private satelliteModelPath = 'assets/main-sat.glb';
+  private satelliteModelPath = '../../assets/main-sat.glb';
 
   ngOnInit(): void {
     //** afterViewInit is enough **/
@@ -54,11 +54,13 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.createStars();
     this.setupUI();
     this.addEventListeners();
+    //this.createTornado();
     //** Load satellites from JSON **//
     this.loadSatellitesFromJSON();
     //** Start animation loop **//
     this.animate();
   }
+
 
   /**
     * Setup the WebGL renderer
@@ -351,6 +353,43 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.updateSensorCone(satellite);
   }
 
+/*
+  private createTornado(): void {
+    const tornadoGroup = new THREE.Group();
+
+    // Load Perlin noise texture
+    const textureLoader = new THREE.TextureLoader();
+    const perlinTexture = textureLoader.load("../../assets/rgb-256x256.png");
+    perlinTexture.wrapS = THREE.RepeatWrapping;
+    perlinTexture.wrapT = THREE.RepeatWrapping;
+
+    // Tornado uniforms (Replace with shader material logic if necessary)
+    const timeScale = 0.2;
+
+    // Tornado Floor
+    const floorMaterial = new THREE.MeshBasicMaterial({ transparent: true });
+    const floorGeometry = new THREE.PlaneGeometry(2, 2);
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.rotation.x = -Math.PI * 0.5;
+    tornadoGroup.add(floor);
+
+    // Tornado Cylinder
+    const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 2, 20, 20, true);
+    const emissiveMaterial = new THREE.MeshBasicMaterial({
+        map: perlinTexture,
+        transparent: true,
+        side: THREE.DoubleSide
+    });
+
+    const tornadoMesh = new THREE.Mesh(cylinderGeometry, emissiveMaterial);
+    tornadoMesh.position.y = 1;
+    tornadoGroup.add(tornadoMesh);
+    tornadoGroup.position.set(4,4,4);
+    this.scene.add(tornadoGroup);
+}
+*/
+
+
   /**
     * Load the satellite model
     * @method loadSatelliteModel
@@ -365,7 +404,7 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
         group.remove(placeholder);
 
         const satelliteModel = gltf.scene;
-        satelliteModel.scale.set(0.005, 0.005, 0.005);
+        satelliteModel.scale.set(0.1, 0.1, 0.1);
         satelliteModel.traverse((child: any) => {
           if (child.isMesh) {
             child.castShadow = true;

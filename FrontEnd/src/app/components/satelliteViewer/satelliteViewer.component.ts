@@ -6,8 +6,9 @@ import { loadSatelliteModel,
   calculateSatelliteOrbitalTrajectory,
   createSatelliteOrbitPath, 
   updateSatellitePosition
-} 
-  from './utils/satelliteUtils';
+} from './utils/satelliteUtils';
+
+
 @Component({
   selector: 'appSatelliteViewer',
   templateUrl: './satelliteViewer.component.html',
@@ -20,7 +21,6 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   private camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   private renderer = new THREE.WebGLRenderer({ antialias: true });
   private textureLoader = new THREE.TextureLoader();
-  private gltfLoader = new GLTFLoader();
 
   private controls = new OrbitControls(this.camera, this.renderer.domElement);
   
@@ -37,7 +37,7 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   private earthRadius = 6371;
   private earthRadiusSceneUnits = 4;
   private scaleFactor = this.earthRadiusSceneUnits / this.earthRadius;
-  private satelliteModelPath = '../../assets/main-sat.glb';
+  private satelliteModelPath = 'assets/main-sat.glb';
 
   private satellitesData = [
     {
@@ -433,7 +433,10 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.orbitPaths.push(orbitPath);
   }
 
-
+  /**
+    * Update the satellites' positions and animations
+    * @method updateSatellites
+    */
   private updateSatellites(): void {
     this.satellites.forEach(satellite => {
       satellite.animationParams.currentTime += 0.016 * satellite.orbitParams.speedMultiplier;

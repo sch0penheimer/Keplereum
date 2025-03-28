@@ -1,7 +1,12 @@
 {
   "dependencies": {
+    "@angular/core": "^19.2.3",
+    "@angular/router": "^19.2.4",
     "cesium": "^1.126.0",
-    "three": "^0.174.0",
     "web3": "^4.16.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.174.0",
+    "three": "^0.174.0"
   }
 }

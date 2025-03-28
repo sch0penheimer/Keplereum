@@ -735,11 +735,23 @@ class EarthSatelliteApp {
         this.satellites = [];
         this.orbitPaths = [];
     }
-    
-    /**
-    * Animation loop
-    * @method animate
+
+  /**
+    * Add event listeners for window resize
+    * @method addEventListeners
     */
+    addEventListeners() {
+        window.addEventListener('resize', () => {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    }
+
+    /**
+      * Animation loop
+      * @method animate
+      */
     animate() {
         requestAnimationFrame(this.animate.bind(this));
         
@@ -757,22 +769,5 @@ class EarthSatelliteApp {
         this.renderer.render(this.scene, this.camera);
     }
     
-    /**
-    * Add event listeners for window resize
-    * @method addEventListeners
-    */
-    addEventListeners() {
-        window.addEventListener('resize', () => {
-            this.camera.aspect = window.innerWidth / window.innerHeight;
-            this.camera.updateProjectionMatrix();
-            this.renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-    }
-}
 
-/**
-* Initialize the application when the document is loaded
-*/
-document.addEventListener('DOMContentLoaded', () => {
-    const app = new EarthSatelliteApp();
-});
+}

@@ -2,12 +2,18 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
+import { loadSatelliteModel,
+  calculateSatelliteOrbitalTrajectory,
+  createSatelliteOrbitPath, 
+  updateSatellitePosition
+} 
+  from './utils/satelliteUtils';
 @Component({
   selector: 'appSatelliteViewer',
   templateUrl: './satelliteViewer.component.html',
   styleUrls: ['']
 })
+
 
 export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   private scene = new THREE.Scene();
@@ -33,6 +39,47 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   private scaleFactor = this.earthRadiusSceneUnits / this.earthRadius;
   private satelliteModelPath = '../../assets/main-sat.glb';
 
+  private satellitesData = [
+    {
+        id: "sat-1",
+        name: "sat-1",
+        color: "#00ffff",
+        perigeeAltitude: 500,
+        eccentricity: 0.1,
+        inclination: 45,
+        longitudeOfAscendingNode: 0,
+        argumentOfPeriapsis: 0,
+        speedMultiplier: 20,
+        maxSensorBaseRadius: 0.9,
+        maxSensorHeight: 2.3
+    },
+    {
+        id: "sat-2",
+        name: "sat-2",
+        color: "#ff00ff",
+        perigeeAltitude: 800,
+        eccentricity: 0.7,
+        inclination: 60,
+        longitudeOfAscendingNode: 120,
+        argumentOfPeriapsis: 45,
+        speedMultiplier: 20,
+        maxSensorBaseRadius: 0.9,
+        maxSensorHeight: 3.5
+    },
+    {
+        id: "sat-3",
+        name: "sat-3",
+        color: "#ffff00",
+        perigeeAltitude: 1200,
+        eccentricity: 0.15,
+        inclination: 30,
+        longitudeOfAscendingNode: 240,
+        argumentOfPeriapsis: 90,
+        speedMultiplier: 20,
+        maxSensorBaseRadius: 0.9,
+        maxSensorHeight: 2.3
+    }
+];
   ngOnInit(): void {
     //** afterViewInit is enough **/
   }
@@ -56,7 +103,7 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.addEventListeners();
     //this.createTornado();
     //** Load satellites from JSON **//
-    this.loadSatellitesFromJSON();
+    this.loadSatellitesFromJSON(this.satellitesData);
     //** Start animation loop **//
     this.animate();
   }
@@ -174,51 +221,8 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     * Load satellites from JSON data
     * @method loadSatellitesFromJSON
     */
-  private loadSatellitesFromJSON(): void {
-    //** Dummy satellite JSON array **//
-    const satellitesData = [
-        {
-            id: "sat-1",
-            name: "sat-1",
-            color: "#00ffff",
-            perigeeAltitude: 500,
-            eccentricity: 0.1,
-            inclination: 45,
-            longitudeOfAscendingNode: 0,
-            argumentOfPeriapsis: 0,
-            speedMultiplier: 20,
-            maxSensorBaseRadius: 0.9,
-            maxSensorHeight: 2.3
-        },
-        {
-            id: "sat-2",
-            name: "sat-2",
-            color: "#ff00ff",
-            perigeeAltitude: 800,
-            eccentricity: 0.7,
-            inclination: 60,
-            longitudeOfAscendingNode: 120,
-            argumentOfPeriapsis: 45,
-            speedMultiplier: 20,
-            maxSensorBaseRadius: 0.9,
-            maxSensorHeight: 3.5
-        },
-        {
-            id: "sat-3",
-            name: "sat-3",
-            color: "#ffff00",
-            perigeeAltitude: 1200,
-            eccentricity: 0.15,
-            inclination: 30,
-            longitudeOfAscendingNode: 240,
-            argumentOfPeriapsis: 90,
-            speedMultiplier: 20,
-            maxSensorBaseRadius: 0.9,
-            maxSensorHeight: 2.3
-        }
-    ];
-
-    //** Process each satellite in the data array **//
+  private loadSatellitesFromJSON(satellitesData: Array<Object>): void {
+    
     satellitesData.forEach((data, index) => {
         this.createSatellite(data, index, satellitesData.length);
     });
@@ -336,11 +340,11 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.calculateSatelliteOrbit(satellite);
 
     //** Create orbit path visualization **//
-    this.createSatelliteOrbitPath(satellite);
+    createSatelliteOrbitPath(satellite,this.scene,this.orbitPaths);
 
     //** 3D model loading **//
     const modelPath = data.model || this.satelliteModelPath;
-    this.loadSatelliteModel(
+    loadSatelliteModel(
         modelPath,
         satellitePlaceholder,
         satellite.group
@@ -391,50 +395,19 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
 
 
   /**
-    * Load the satellite model
-    * @method loadSatelliteModel
-    * @param {string} modelPath - Path to the GLTF model
-    * @param {THREE.Mesh} placeholder - Placeholder mesh for the satellite
-    * @param {THREE.Group} group - Group container for the satellite
-    */
-  private loadSatelliteModel( modelPath: string, placeholder: THREE.Object3D, group: THREE.Group ) : void {
-    this.gltfLoader.load(
-      modelPath,
-      (gltf) => {
-        group.remove(placeholder);
-
-        const satelliteModel = gltf.scene;
-        satelliteModel.scale.set(0.1, 0.1, 0.1);
-        satelliteModel.traverse((child: any) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            if (child.material) {
-              child.material.emissive = new THREE.Color(0x555555);
-            }
-          }
-        });
-
-        group.add(satelliteModel);
-      },
-      
-      (error) => {
-        console.error('Error loading satellite model:', error);
-      }
-    );
-  }
-
-  /**
     * Calculate the satellite's orbit parameters
     * @method calculateSatelliteOrbit
     * @param {Object} satellite - Satellite object
     */
   private calculateSatelliteOrbit(satellite: any): void {
-    const result = this.calculateSatelliteOrbitalTrajectory(
+    const result = calculateSatelliteOrbitalTrajectory(
       satellite.orbitParams.perigeeAltitude,
       satellite.orbitParams.eccentricity,
       satellite.orbitParams.inclination,
       satellite.orbitParams.longitudeOfAscendingNode,
-      satellite.orbitParams.argumentOfPeriapsis
+      satellite.orbitParams.argumentOfPeriapsis,
+      this.earthRadius,
+      this.scaleFactor
     );
     
     satellite.animationParams.periodSeconds = result.periodSeconds;
@@ -460,112 +433,17 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.orbitPaths.push(orbitPath);
   }
 
-  /**
-    * Calculate the satellite's orbital trajectory
-    * @method calculateSatelliteOrbitalTrajectory
-    * @param {number} perigeeAltitude - Perigee altitude in kilometers
-    * @param {number} eccentricity - Eccentricity of the orbit
-    * @param {number} inclination - Inclination in degrees
-    * @param {number} longitudeOfAscendingNode - Longitude of ascending node in degrees
-    * @param {number} argumentOfPeriapsis - Argument of periapsis in degrees
-    * @returns {Object} - Contains cartesian values, points3D, and periodSeconds
-    */
-  private calculateSatelliteOrbitalTrajectory(
-    perigeeAltitude: number,
-    eccentricity: number,
-    inclination: number,
-    longitudeOfAscendingNode: number,
-    argumentOfPeriapsis: number
-  ): { cartesianValues: number[], points3D: THREE.Vector3[], periodSeconds: number } {
-    const perigeeRadius = this.earthRadius + perigeeAltitude;
-    const semiMajorAxis = perigeeRadius / (1 - eccentricity);
-    const semiMajorAxisMeters = semiMajorAxis * 1000;
-    const GM = 3.986004418e14;
-    const periodSeconds = 2 * Math.PI * Math.sqrt(Math.pow(semiMajorAxisMeters, 3) / GM);
-    
-    const numSamples = 500;
-    const timeStepSeconds = periodSeconds / numSamples;
-    
-    const cartesianValues: number[] = [];
-    const points3D: THREE.Vector3[] = [];
-    
-    // ...rest of the trajectory calculation logic remains the same...
-    for (let i = 0; i <= numSamples; i++) {
-      const timeSeconds = i * timeStepSeconds;
-      const meanAnomaly = (i / numSamples) * 2 * Math.PI;
-      
-      let eccentricAnomaly = meanAnomaly;
-      let delta = 1e-6;
-      for (let j = 0; j < 50; j++) {
-        let newEccentricAnomaly = meanAnomaly + eccentricity * Math.sin(eccentricAnomaly);
-        if (Math.abs(newEccentricAnomaly - eccentricAnomaly) < delta) break;
-        eccentricAnomaly = newEccentricAnomaly;
-      }
-      
-      const trueAnomaly = 2 * Math.atan2(
-        Math.sqrt(1 + eccentricity) * Math.sin(eccentricAnomaly / 2),
-        Math.sqrt(1 - eccentricity) * Math.cos(eccentricAnomaly / 2)
-      );
-      const radius = semiMajorAxisMeters * (1 - eccentricity * Math.cos(eccentricAnomaly));
-      
-      const x = radius * Math.cos(trueAnomaly);
-      const y = radius * Math.sin(trueAnomaly);
-      
-      const inclinationRad = inclination * Math.PI / 180;
-      const lonAscNodeRad = longitudeOfAscendingNode * Math.PI / 180;
-      const argPeriapsisRad = argumentOfPeriapsis * Math.PI / 180;
-      
-      let xTemp = x * Math.cos(argPeriapsisRad) - y * Math.sin(argPeriapsisRad);
-      let yTemp = x * Math.sin(argPeriapsisRad) + y * Math.cos(argPeriapsisRad);
-      
-      let xNew = xTemp;
-      let yNew = yTemp * Math.cos(inclinationRad);
-      let z = yTemp * Math.sin(inclinationRad);
-      
-      let xFinal = xNew * Math.cos(lonAscNodeRad) - yNew * Math.sin(lonAscNodeRad);
-      let yFinal = xNew * Math.sin(lonAscNodeRad) + yNew * Math.cos(lonAscNodeRad);
-      
-      const xScene = xFinal * this.scaleFactor / 1000;
-      const yScene = yFinal * this.scaleFactor / 1000;
-      const zScene = z * this.scaleFactor / 1000;
-      
-      cartesianValues.push(timeSeconds, xScene, yScene, zScene);
-      points3D.push(new THREE.Vector3(xScene, yScene, zScene));
-    }
-    
-    return { cartesianValues, points3D, periodSeconds };
-  }
 
   private updateSatellites(): void {
     this.satellites.forEach(satellite => {
       satellite.animationParams.currentTime += 0.016 * satellite.orbitParams.speedMultiplier;
-      this.updateSatellitePosition(satellite);
+      updateSatellitePosition(satellite);
       this.updateSatelliteOrientation(satellite);
       this.updateSensorCone(satellite);
       this.updateSatelliteLabel(satellite);
     });
   }
 
-  /**
-    * Update the satellite's position based on its orbital parameters
-    * @method updateSatellitePosition
-    * @param {Object} satellite - Satellite object
-    */
-  private updateSatellitePosition(satellite: any): void {
-    if (!satellite.animationParams.orbitPoints.length) return;
-    
-    const points = satellite.animationParams.orbitPoints;
-    const totalPoints = points.length;
-    const normalizedTime = (satellite.animationParams.currentTime % satellite.animationParams.periodSeconds) / satellite.animationParams.periodSeconds;
-    const index = Math.floor(normalizedTime * (totalPoints - 1));
-    const nextIndex = (index + 1) % totalPoints;
-    
-    const fraction = (normalizedTime * (totalPoints - 1)) - index;
-    const position = new THREE.Vector3();
-    position.lerpVectors(points[index], points[nextIndex], fraction);
-    
-    satellite.group.position.copy(position);
-  }
 
   /**
     * Update the satellite's orientation to face the Earth

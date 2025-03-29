@@ -152,3 +152,4 @@ export function calculateSatelliteOrbitalTrajectory(
     
     satellite.group.position.copy(position);
   }
+  

@@ -7,8 +7,8 @@ import { loadSatelliteModel,
   calculateSatelliteOrbitalTrajectory,
   createSatelliteOrbitPath, 
   updateSatellitePosition
-} 
-  from './utils/satelliteUtils';
+
+} from './utils/satelliteUtils';
 
 
 @Component({
@@ -23,7 +23,6 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   private camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   private renderer = new THREE.WebGLRenderer({ antialias: true });
   private textureLoader = new THREE.TextureLoader();
-  private gltfLoader = new GLTFLoader();
 
   private animateFunctions: (() => void)[] = [];
   private controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -41,7 +40,7 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   private earthRadius = 6371;
   private earthRadiusSceneUnits = 4;
   private scaleFactor = this.earthRadiusSceneUnits / this.earthRadius;
-  private satelliteModelPath = '../../assets/main-sat.glb';
+  private satelliteModelPath = 'assets/main-sat.glb';
 
   private satellitesData = [
     {
@@ -477,7 +476,29 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     satellite.animationParams.orbitPoints = result.points3D;
   }
 
+  /**
+    * Create the satellite's orbit path
+    * @method createSatelliteOrbitPath
+    * @param {Object} satellite - Satellite object
+    */
+  private createSatelliteOrbitPath(satellite: any): void {
+    const geometry = new THREE.BufferGeometry().setFromPoints(satellite.animationParams.orbitPoints);
+    const material = new THREE.LineBasicMaterial({
+      color: satellite.color,
+      transparent: true,
+      opacity: 0.8
+    });
+    
+    const orbitPath = new THREE.Line(geometry, material);
+    this.scene.add(orbitPath);
+    satellite.orbitPath = orbitPath;
+    this.orbitPaths.push(orbitPath);
+  }
 
+  /**
+    * Update the satellites' positions and animations
+    * @method updateSatellites
+    */
   private updateSatellites(): void {
     this.satellites.forEach(satellite => {
       satellite.animationParams.currentTime += 0.016 * satellite.orbitParams.speedMultiplier;

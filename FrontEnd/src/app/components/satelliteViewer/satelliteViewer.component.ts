@@ -2,12 +2,15 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
 import { loadSatelliteModel,
   calculateSatelliteOrbitalTrajectory,
   createSatelliteOrbitPath, 
   updateSatellitePosition
 } 
   from './utils/satelliteUtils';
+
+
 @Component({
   selector: 'appSatelliteViewer',
   templateUrl: './satelliteViewer.component.html',
@@ -22,6 +25,7 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   private textureLoader = new THREE.TextureLoader();
   private gltfLoader = new GLTFLoader();
 
+  private animateFunctions: (() => void)[] = [];
   private controls = new OrbitControls(this.camera, this.renderer.domElement);
   
   //* Earth related objects *//
@@ -32,7 +36,7 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   private orbitPaths: any[] = [];
   private ambientLight = new THREE.AmbientLight(0xffffff, 2)
   
-
+  
   //* Constants *//
   private earthRadius = 6371;
   private earthRadiusSceneUnits = 4;
@@ -86,6 +90,7 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.init();
+    
   }
 
   /**
@@ -101,7 +106,8 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.createStars();
     this.setupUI();
     this.addEventListeners();
-    //this.createTornado();
+    this.createTornado(3,2,4);
+    
     //** Load satellites from JSON **//
     this.loadSatellitesFromJSON(this.satellitesData);
     //** Start animation loop **//
@@ -124,6 +130,10 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.5;
     document.body.appendChild(this.renderer.domElement);
+
+    // Add axes Helper The X axis is red. The Y axis is green. The Z axis is blue.
+    const axesHelper = new THREE.AxesHelper( 10 );
+    this.scene.add( axesHelper );
   }
 
   /**
@@ -357,41 +367,88 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.updateSensorCone(satellite);
   }
 
-/*
-  private createTornado(): void {
+
+  private createTornado(positionX: number , positionY: number , positionZ: number=4): void {
+    // Tornado parameters
+    const height = 3;
+    const radius = 1.4;
+    const segments = 60;
     const tornadoGroup = new THREE.Group();
+    tornadoGroup.position.set(positionX, positionY, positionZ+0.04);
 
-    // Load Perlin noise texture
-    const textureLoader = new THREE.TextureLoader();
-    const perlinTexture = textureLoader.load("../../assets/rgb-256x256.png");
-    perlinTexture.wrapS = THREE.RepeatWrapping;
-    perlinTexture.wrapT = THREE.RepeatWrapping;
-
-    // Tornado uniforms (Replace with shader material logic if necessary)
-    const timeScale = 0.2;
-
-    // Tornado Floor
-    const floorMaterial = new THREE.MeshBasicMaterial({ transparent: true });
-    const floorGeometry = new THREE.PlaneGeometry(2, 2);
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    floor.rotation.x = -Math.PI * 0.5;
-    tornadoGroup.add(floor);
-
-    // Tornado Cylinder
-    const cylinderGeometry = new THREE.CylinderGeometry(1, 1, 2, 20, 20, true);
-    const emissiveMaterial = new THREE.MeshBasicMaterial({
-        map: perlinTexture,
-        transparent: true,
-        side: THREE.DoubleSide
+    
+    // Create twisted cylinder geometry
+    const geometry = new THREE.CylinderGeometry(
+      radius ,  // Top radius (smaller for tapered look)
+      radius* 0.2,       // Bottom radius
+      height,       // Height
+      segments,     // Radial segments
+      segments,     // Height segments
+      true          // Open ended
+    );
+    
+    // Add vertex displacement for twist effect
+    const pos = geometry.attributes['position'];
+    const v3 = new THREE.Vector3();
+    for (let i = 0; i < pos.count; i++) {
+      v3.fromBufferAttribute(pos, i);
+      
+      // Calculate twist amount based on height
+      const twistAmount = Math.sin(v3.y * 2) * 0.2;
+      
+      // Apply twist to x and z coordinates
+      v3.x += twistAmount * Math.cos(v3.y * 5);
+      v3.z += twistAmount * Math.sin(v3.y * 5);
+      
+      pos.setXYZ(i, v3.x, v3.y, v3.z);
+    }
+    
+    // Create main tornado material (orange emissive)
+    const tornadoMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff8b4d,
+      transparent: true,
+      opacity: 0.7,
+      side: THREE.DoubleSide
     });
-
-    const tornadoMesh = new THREE.Mesh(cylinderGeometry, emissiveMaterial);
-    tornadoMesh.position.y = 1;
-    tornadoGroup.add(tornadoMesh);
-    tornadoGroup.position.set(4,4,4);
+    
+    const tornado = new THREE.Mesh(geometry, tornadoMaterial);
+    tornado.position.y = height / 2;  // Center verticall
+    
+    tornadoGroup.add(tornado);
+    
+    // Create base plane effect
+    const baseGeometry = new THREE.CircleGeometry(radius * 1.5, 32);
+    const baseMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff8b4d,
+      transparent: true,
+      opacity: 0.3,
+      side: THREE.DoubleSide
+    });
+    
+    const base = new THREE.Mesh(baseGeometry, baseMaterial);
+    base.rotation.x = -Math.PI / 2; // Make it horizontal
+    base.position.y = 0;  
+    
+    tornadoGroup.add(base);
+    
+    tornadoGroup.lookAt(0,0,0);
+    tornadoGroup.scale.set(0.2, -0.2, 0.2);
+    tornadoGroup.rotateX(Math.PI/2);
+    
     this.scene.add(tornadoGroup);
-}
-*/
+    
+    // Add animation function
+    this.animateFunctions.push(() => {
+      const rotationSpeed = 0.08;
+      tornado.rotation.y += rotationSpeed;
+      
+      
+      // Add slight pulsing effect
+      const pulse = Math.sin(Date.now() * 0.001) * 0.05 + 1;
+      tornado.scale.set(pulse, pulse, pulse);
+      
+    });
+  }
 
 
   /**
@@ -412,25 +469,6 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     
     satellite.animationParams.periodSeconds = result.periodSeconds;
     satellite.animationParams.orbitPoints = result.points3D;
-  }
-
-  /**
-    * Create the satellite's orbit path
-    * @method createSatelliteOrbitPath
-    * @param {Object} satellite - Satellite object
-    */
-  private createSatelliteOrbitPath(satellite: any): void {
-    const geometry = new THREE.BufferGeometry().setFromPoints(satellite.animationParams.orbitPoints);
-    const material = new THREE.LineBasicMaterial({
-      color: satellite.color,
-      transparent: true,
-      opacity: 0.8
-    });
-    
-    const orbitPath = new THREE.Line(geometry, material);
-    this.scene.add(orbitPath);
-    satellite.orbitPath = orbitPath;
-    this.orbitPaths.push(orbitPath);
   }
 
 
@@ -610,8 +648,10 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     if (this.clouds) {
       this.clouds.rotation.y += 0.00002;
     }
-    
+    this.animateFunctions.forEach(fn => fn());
+
     this.controls.update();
+    
     this.renderer.render(this.scene, this.camera);
   }
 }

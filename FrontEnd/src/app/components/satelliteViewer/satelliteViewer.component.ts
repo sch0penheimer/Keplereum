@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
+import FromLatLongToXYZ from './utils/FromLatLongToXYZ'
 import { loadSatelliteModel,
   calculateSatelliteOrbitalTrajectory,
   createSatelliteOrbitPath, 
@@ -106,7 +106,9 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     this.createStars();
     this.setupUI();
     this.addEventListeners();
-    this.createTornado(3,2,4);
+
+    //Ensias Latitude & Longitude
+    this.createTornado(33.984376,-6.867138);
     
     //** Load satellites from JSON **//
     this.loadSatellitesFromJSON(this.satellitesData);
@@ -368,13 +370,16 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
   }
 
 
-  private createTornado(positionX: number , positionY: number , positionZ: number=4): void {
+  private createTornado(latitude: number , longitude: number ): void {
     // Tornado parameters
+    
+    const [positionX,positionY,positionZ]= FromLatLongToXYZ(latitude,longitude);
+    
     const height = 3;
     const radius = 1.4;
     const segments = 60;
     const tornadoGroup = new THREE.Group();
-    tornadoGroup.position.set(positionX, positionY, positionZ+0.04);
+    tornadoGroup.position.set(positionX, positionY, positionZ);
 
     
     // Create twisted cylinder geometry
@@ -432,7 +437,8 @@ export class SatelliteViewerComponent implements OnInit, AfterViewInit {
     tornadoGroup.add(base);
     
     tornadoGroup.lookAt(0,0,0);
-    tornadoGroup.scale.set(0.2, -0.2, 0.2);
+    
+    tornadoGroup.scale.set(0.1, -0.1, 0.1);
     tornadoGroup.rotateX(Math.PI/2);
     
     this.scene.add(tornadoGroup);

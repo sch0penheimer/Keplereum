@@ -1,157 +1,256 @@
-
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import SatelliteWindow from "./SatelliteWindow";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { useSatelliteContext } from "@/contexts/SatelliteContext";
 
-const PolarPlotContent = () => {
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 4;
+
+const PassPredictionsContent = () => {
   const { selectedSatellite } = useSatelliteContext();
-  const [trackPosition, setTrackPosition] = useState({ top: "40%", left: "60%" });
-  const animationFrameRef = useRef<number>();
+  const [page, setPage] = useState(1);
+  const [azimuthFormat, setAzimuthFormat] = useState("compass");
+  const [visibleOnly, setVisibleOnly] = useState(false);
+  const [passPredictions, setPassPredictions] = useState<any[]>([]);
+  const [timeSpan, setTimeSpan] = useState(10);
+  const [timeStep, setTimeStep] = useState(60);
+  const [nextUpdateTime, setNextUpdateTime] = useState(0);
   
   useEffect(() => {
-    if (!selectedSatellite || !selectedSatellite.trackData) return;
+    if (!selectedSatellite || !selectedSatellite.passPredictions) return;
     
-    let angle = 0;
-    const track = selectedSatellite.trackData;
-    const radius = 35;
+    setPassPredictions(selectedSatellite.passPredictions);
     
-    const updatePosition = () => {
-      //* Calculate position based on circular orbit *//
-      angle += 0.01;
-      const radians = angle * Math.PI / 180;
-      
-      //* Adjust radius and center position based on the track data *//
-      const adjustedRadius = radius * (track.scale.x + track.scale.y) / 2;
-      
-      //* Calculate new position *//
-      const top = `${50 - Math.cos(radians) * adjustedRadius}%`;
-      const left = `${50 + Math.sin(radians) * adjustedRadius}%`;
-      
-      setTrackPosition({ top, left });
-      
-      animationFrameRef.current = requestAnimationFrame(updatePosition);
-    };
-    
-    updatePosition();
-    
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
+    const interval = setInterval(() => {
+      if (selectedSatellite.passPredictions) {
+        const timeElapsed = timeStep;
+        
+        const updatedPredictions = selectedSatellite.passPredictions.map(pass => {
+          const riseDate = new Date(`2025-${pass.rise.date.replace(' ', '-')} ${pass.rise.time}`);
+          const setDate = new Date(`2025-${pass.set.date.replace(' ', '-')} ${pass.set.time}`);
+          
+          riseDate.setSeconds(riseDate.getSeconds() - timeElapsed);
+          setDate.setSeconds(setDate.getSeconds() - timeElapsed);
+          
+          const formatDate = (date: Date) => {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = date.toLocaleString('en-US', { month: 'short' });
+            return `${day} ${month}`;
+          };
+          
+          const formatTime = (date: Date) => {
+            return date.toLocaleTimeString('en-US', { 
+              hour: '2-digit', 
+              minute: '2-digit',
+              hour12: false
+            });
+          };
+          
+          const varyAzimuth = (az: string, deg: string) => {
+            if (az.length <= 3) {
+              const degValue = parseFloat(deg);
+              const newDegValue = degValue + (Math.random() * 2 - 1);
+              return {
+                az: az,
+                deg: `${newDegValue.toFixed(1)}°`
+              };
+            }
+            return { az, deg };
+          };
+          
+          const riseAzimuth = varyAzimuth(pass.rise.az, pass.rise.deg);
+          const setAzimuth = varyAzimuth(pass.set.az, pass.set.deg);
+          
+          return {
+            ...pass,
+            rise: {
+              date: formatDate(riseDate),
+              time: formatTime(riseDate),
+              az: riseAzimuth.az,
+              deg: riseAzimuth.deg
+            },
+            set: {
+              date: formatDate(setDate),
+              time: formatTime(setDate),
+              az: setAzimuth.az,
+              deg: setAzimuth.deg
+            }
+          };
+        });
+        
+        setPassPredictions(updatedPredictions);
+        setNextUpdateTime(timeStep);
       }
-    };
-  }, [selectedSatellite]);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [selectedSatellite, timeStep]);
   
-  if (!selectedSatellite || !selectedSatellite.trackData) {
+  useEffect(() => {
+    if (nextUpdateTime <= 0) return;
+    
+    const timer = setInterval(() => {
+      setNextUpdateTime(prev => Math.max(0, prev - 1));
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [nextUpdateTime]);
+  
+  if (!selectedSatellite || !passPredictions.length) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-sm text-gray-500">No satellite track data available</p>
+        <p className="text-sm text-gray-500">No pass prediction data available</p>
       </div>
     );
   }
   
-  const track = selectedSatellite.trackData;
+  const filteredPasses = visibleOnly 
+    ? passPredictions.filter(pass => pass.visibility === "V") 
+    : passPredictions;
+  
+  const totalPages = Math.ceil(filteredPasses.length / ITEMS_PER_PAGE);
+  const currentPageData = filteredPasses.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
   
   return (
-    <div className="relative h-full w-full bg-black overflow-hidden">
-      <div className="absolute inset-0 flex items-center justify-center">
-        {/* Concentric circles */}
-        {[0, 1, 2, 3].map((index) => (
-          <div 
-            key={index}
-            className="absolute border border-gray-700 rounded-full"
-            style={{ 
-              width: `${(index + 1) * 25}%`, 
-              height: `${(index + 1) * 25}%`,
-              opacity: 0.7
-            }}
+    <div className="p-2 h-full flex flex-col">
+      <div className="mb-3 grid grid-cols-2 gap-3">
+        <div>
+          <Label htmlFor="timeSpan" className="mb-1 text-xs block">Time Span [Days]:</Label>
+          <Input 
+            id="timeSpan" 
+            value={timeSpan} 
+            onChange={(e) => setTimeSpan(parseInt(e.target.value) || 10)}
+            className="h-8 text-sm" 
           />
-        ))}
-        
-        {/* Radial lines for directions */}
-        {["N", "NE", "E", "SE", "S", "SW", "W", "NW"].map((dir, i) => {
-          const angle = i * 45;
-          return (
-            <div 
-              key={dir}
-              className="absolute h-full w-[1px] bg-gray-700 origin-bottom"
-              style={{ 
-                transform: `translateX(-50%) rotate(${angle}deg)`,
-                opacity: 0.7
-              }}
-            />
-          );
-        })}
-        
-        {/* Direction labels */}
-        {[
-          { label: "N", top: "2%", left: "50%" },
-          { label: "NE", top: "15%", left: "85%" },
-          { label: "E", top: "50%", left: "98%" },
-          { label: "SE", top: "85%", left: "85%" },
-          { label: "S", top: "98%", left: "50%" },
-          { label: "SW", top: "85%", left: "15%" },
-          { label: "W", top: "50%", left: "2%" },
-          { label: "NW", top: "15%", left: "15%" },
-        ].map((item) => (
-          <div 
-            key={item.label}
-            className="absolute text-xs text-gray-400"
-            style={{ 
-              top: item.top, 
-              left: item.left,
-              transform: "translate(-50%, -50%)"
-            }}
-          >
-            {item.label}
-          </div>
-        ))}
-        
-        {/* Elevation labels */}
-        <div className="absolute text-[10px] text-gray-500 top-[25%] right-[46%]">30°</div>
-        <div className="absolute text-[10px] text-gray-500 top-[50%] right-[46%]">60°</div>
-        <div className="absolute text-[10px] text-gray-500 top-[75%] right-[46%]">90°</div>
-
-        {/* Satellite track based on selected satellite */}
-        <div 
-          className="absolute w-[80%] h-[80%] rounded-full border-2 border-dashed" 
-          style={{ 
-            borderColor: track.color,
-            opacity: 0.4,
-            transform: `rotate(${track.rotation}deg) scale(${track.scale.x}, ${track.scale.y})` 
-          }} 
-        />
-        
-        {/* Secondary track for visual interest */}
-        <div 
-          className="absolute w-[60%] h-[70%] rounded-full border-2 border-dashed" 
-          style={{ 
-            borderColor: track.color,
-            opacity: 0.3,
-            transform: `rotate(${-track.rotation}deg) scale(${track.scale.y}, ${track.scale.x})` 
-          }} 
-        />
-        
-        {/* Current position indicator with dynamic position */}
-        <div 
-          className="absolute h-2 w-2 rounded-full animate-pulse"
-          style={{ 
-            backgroundColor: track.color,
-            top: trackPosition.top,
-            left: trackPosition.left,
-            transition: "top 0.5s ease, left 0.5s ease"
-          }}
-        />
+        </div>
+        <div>
+          <Label htmlFor="timeStep" className="mb-1 text-xs block">Time Step [sec]:</Label>
+          <Input 
+            id="timeStep" 
+            value={timeStep} 
+            onChange={(e) => setTimeStep(parseInt(e.target.value) || 60)}
+            className="h-8 text-sm" 
+          />
+        </div>
       </div>
       
-      <div className="absolute bottom-2 left-2 text-xs text-gray-400">
-        Satellite: {selectedSatellite.name}
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Checkbox 
+            id="visibleOnly" 
+            checked={visibleOnly} 
+            onCheckedChange={(checked) => setVisibleOnly(checked as boolean)}
+          />
+          <Label htmlFor="visibleOnly" className="text-xs">Visible Only</Label>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Label htmlFor="riseSet" className="text-xs">Rise/Set Azimuth:</Label>
+          <Select 
+            value={azimuthFormat} 
+            onValueChange={setAzimuthFormat}
+          >
+            <SelectTrigger className="h-7 w-40 text-xs">
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="compass">Compass Points</SelectItem>
+              <SelectItem value="degrees">Degrees</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      <div className="flex-1 overflow-auto">
+        <table className="satellite-table w-full text-xs">
+          <thead>
+            <tr>
+              <th className="w-8">#</th>
+              <th>Rise Time</th>
+              <th>Rise Az</th>
+              <th>Set Time</th>
+              <th>Set Az</th>
+              <th>Duration</th>
+              <th className="w-6">V</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentPageData.map((pass) => (
+              <tr key={pass.id} className={pass.visibility === "V" ? "text-green-500" : ""}>
+                <td>{pass.id}</td>
+                <td>{`${pass.rise.date} ${pass.rise.time}`}</td>
+                <td>{azimuthFormat === "compass" ? pass.rise.az : pass.rise.deg}</td>
+                <td>{`${pass.set.date} ${pass.set.time}`}</td>
+                <td>{azimuthFormat === "compass" ? pass.set.az : pass.set.deg}</td>
+                <td>{pass.duration}</td>
+                <td>{pass.visibility}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
+      {totalPages > 1 && (
+        <div className="mt-3">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  className={`cursor-pointer ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
+              </PaginationItem>
+              
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink 
+                    isActive={page === i + 1}
+                    onClick={() => setPage(i + 1)}
+                    className="cursor-pointer"
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  className={`cursor-pointer ${page === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+      
+      <div className="mt-3 flex justify-between items-center">
+        <div className="text-xs">
+          Next update in: {nextUpdateTime}s
+        </div>
+        <Button variant="secondary" size="sm" className="text-xs">Go to Pass</Button>
       </div>
     </div>
   );
 };
 
-const TrackingTool1 = () => {
+const TrackingTool2 = () => {
   const { selectedSatellite } = useSatelliteContext();
   
   return (
@@ -159,7 +258,7 @@ const TrackingTool1 = () => {
       title={`Tracking Tool (${selectedSatellite ? selectedSatellite.name : "No Selection"})`} 
       className="col-span-1 row-span-2"
     >
-      <Tabs defaultValue="polar" className="h-full flex flex-col">
+      <Tabs defaultValue="pass" className="h-full flex flex-col">
         <TabsList className="bg-satellite-header rounded-none border-b border-satellite-border">
           <TabsTrigger value="basic" className="text-xs">Basic</TabsTrigger>
           <TabsTrigger value="polar" className="text-xs">Polar Plot</TabsTrigger>
@@ -168,15 +267,15 @@ const TrackingTool1 = () => {
         <TabsContent value="basic" className="flex-1 p-2">
           <p className="text-sm">Basic tracking information for {selectedSatellite?.name || "No Selection"}</p>
         </TabsContent>
-        <TabsContent value="polar" className="flex-1 m-0 p-0 data-[state=active]:h-full">
-          <PolarPlotContent />
+        <TabsContent value="polar" className="flex-1 p-2">
+          <p className="text-sm">Polar plot for {selectedSatellite?.name || "No Selection"}</p>
         </TabsContent>
-        <TabsContent value="pass" className="flex-1 p-2">
-          <p className="text-sm">Pass predictions would go here.</p>
+        <TabsContent value="pass" className="flex-1 m-0 p-0 data-[state=active]:h-full">
+          <PassPredictionsContent />
         </TabsContent>
       </Tabs>
     </SatelliteWindow>
   );
 };
 
-export default TrackingTool1;
+export default TrackingTool2;

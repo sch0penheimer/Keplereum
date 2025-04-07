@@ -1,6 +1,29 @@
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import * as THREE from 'three';
+import { 
+  calculateSatelliteOrbitalTrajectory,
+  getCurrentSatelliteTelemetry
+} from '@/utils/satelliteUtils';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import {
+  earthRadius,
+  scaleFactor
+} from "@/utils/constants"
 
+//** The telemetry interface **//
+export interface SatelliteTelemetryData {
+  property: string;
+  value: string | number;
+}
+
+//** Orbital data interface **//
+export interface OrbitalData {
+  cartesianValues: number[];
+  points3D: THREE.Vector3[];
+  periodSeconds: number;
+}
+
+//** Satellite data interface **//
 export interface SatelliteData {
   id: string;
   name: string;
@@ -13,9 +36,13 @@ export interface SatelliteData {
   speedMultiplier: number;
   maxSensorBaseRadius: number;
   maxSensorHeight: number;
-  telemetry?: {
-    [key: string]: string | number;
-  }[];
+  tleEpoch: string;
+  orbitalData?: {
+    cartesianValues: number[];
+    points3D: THREE.Vector3[];
+    periodSeconds: number;
+  };
+  telemetry?: SatelliteTelemetryData[];
   passPredictions?: {
     id: number;
     rise: { date: string; time: string; az: string; deg: string };
@@ -31,27 +58,57 @@ export interface SatelliteData {
   glbPath?:string;
 }
 
+//** Context type interface **//
 interface SatelliteContextType {
   satellites: SatelliteData[];
+  setSatellites: React.Dispatch<React.SetStateAction<SatelliteData[]>>;
   selectedSatelliteId: string;
   setSelectedSatelliteId: (id: string) => void;
   selectedSatellite: SatelliteData | null;
   groundStations: { id: number; name: string; selected: boolean }[];
   setGroundStations: React.Dispatch<React.SetStateAction<{ id: number; name: string; selected: boolean }[]>>;
+  loading: boolean;
 }
 
+//** maincontext **//
 export const SatelliteContext = createContext<SatelliteContextType>({
   satellites: [],
+  setSatellites: () => {},
   selectedSatelliteId: '',
   setSelectedSatelliteId: () => {},
   selectedSatellite: null,
   groundStations: [],
   setGroundStations: () => {},
+  loading: true
 });
 
 export const useSatelliteContext = () => useContext(SatelliteContext);
 
-// Initial satellite data with all the information needed by components
+//** Telemetry and OrbitalData placeholders data arrays (before initialization) **//
+const SatelliteTelemetryDataPlaceholder: SatelliteTelemetryData[] = [
+  { property: "TLE Age [days]", value: "" },
+  { property: "Latitude [deg]", value: "" },
+  { property: "Longitude [deg]", value: "" },
+  { property: "Altitude [m]", value: "" },
+  { property: "x [m]", value: "" },
+  { property: "y [m]", value: "" },
+  { property: "z [m]", value: "" },
+  { property: "dx/dt [m/s]", value: "" },
+  { property: "dy/dt [m/s]", value: "" },
+  { property: "dz/dt [m/s]", value: "" },
+  { property: "Semimajor axis (a) [m]", value: "" },
+  { property: "Eccentricity (e)", value: "" },
+  { property: "Inclination (i) [deg]", value: "" },
+  { property: "RAAN [deg]", value: "" }
+];
+
+const OrbitalDataPlaceholder: OrbitalData = {
+  cartesianValues: [],
+  points3D: [],
+  periodSeconds: NaN,
+};
+
+//** Initial satellite data (Dummy as in to be FETCHED) **//
 const initialSatellitesData: SatelliteData[] = [
   {
     id: "sat-1",
@@ -65,29 +122,13 @@ const initialSatellitesData: SatelliteData[] = [
     speedMultiplier: 20,
     maxSensorBaseRadius: 0.9,
     maxSensorHeight: 2.3,
-    telemetry: [
-      { property: "TLE Age [days]", value: "0.00783712139845" },
-      { property: "Latitude [deg]", value: "-11.296602968423622" },
-      { property: "Longitude [deg]", value: "81.50832996989672" },
-      { property: "Altitude [m]", value: "707755.7803755393" },
-      { property: "Position: J2000", value: "" },
-      { property: "x [m]", value: "6873754.353686401" },
-      { property: "y [m]", value: "1010064.48018664" },
-      { property: "z [m]", value: "-1389098.6635943877" },
-      { property: "Velocity: J2000", value: "" },
-      { property: "dx/dt [m/s]", value: "-1274.1465604729071" },
-      { property: "dy/dt [m/s]", value: "-1287.115418884501" },
-      { property: "dz/dt [m/s]", value: "-7279.2769434856" },
-      { property: "Keplarian Elem. (Osc / J...)", value: "" },
-      { property: "Semimajor axis (a) [m]", value: "7086190.836970952" },
-      { property: "Eccentricity (e)", value: "0.00101686175972369" },
-      { property: "Inclination (i) [deg]", value: "98.17833532275806" },
-      { property: "RAAN [deg]", value: "-169.99389095640146" },
-    ],
+    orbitalData: OrbitalDataPlaceholder,
+    telemetry: SatelliteTelemetryDataPlaceholder,
+    tleEpoch: "2025-04-01T00:00:00Z",
     trackData: {
       color: "green",
       rotation: 30,
-      scale: { x: 0.8, y: 1 }
+      scale: { x: 0.8, y: 1 },
     },
     passPredictions: [
       { id: 1, rise: { date: "04 Apr", time: "15:30", az: "E", deg: "47.5°" }, set: { date: "04 Apr", time: "15:45", az: "N", deg: "32.1°" }, duration: "407.553", visibility: "R" },
@@ -111,25 +152,9 @@ const initialSatellitesData: SatelliteData[] = [
     speedMultiplier: 20,
     maxSensorBaseRadius: 0.9,
     maxSensorHeight: 3.5,
-    telemetry: [
-      { property: "TLE Age [days]", value: "0.00654328574231" },
-      { property: "Latitude [deg]", value: "-9.187354298743521" },
-      { property: "Longitude [deg]", value: "85.32784326784532" },
-      { property: "Altitude [m]", value: "705325.4587235623" },
-      { property: "Position: J2000", value: "" },
-      { property: "x [m]", value: "6823124.234769401" },
-      { property: "y [m]", value: "1104364.98714664" },
-      { property: "z [m]", value: "-1289645.9475943877" },
-      { property: "Velocity: J2000", value: "" },
-      { property: "dx/dt [m/s]", value: "-1298.7645604729071" },
-      { property: "dy/dt [m/s]", value: "-1302.385418884501" },
-      { property: "dz/dt [m/s]", value: "-7298.2865434856" },
-      { property: "Keplarian Elem. (Osc / J...)", value: "" },
-      { property: "Semimajor axis (a) [m]", value: "7082165.834770952" },
-      { property: "Eccentricity (e)", value: "0.00098746175972369" },
-      { property: "Inclination (i) [deg]", value: "98.21763532275806" },
-      { property: "RAAN [deg]", value: "-170.12389095640146" },
-    ],
+    orbitalData: OrbitalDataPlaceholder,
+    telemetry: SatelliteTelemetryDataPlaceholder,
+    tleEpoch: "2025-04-01T00:00:00Z",
     trackData: {
       color: "blue",
       rotation: -15,
@@ -155,25 +180,9 @@ const initialSatellitesData: SatelliteData[] = [
     speedMultiplier: 20,
     maxSensorBaseRadius: 0.9,
     maxSensorHeight: 2.3,
-    telemetry: [
-      { property: "TLE Age [days]", value: "0.00894726139845" },
-      { property: "Latitude [deg]", value: "-12.156602968423622" },
-      { property: "Longitude [deg]", value: "79.87832996989672" },
-      { property: "Altitude [m]", value: "703755.7803755393" },
-      { property: "Position: J2000", value: "" },
-      { property: "x [m]", value: "6873754.353686401" },
-      { property: "y [m]", value: "1010064.48018664" },
-      { property: "z [m]", value: "-1389098.6635943877" },
-      { property: "Velocity: J2000", value: "" },
-      { property: "dx/dt [m/s]", value: "-1289.1465604729071" },
-      { property: "dy/dt [m/s]", value: "-1276.115418884501" },
-      { property: "dz/dt [m/s]", value: "-7274.2769434856" },
-      { property: "Keplarian Elem. (Osc / J...)", value: "" },
-      { property: "Semimajor axis (a) [m]", value: "7056190.836970952" },
-      { property: "Eccentricity (e)", value: "0.00112686175972369" },
-      { property: "Inclination (i) [deg]", value: "97.98833532275806" },
-      { property: "RAAN [deg]", value: "-168.99389095640146" },
-    ],
+    orbitalData: OrbitalDataPlaceholder,
+    telemetry: SatelliteTelemetryDataPlaceholder,
+    tleEpoch: "2025-04-01T00:00:00Z",
     trackData: {
       color: "purple",
       rotation: 45,
@@ -188,50 +197,6 @@ const initialSatellitesData: SatelliteData[] = [
   },
   {
     id: "sat-4",
-    name: "CLOUDSAT",
-    color: "#00ff00",
-    perigeeAltitude: 500,
-    eccentricity: 0.1,
-    inclination: 45,
-    longitudeOfAscendingNode: 0,
-    argumentOfPeriapsis: 0,
-    speedMultiplier: 20,
-    maxSensorBaseRadius: 0.9,
-    maxSensorHeight: 2.3,
-    telemetry: [
-      { property: "TLE Age [days]", value: "0.00642712139845" },
-      { property: "Latitude [deg]", value: "-10.876602968423622" },
-      { property: "Longitude [deg]", value: "82.10832996989672" },
-      { property: "Altitude [m]", value: "712755.7803755393" },
-      { property: "Position: J2000", value: "" },
-      { property: "x [m]", value: "6913754.353686401" },
-      { property: "y [m]", value: "1020064.48018664" },
-      { property: "z [m]", value: "-1369098.6635943877" },
-      { property: "Velocity: J2000", value: "" },
-      { property: "dx/dt [m/s]", value: "-1264.1465604729071" },
-      { property: "dy/dt [m/s]", value: "-1297.115418884501" },
-      { property: "dz/dt [m/s]", value: "-7259.2769434856" },
-      { property: "Keplarian Elem. (Osc / J...)", value: "" },
-      { property: "Semimajor axis (a) [m]", value: "7176190.836970952" },
-      { property: "Eccentricity (e)", value: "0.00091686175972369" },
-      { property: "Inclination (i) [deg]", value: "98.27833532275806" },
-      { property: "RAAN [deg]", value: "-171.99389095640146" },
-    ],
-    trackData: {
-      color: "cyan",
-      rotation: 10,
-      scale: { x: 0.75, y: 0.9 }
-    },
-    passPredictions: [
-      { id: 1, rise: { date: "04 Apr", time: "15:10", az: "SE", deg: "49.7°" }, set: { date: "04 Apr", time: "15:27", az: "NE", deg: "43.2°" }, duration: "479.154", visibility: "R" },
-      { id: 2, rise: { date: "04 Apr", time: "16:55", az: "S", deg: "36.1°" }, set: { date: "04 Apr", time: "17:12", az: "N", deg: "39.4°" }, duration: "435.627", visibility: "R" },
-      { id: 3, rise: { date: "05 Apr", time: "04:40", az: "E", deg: "51.5°" }, set: { date: "05 Apr", time: "05:00", az: "W", deg: "55.8°" }, duration: "578.942", visibility: "V" },
-      { id: 4, rise: { date: "05 Apr", time: "06:25", az: "NE", deg: "34.8°" }, set: { date: "05 Apr", time: "06:42", az: "SE", deg: "39.1°" }, duration: "451.376", visibility: "V" },
-      { id: 5, rise: { date: "05 Apr", time: "08:10", az: "N", deg: "57.3°" }, set: { date: "05 Apr", time: "08:30", az: "S", deg: "61.6°" }, duration: "615.789", visibility: "V" },
-    ]
-  },
-  {
-    id: "sat-5",
     name: "GCOM-W1 (SHIZUKU)",
     color: "#ff8c00",
     perigeeAltitude: 700,
@@ -242,25 +207,9 @@ const initialSatellitesData: SatelliteData[] = [
     speedMultiplier: 20,
     maxSensorBaseRadius: 0.9,
     maxSensorHeight: 2.3,
-    telemetry: [
-      { property: "TLE Age [days]", value: "0.00983712139845" },
-      { property: "Latitude [deg]", value: "-13.296602968423622" },
-      { property: "Longitude [deg]", value: "78.50832996989672" },
-      { property: "Altitude [m]", value: "698755.7803755393" },
-      { property: "Position: J2000", value: "" },
-      { property: "x [m]", value: "6773754.353686401" },
-      { property: "y [m]", value: "1110064.48018664" },
-      { property: "z [m]", value: "-1489098.6635943877" },
-      { property: "Velocity: J2000", value: "" },
-      { property: "dx/dt [m/s]", value: "-1284.1465604729071" },
-      { property: "dy/dt [m/s]", value: "-1277.115418884501" },
-      { property: "dz/dt [m/s]", value: "-7289.2769434856" },
-      { property: "Keplarian Elem. (Osc / J...)", value: "" },
-      { property: "Semimajor axis (a) [m]", value: "6986190.836970952" },
-      { property: "Eccentricity (e)", value: "0.00121686175972369" },
-      { property: "Inclination (i) [deg]", value: "97.87833532275806" },
-      { property: "RAAN [deg]", value: "-168.79389095640146" },
-    ],
+    orbitalData: OrbitalDataPlaceholder,
+    telemetry: SatelliteTelemetryDataPlaceholder,
+    tleEpoch: "2025-04-01T00:00:00Z",
     trackData: {
       color: "orange",
       rotation: -30,
@@ -276,26 +225,76 @@ const initialSatellitesData: SatelliteData[] = [
   },
 ];
 
+//** Initial ground stations (One as in the curretly logged IN) **//
 const initialGroundStations = [
   { id: 1, name: "KLC", selected: true }
 ];
 
+const loadInitialSatellites = async (): Promise<SatelliteData[]> => {
+  const satellites = initialSatellitesData.map(satellite => {
+    const result = calculateSatelliteOrbitalTrajectory(
+      satellite.perigeeAltitude,
+      satellite.eccentricity,
+      satellite.inclination,
+      satellite.longitudeOfAscendingNode,
+      satellite.argumentOfPeriapsis,
+      earthRadius,
+      scaleFactor
+    );
+
+    const telemetry = getCurrentSatelliteTelemetry({
+      ...satellite,
+      orbitalData: {
+        cartesianValues: result.cartesianValues,
+        points3D: result.points3D,
+        periodSeconds: result.periodSeconds,
+      },
+    });
+
+    return {
+      ...satellite,
+      orbitalData: {
+        cartesianValues: result.cartesianValues,
+        points3D: result.points3D,
+        periodSeconds: result.periodSeconds,
+      },
+      telemetry,
+    };
+  });
+
+  return satellites;
+};
+
+//** Provider main functional component **//
 export const SatelliteProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [satellites] = useState<SatelliteData[]>(initialSatellitesData);
+  const [satellites, setSatellites] = useState<SatelliteData[]>([]);
   const [selectedSatelliteId, setSelectedSatelliteId] = useState<string>("sat-1");
   const [groundStations, setGroundStations] = useState(initialGroundStations);
 
   const selectedSatellite = satellites.find(sat => sat.id === selectedSatelliteId) || null;
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const initializeSatellites = async () => {
+      const initializedSatellites = await loadInitialSatellites();
+      setSatellites(initializedSatellites);
+      setLoading(false);
+    };
+
+    initializeSatellites();
+  }, []);
 
   return (
-    <SatelliteContext.Provider 
-      value={{ 
-        satellites, 
-        selectedSatelliteId, 
+    <SatelliteContext.Provider
+      value={{
+        satellites,
+        setSatellites,
+        selectedSatelliteId,
         setSelectedSatelliteId,
         selectedSatellite,
         groundStations,
-        setGroundStations
+        setGroundStations,
+        loading,
       }}
     >
       {children}

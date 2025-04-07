@@ -8,7 +8,7 @@ const Earth3DWindow = () => {
   const { selectedSatellite } = useSatelliteContext();
   const containerRef = useRef<HTMLDivElement>(null);
   
-  //** Resize Hnadling for Proper Scaling **//
+  //** Resize handling **//
   useEffect(() => {
     const handleResize = () => {
       window.dispatchEvent(new Event('resize'));

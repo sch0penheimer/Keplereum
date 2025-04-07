@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import SatelliteWindow from "./SatelliteWindow";
 import { useSatelliteContext } from "@/contexts/SatelliteContext";
+import SatellitePreviewer from "./SatellitePreviewer";
 
 const InfoComponent = () => {
   const { selectedSatellite } = useSatelliteContext();
@@ -55,6 +56,7 @@ const InfoComponent = () => {
   return (
     <SatelliteWindow title={selectedSatellite.name} className="col-span-1 row-span-1">
       <div className="h-full overflow-y-auto">
+      <SatellitePreviewer/>
         <table className="satellite-table w-full">
           <thead>
             <tr>

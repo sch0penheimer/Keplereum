@@ -28,6 +28,7 @@ export interface SatelliteData {
     rotation: number;
     scale: { x: number; y: number };
   };
+  glbPath?:string;
 }
 
 interface SatelliteContextType {
@@ -95,7 +96,8 @@ const initialSatellitesData: SatelliteData[] = [
       { id: 4, rise: { date: "05 Apr", time: "05:30", az: "ENE", deg: "42.3°" }, set: { date: "05 Apr", time: "05:48", az: "ESE", deg: "39.6°" }, duration: "245.183", visibility: "V" },
       { id: 5, rise: { date: "05 Apr", time: "07:15", az: "NNE", deg: "57.1°" }, set: { date: "05 Apr", time: "07:35", az: "S", deg: "62.8°" }, duration: "569.649", visibility: "V" },
       { id: 6, rise: { date: "05 Apr", time: "09:00", az: "N", deg: "31.4°" }, set: { date: "05 Apr", time: "09:18", az: "WSW", deg: "27.9°" }, duration: "485.170", visibility: "V" },
-    ]
+    ],
+    glbPath:"main-sat.glb"
   },
   {
     id: "sat-2",

@@ -7,16 +7,18 @@ const Earth2DWindow = () => {
   const { selectedSatellite } = useSatelliteContext();
   const containerRef = useRef<HTMLDivElement>(null);
   
-  //** Resize Hnadling for Proper Scaling **//
+  /** Resize Hnadling for Proper Scaling */
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
+        window.addEventListener('resize', handleResize);
+        
       }
     };
-    
-    window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    
+  }, []); 
+  
   
   return (
     <SatelliteWindow title="2D Earth Window" className="col-span-2 row-span-1">

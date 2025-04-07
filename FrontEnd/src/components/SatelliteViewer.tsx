@@ -8,11 +8,18 @@ import FromLatLongToXYZ from '../utils/FromLatLongToXYZ';
 import { useSatelliteContext } from '@/contexts/SatelliteContext';
 import {
   loadSatelliteModel,
-  calculateSatelliteOrbitalTrajectory,
   createSatelliteOrbitPath,
   updateSatellitePosition
 } from '../utils/satelliteUtils';
 
+import { 
+  satelliteModelPath,
+  earthRadiusSceneUnits
+} from '@/utils/constants';
+
+/**
+ * SatelliteObject interface defines the structure of a satellite object in the 3D scene.
+ */
 interface SatelliteObject {
   id: string;
   name: string;
@@ -39,16 +46,18 @@ interface SatelliteObject {
   labelBaseScale: { x: number; y: number; z: number };
 }
 
+/** SatelliteViewer functional component renders a 3D satellite viewer using Three.js. **/
 export default function SatelliteViewer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
-  const { satellites, selectedSatelliteId, setSelectedSatelliteId } = useSatelliteContext();
+  const { satellites, selectedSatelliteId, setSelectedSatelliteId, setSatellites } = useSatelliteContext();
   const [cameraTrackingEnabled, setCameraTrackingEnabled] = useState(true);
   const isTrackingSatellite = useRef(false);
   const previousSelectedId = useRef<string | null>(null);
   const initialCameraPosition = useRef<THREE.Vector3 | null>(null);
   const initialControlsTarget = useRef<THREE.Vector3 | null>(null);
   const cameraTransitionInProgress = useRef(false);
+  const currentlyTrackedSatelliteId = useRef<string | null>(null);
 
   //** Three.js objects **//
   const scene = useRef(new THREE.Scene());
@@ -59,20 +68,12 @@ export default function SatelliteViewer() {
   const animateFunctions = useRef<(() => void)[]>([]);
   const controls = useRef<OrbitControls>();
 
-  
   //* Earth related objects *//
   const earth = useRef<THREE.Mesh>();
   const clouds = useRef<THREE.Mesh>();
   const stars = useRef<THREE.Points>();
   const satelliteObjects = useRef<SatelliteObject[]>([]);
   const orbitPaths = useRef<THREE.Line[]>([]);
-  
-
-  //* Constants *//
-  const earthRadius = 6371;
-  const earthRadiusSceneUnits = 4;
-  const scaleFactor = earthRadiusSceneUnits / earthRadius;
-  const satelliteModelPath = 'main-sat.glb';
 
   //* Reset camera to initial position *//
   const resetCamera = () => {
@@ -105,6 +106,7 @@ export default function SatelliteViewer() {
         requestAnimationFrame(animate);
       } else {
         isTrackingSatellite.current = false;
+        currentlyTrackedSatelliteId.current = null;
         cameraTransitionInProgress.current = false;
       }
     };
@@ -148,6 +150,7 @@ export default function SatelliteViewer() {
       return;
     }
 
+    // Only handle camera transitions when selection changes
     if (previousSelectedId.current !== selectedSatelliteId) {
       previousSelectedId.current = selectedSatelliteId;
       
@@ -174,23 +177,20 @@ export default function SatelliteViewer() {
         if (cameraTransitionInProgress.current) return;
         
         cameraTransitionInProgress.current = true;
-        
-        //**** Start tracking the selected satellite ****//
         isTrackingSatellite.current = true;
+
+        currentlyTrackedSatelliteId.current = selectedSatelliteId;
         
         const satellitePosition = selectedObject.group.position.clone();
         const distanceVector = new THREE.Vector3(0, 0, 1);
-        
-        //* Position camera to look at satellite from a distance *//
-        const cameraTarget = satellitePosition.clone();
         
         //* Move the camera to the new position with smooth transition *//
         const startPosition = camera.current.position.clone();
         const endPosition = satellitePosition.clone().add(distanceVector);
         const startTarget = controls.current.target.clone();
-        const endTarget = cameraTarget;
+        const endTarget = satellitePosition.clone();
         
-        const duration = 1000; // ms
+        const duration = 1000;
         const startTime = Date.now();
         
         const animate = () => {
@@ -214,6 +214,11 @@ export default function SatelliteViewer() {
     }
   }, [selectedSatelliteId, cameraTrackingEnabled]);
 
+  //*********************************************************************************************//
+
+  /**
+   * Initializes the Three.js renderer, camera, and controls.
+   */
   const initThreeJS = () => {
     if (!containerRef.current) return;
 
@@ -246,6 +251,9 @@ export default function SatelliteViewer() {
     initialControlsTarget.current = controls.current.target.clone();
   };
 
+  /**
+   * Sets up the scene with lights, Earth, stars, and tornado.
+   */
   const setupScene = () => {
     const ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.current.add(ambientLight);
@@ -255,6 +263,9 @@ export default function SatelliteViewer() {
     animate();
   };
 
+  /**
+   * Creates the Earth mesh with textures and a cloud layer.
+   */
   const createEarth = () => {
     const earthGeometry = new THREE.SphereGeometry(earthRadiusSceneUnits, 64, 64);
   
@@ -288,6 +299,9 @@ export default function SatelliteViewer() {
     scene.current.add(clouds.current);
   };
 
+  /**
+   * Creates a star field in the scene.
+   */
   const createStars = () => {
     const starsGeometry = new THREE.BufferGeometry();
     const starsMaterial = new THREE.PointsMaterial({
@@ -309,6 +323,9 @@ export default function SatelliteViewer() {
     scene.current.add(stars.current);
   };
 
+  /**
+   * Loads initial satellites into the scene.
+   */
   const loadInitialSatellites = () => {
     satellites.forEach((data, index) => {
       createSatellite(data, index, satellites.length);
@@ -316,6 +333,12 @@ export default function SatelliteViewer() {
     setLoading(false);
   };
   
+  /**
+   * Creates a satellite object and adds it to the scene.
+   * @param data - Satellite data from context.
+   * @param index - Index of the satellite in the array.
+   * @param total - Total number of satellites.
+   */
   const createSatellite = (data: any, index: number, total: number) => {
     const satellite: SatelliteObject = {
       id: data.id,
@@ -327,14 +350,14 @@ export default function SatelliteViewer() {
         inclination: data.inclination,
         longitudeOfAscendingNode: data.longitudeOfAscendingNode,
         argumentOfPeriapsis: data.argumentOfPeriapsis,
-        speedMultiplier: data.speedMultiplier,
-        maxSensorBaseRadius: data.maxSensorBaseRadius || 0.9,
-        maxSensorHeight: data.maxSensorHeight || 2.3
+        maxSensorBaseRadius: data.maxSensorBaseRadius,
+        maxSensorHeight: data.maxSensorHeight,
+        speedMultiplier: data.speedMultiplier
       },
       animationParams: {
-        currentTime: 0,
-        periodSeconds: 0,
-        orbitPoints: []
+        currentTime: Date.now() / 1000,
+        periodSeconds: data.orbitalData.periodSeconds,
+        orbitPoints: data.orbitalData.points3D
       },
       color: parseInt(data.color.replace('#', '0x')),
       highlight: null,
@@ -406,20 +429,10 @@ export default function SatelliteViewer() {
     satellite.label.scale.set(2, 0.8, 1);
     satellite.labelBaseScale = { x: 2, y: 0.8, z: 1 };
     satellite.group.add(satellite.label);
-  
-    //* Orbit Calculation *//
-    const result = calculateSatelliteOrbitalTrajectory(
-      satellite.orbitParams.perigeeAltitude,
-      satellite.orbitParams.eccentricity,
-      satellite.orbitParams.inclination,
-      satellite.orbitParams.longitudeOfAscendingNode,
-      satellite.orbitParams.argumentOfPeriapsis,
-      earthRadius,
-      scaleFactor
-    );
     
-    satellite.animationParams.periodSeconds = result.periodSeconds;
-    satellite.animationParams.orbitPoints = result.points3D;
+    
+    satellite.animationParams.periodSeconds = data.orbitalData.periodSeconds;
+    satellite.animationParams.orbitPoints = data.orbitalData.points3D;
   
     //* Create orbit path *//
     createSatelliteOrbitPath(satellite, scene.current, orbitPaths.current);
@@ -436,6 +449,9 @@ export default function SatelliteViewer() {
     updateSensorCone(satellite);
   };
   
+  /**
+   * Animation loop for the scene.
+   */
   const animate = () => {
     if (!renderer.current || !camera.current) return;
   
@@ -452,20 +468,31 @@ export default function SatelliteViewer() {
       controls.current.update();
     }
     
-    //* If tracking a satellite, update camera position to follow it *//
-    if (isTrackingSatellite.current && cameraTrackingEnabled && selectedSatelliteId && !cameraTransitionInProgress.current) {
-      const selectedObject = satelliteObjects.current.find(sat => sat.id === selectedSatelliteId);
+    if (isTrackingSatellite.current && cameraTrackingEnabled && currentlyTrackedSatelliteId.current && !cameraTransitionInProgress.current) {
+      const selectedObject = satelliteObjects.current.find(sat => sat.id === currentlyTrackedSatelliteId.current);
+
+      
       if (selectedObject && controls.current) {
         controls.current.target.copy(selectedObject.group.position);
+        
+        const offsetDistance = 2;
+        const directionToCamera = camera.current.position.clone().sub(controls.current.target).normalize();
+        const newCameraPosition = selectedObject.group.position.clone().add(directionToCamera.multiplyScalar(offsetDistance));
+        
+        camera.current.position.lerp(newCameraPosition, 0.05);
       }
     }
   
     renderer.current.render(scene.current, camera.current);
   };
   
+  /**
+   * Updates the position and orientation of all satellites in the scene.
+   */
   const updateSatellites = () => {
     satelliteObjects.current.forEach(satellite => {
-      satellite.animationParams.currentTime += 0.016 * satellite.orbitParams.speedMultiplier;
+      satellite.animationParams.currentTime = (Date.now() / 1000) * satellite.orbitParams.speedMultiplier;
+      
       updateSatellitePosition(satellite);
       updateSatelliteOrientation(satellite);
       updateSensorCone(satellite);
@@ -473,6 +500,11 @@ export default function SatelliteViewer() {
     });
   };
 
+  /**
+   * Creates a tornado effect at the specified latitude and longitude.
+   * @param latitude - Latitude of the tornado location.
+   * @param longitude - Longitude of the tornado location.
+   */
   const createTornado = (latitude: number, longitude: number) => {
     const [positionX, positionY, positionZ] = FromLatLongToXYZ(latitude, longitude);
     
@@ -532,11 +564,19 @@ export default function SatelliteViewer() {
     });
   };
   
+  /**
+   * Updates the orientation of the satellite to face the Earth.
+   * @param satellite - The satellite object to update.
+   */
   const updateSatelliteOrientation = (satellite: SatelliteObject) => {
     if (!satellite.group || !satellite.group.position) return;
     satellite.group.lookAt(0, 0, 0);
   };
   
+  /**
+   * Updates the sensor cone of the satellite based on its position and altitude.
+   * @param satellite - The satellite object to update.
+   */
   const updateSensorCone = (satellite: SatelliteObject) => {
     if (!satellite.sensorCone) return;
   
@@ -559,6 +599,10 @@ export default function SatelliteViewer() {
     );
   };
   
+  /**
+   * Updates the label of the satellite based on its distance from the camera.
+   * @param satellite - The satellite object to update.
+   */
   const updateSatelliteLabel = (satellite: SatelliteObject) => {
     if (!satellite.label || !satellite.labelBaseScale || !camera.current) return;
     
@@ -587,10 +631,9 @@ export default function SatelliteViewer() {
           onClick={() => {
             setCameraTrackingEnabled(!cameraTrackingEnabled);
             if (!cameraTrackingEnabled && selectedSatelliteId) {
-              //* If turning tracking back on, focus on the selected satellite *//
               isTrackingSatellite.current = true;
+              currentlyTrackedSatelliteId.current = selectedSatelliteId;
             } else if (cameraTrackingEnabled) {
-              //* If turning tracking off, reset camera to Earth view *//
               resetCamera();
             }
           }}

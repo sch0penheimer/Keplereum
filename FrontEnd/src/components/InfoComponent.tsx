@@ -1,80 +1,66 @@
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import SatelliteWindow from "./SatelliteWindow";
 import { useSatelliteContext } from "@/contexts/SatelliteContext";
+import {
+  getCurrentSatelliteTelemetry
+} from "@/utils/satelliteUtils";
 
 const InfoComponent = () => {
-  const { selectedSatellite } = useSatelliteContext();
-  const [telemetryData, setTelemetryData] = useState<{property: string, value: string | number}[]>([]);
+  const { selectedSatellite, setSatellites} = useSatelliteContext();
+  const [telemetryData, setTelemetryData] = useState<{ property: string; value: string | number }[]>([]);
   
-  //** Updating Telemetry Data at 500ms intervals to simulate real-time updates **//
   useEffect(() => {
-    if (!selectedSatellite) return;
-    
-    setTelemetryData(selectedSatellite.telemetry || []);
-    
-    const interval = setInterval(() => {
-      if (selectedSatellite && selectedSatellite.telemetry) {
-        //** Clone telemetry data and update values to simulate real-time changes **/
-        const updatedTelemetry = selectedSatellite.telemetry.map(item => {
-          if (typeof item.value === 'string' && !isNaN(parseFloat(item.value as string))) {
-            //** For numeric values stored as strings, added small variations **//
-            const value = parseFloat(item.value as string);
-            const variation = value * 0.0005 * (Math.random() > 0.5 ? 1 : -1);
-            return {
-              ...item,
-              value: (value + variation).toFixed(12)
-            };
-          } else if (typeof item.value === 'number') {
-            const variation = item.value * 0.0005 * (Math.random() > 0.5 ? 1 : -1);
-            return {
-              ...item,
-              value: parseFloat((item.value + variation).toFixed(12))
-            };
-          }
-          return item;
-        });
-        
+    let intervalId: NodeJS.Timeout | null = null;
+
+    if (selectedSatellite) {
+      intervalId = setInterval(() => {
+        const updatedTelemetry = getCurrentSatelliteTelemetry(selectedSatellite);
+
+        setSatellites((prevSatellites) =>
+          prevSatellites.map((satellite) =>
+            satellite.id === selectedSatellite.id
+              ? { ...satellite, telemetry: updatedTelemetry }
+              : satellite
+          )
+        );
+
         setTelemetryData(updatedTelemetry);
-      }
-    }, 500);
-    
-    return () => clearInterval(interval);
-  }, [selectedSatellite]);
-  
-  if (!selectedSatellite) {
-    return (
-      <SatelliteWindow title="Satellite Information" className="col-span-1 row-span-1">
-        <div className="h-full flex items-center justify-center">
-          <p className="text-sm text-gray-500">No satellite selected</p>
-        </div>
-      </SatelliteWindow>
-    );
-  }
+      }, 200);
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [selectedSatellite, setSatellites]);
 
   return (
-    <SatelliteWindow title={selectedSatellite.name} className="col-span-1 row-span-1">
-      <div className="h-full overflow-y-auto">
-        <table className="satellite-table w-full">
-          <thead>
-            <tr>
-              <th className="w-1/2">Property</th>
-              <th className="w-1/2">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {telemetryData.map((item, index) => (
-              <tr key={index}>
-                <td className={item.property.toString().includes(":") ? "font-bold" : ""}>
-                  {item.property}
-                </td>
-                <td className={item.value ? "font-mono" : ""}>
-                  {item.value ? item.value.toString() : ""}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <SatelliteWindow title="Satellite Info" className="col-span-1 row-span-1">
+      <div className="p-2 h-full overflow-auto">
+        {selectedSatellite ? (
+          <div className="space-y-2">
+            <div className="p-1 pl-3 bg-satellite-dark-accent rounded">
+              <h3 className="text-xs font-medium text-satellite-highlight">{selectedSatellite.name} Telemetry</h3>
+            </div>
+            <div className="text-xs space-y-1">
+              {telemetryData.map((item, index) => (
+                <div 
+                  key={index} 
+                  className={`flex justify-between p-1 ${
+                    index % 2 === 0 ? 'bg-satellite-dark-accent/30' : ''
+                  }`}
+                >
+                  <span className="text-gray-400">{item.property}</span>
+                  <span className="text-satellite-text font-mono">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="h-full flex items-center justify-center text-gray-500 text-sm">
+            No satellite selected
+          </div>
+        )}
       </div>
     </SatelliteWindow>
   );

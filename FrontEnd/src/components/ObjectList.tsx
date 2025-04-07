@@ -1,5 +1,3 @@
-
-import React from "react";
 import SatelliteWindow from "./SatelliteWindow";
 import { Satellite, MapPin } from "lucide-react";
 import { useSatelliteContext } from "@/contexts/SatelliteContext";

@@ -11,12 +11,14 @@ const Earth2DWindow = () => {
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
+        window.addEventListener('resize', handleResize);
+        
       }
     };
-    
-    window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    
+  }, []); 
+  
   
   return (
     <SatelliteWindow title="2D Earth Window" className="col-span-2 row-span-1">

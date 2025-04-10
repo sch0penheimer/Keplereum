@@ -1,256 +1,390 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SatelliteWindow from "./SatelliteWindow";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { useSatelliteContext } from "@/contexts/SatelliteContext";
+import { propagateState, initializeSatelliteState, getSatelliteState } from "@/utils/polarCoordinates";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-
-const ITEMS_PER_PAGE = 4;
-
-const PassPredictionsContent = () => {
+const PolarPlotContent = () => {
   const { selectedSatellite } = useSatelliteContext();
-  const [page, setPage] = useState(1);
-  const [azimuthFormat, setAzimuthFormat] = useState("compass");
-  const [visibleOnly, setVisibleOnly] = useState(false);
-  const [passPredictions, setPassPredictions] = useState<any[]>([]);
-  const [timeSpan, setTimeSpan] = useState(10);
-  const [timeStep, setTimeStep] = useState(60);
-  const [nextUpdateTime, setNextUpdateTime] = useState(0);
+  const [trackPosition, setTrackPosition] = useState({ top: "50%", left: "50%" });
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameRef = useRef<number>();
+  const lastUpdateTimeRef = useRef<number>(Date.now());
   
   useEffect(() => {
-    if (!selectedSatellite || !selectedSatellite.passPredictions) return;
+    if (!selectedSatellite) return;
     
-    setPassPredictions(selectedSatellite.passPredictions);
+    const telemetry = selectedSatellite.telemetry || [];
     
-    const interval = setInterval(() => {
-      if (selectedSatellite.passPredictions) {
-        const timeElapsed = timeStep;
+    const initialPosition = {
+      x: parseFloat(String(telemetry.find(t => String(t.property).includes('x [m]'))?.value || '0')),
+      y: parseFloat(String(telemetry.find(t => String(t.property).includes('y [m]'))?.value || '0')),
+      z: parseFloat(String(telemetry.find(t => String(t.property).includes('z [m]'))?.value || '0'))
+    };
+    
+    const initialVelocity = {
+      x: parseFloat(String(telemetry.find(t => String(t.property).includes('dx/dt'))?.value || '0.1')),
+      y: parseFloat(String(telemetry.find(t => String(t.property).includes('dy/dt'))?.value || '0.1')),
+      z: parseFloat(String(telemetry.find(t => String(t.property).includes('dz/dt'))?.value || '0.1'))
+    };
+    
+    if (!getSatelliteState(selectedSatellite.id)) {
+      initializeSatelliteState(selectedSatellite.id, initialPosition, initialVelocity);
+    }
+    
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        drawPolarGrid(ctx, selectedSatellite.color || '#00ffff');
         
-        const updatedPredictions = selectedSatellite.passPredictions.map(pass => {
-          const riseDate = new Date(`2025-${pass.rise.date.replace(' ', '-')} ${pass.rise.time}`);
-          const setDate = new Date(`2025-${pass.set.date.replace(' ', '-')} ${pass.set.time}`);
+        const state = getSatelliteState(selectedSatellite.id);
+        if (state && state.trajectoryPoints.length > 0) {
+          drawTrajectory(ctx, state.trajectoryPoints, selectedSatellite.color || '#00ffff');
           
-          riseDate.setSeconds(riseDate.getSeconds() - timeElapsed);
-          setDate.setSeconds(setDate.getSeconds() - timeElapsed);
+          const lastPoint = state.trajectoryPoints[state.trajectoryPoints.length - 1];
+          drawSatellitePosition(ctx, lastPoint, selectedSatellite.color || '#00ffff');
           
-          const formatDate = (date: Date) => {
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = date.toLocaleString('en-US', { month: 'short' });
-            return `${day} ${month}`;
-          };
-          
-          const formatTime = (date: Date) => {
-            return date.toLocaleTimeString('en-US', { 
-              hour: '2-digit', 
-              minute: '2-digit',
-              hour12: false
-            });
-          };
-          
-          const varyAzimuth = (az: string, deg: string) => {
-            if (az.length <= 3) {
-              const degValue = parseFloat(deg);
-              const newDegValue = degValue + (Math.random() * 2 - 1);
-              return {
-                az: az,
-                deg: `${newDegValue.toFixed(1)}°`
-              };
-            }
-            return { az, deg };
-          };
-          
-          const riseAzimuth = varyAzimuth(pass.rise.az, pass.rise.deg);
-          const setAzimuth = varyAzimuth(pass.set.az, pass.set.deg);
-          
-          return {
-            ...pass,
-            rise: {
-              date: formatDate(riseDate),
-              time: formatTime(riseDate),
-              az: riseAzimuth.az,
-              deg: riseAzimuth.deg
-            },
-            set: {
-              date: formatDate(setDate),
-              time: formatTime(setDate),
-              az: setAzimuth.az,
-              deg: setAzimuth.deg
-            }
-          };
-        });
-        
-        setPassPredictions(updatedPredictions);
-        setNextUpdateTime(timeStep);
+          setTrackPosition({
+            top: `${lastPoint.y * 100}%`,
+            left: `${lastPoint.x * 100}%`
+          });
+        }
       }
-    }, 5000);
+    }
     
-    return () => clearInterval(interval);
-  }, [selectedSatellite, timeStep]);
+    lastUpdateTimeRef.current = Date.now();
+    
+    console.log(`Initialized tracking for satellite: ${selectedSatellite.id}`);
+  }, [selectedSatellite]);
+  
+  const drawPolarGrid = (ctx: CanvasRenderingContext2D, accentColor: string) => {
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    const center = { x: width / 2, y: height / 2 };
+    const maxRadius = Math.min(width, height) / 2 - 20;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    for (let i = 1; i <= 3; i++) {
+      const radius = maxRadius * (i / 3);
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
+      ctx.strokeStyle = '#2a3a4a';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      
+      const elevationAngle = 90 - (i * 30);
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(`${elevationAngle}°`, center.x - radius - 5, center.y);
+    }
+    
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI) / 4;
+      ctx.moveTo(center.x, center.y);
+      ctx.lineTo(
+        center.x + maxRadius * Math.cos(angle),
+        center.y + maxRadius * Math.sin(angle)
+      );
+    }
+    ctx.strokeStyle = '#2a3a4a';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+    directions.forEach((dir, i) => {
+      const angle = (i * Math.PI) / 4;
+      const x = center.x + (maxRadius + 15) * Math.cos(angle);
+      const y = center.y + (maxRadius + 15) * Math.sin(angle);
+      
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(dir, x, y);
+    });
+    
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, maxRadius, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#4b5563';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    ctx.fillStyle = '#d1d5db';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Satellite Polar Plot', center.x, 20);
+  };
+  
+  const drawTrajectory = (
+    ctx: CanvasRenderingContext2D, 
+    points: { x: number; y: number }[],
+    color: string
+  ) => {
+    if (points.length < 2) return;
+    
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    
+    ctx.beginPath();
+    
+    const firstPoint = points[0];
+    ctx.moveTo(firstPoint.x * width, firstPoint.y * height);
+    
+    for (let i = 1; i < points.length; i++) {
+      const point = points[i];
+      ctx.lineTo(point.x * width, point.y * height);
+    }
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  };
+  
+  const drawSatellitePosition = (
+    ctx: CanvasRenderingContext2D, 
+    point: { x: number; y: number },
+    color: string
+  ) => {
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    
+    const x = point.x * width;
+    const y = point.y * height;
+    
+    const now = Date.now();
+    const pulseFactor = 1 + 0.2 * Math.sin(now / 500);
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 6 * pulseFactor, 0, 2 * Math.PI);
+    ctx.fillStyle = `${color}33`;
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 4 * pulseFactor, 0, 2 * Math.PI);
+    ctx.fillStyle = `${color}66`;
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 2 * pulseFactor, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+  };
   
   useEffect(() => {
-    if (nextUpdateTime <= 0) return;
+    if (!selectedSatellite || !canvasRef.current) return;
     
-    const timer = setInterval(() => {
-      setNextUpdateTime(prev => Math.max(0, prev - 1));
-    }, 1000);
+    const updatePosition = () => {
+      const ctx = canvasRef.current?.getContext('2d');
+      if (!ctx) return;
+      
+      const currentTime = Date.now();
+      const state = getSatelliteState(selectedSatellite.id);
+      
+      if (!state) return;
+      
+      const deltaTime = (currentTime - state.lastUpdateTime) / 1000;
+      
+      const result = propagateState(
+        state.position,
+        state.velocity,
+        deltaTime * (selectedSatellite.speedMultiplier || 1),
+        selectedSatellite.id
+      );
+      
+      setTrackPosition({ 
+        top: `${result.plotPoint.y * 100}%`, 
+        left: `${result.plotPoint.x * 100}%` 
+      });
+      
+      drawPolarGrid(ctx, selectedSatellite.color || '#00ffff');
+      
+      if (result.trajectoryPoints && result.trajectoryPoints.length > 0) {
+        drawTrajectory(ctx, result.trajectoryPoints, selectedSatellite.color || '#00ffff');
+        drawSatellitePosition(ctx, result.plotPoint, selectedSatellite.color || '#00ffff');
+      }
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(`Az: ${result.polar.azimuth.toFixed(1)}°`, 10, ctx.canvas.height - 40);
+      ctx.fillText(`El: ${result.polar.elevation.toFixed(1)}°`, 10, ctx.canvas.height - 25);
+      ctx.fillText(`R: ${result.polar.radius.toFixed(1)} km`, 10, ctx.canvas.height - 10);
+      
+      animationFrameRef.current = requestAnimationFrame(updatePosition);
+    };
     
-    return () => clearInterval(timer);
-  }, [nextUpdateTime]);
+    updatePosition();
+    
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [selectedSatellite]);
   
-  if (!selectedSatellite || !passPredictions.length) {
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (canvasRef.current) {
+        const container = canvasRef.current.parentElement;
+        if (container) {
+          canvasRef.current.width = container.clientWidth;
+          canvasRef.current.height = container.clientHeight;
+          
+          const ctx = canvasRef.current.getContext('2d');
+          if (ctx && selectedSatellite) {
+            drawPolarGrid(ctx, selectedSatellite.color || '#00ffff');
+            
+            const state = getSatelliteState(selectedSatellite.id);
+            if (state && state.trajectoryPoints.length > 0) {
+              drawTrajectory(
+                ctx, 
+                state.trajectoryPoints,
+                selectedSatellite.color || '#00ffff'
+              );
+              
+              const lastPoint = state.trajectoryPoints[state.trajectoryPoints.length - 1];
+              drawSatellitePosition(ctx, lastPoint, selectedSatellite.color || '#00ffff');
+            }
+          }
+        }
+      }
+    };
+    
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+    
+    return () => {
+      window.removeEventListener('resize', updateCanvasSize);
+    };
+  }, [selectedSatellite]);
+  
+  if (!selectedSatellite) {
     return (
       <div className="h-full flex items-center justify-center">
-        <p className="text-sm text-gray-500">No pass prediction data available</p>
+        <p className="text-sm text-gray-500">No satellite selected</p>
       </div>
     );
   }
   
-  const filteredPasses = visibleOnly 
-    ? passPredictions.filter(pass => pass.visibility === "V") 
-    : passPredictions;
-  
-  const totalPages = Math.ceil(filteredPasses.length / ITEMS_PER_PAGE);
-  const currentPageData = filteredPasses.slice(
-    (page - 1) * ITEMS_PER_PAGE,
-    page * ITEMS_PER_PAGE
-  );
-  
   return (
-    <div className="p-2 h-full flex flex-col">
-      <div className="mb-3 grid grid-cols-2 gap-3">
-        <div>
-          <Label htmlFor="timeSpan" className="mb-1 text-xs block">Time Span [Days]:</Label>
-          <Input 
-            id="timeSpan" 
-            value={timeSpan} 
-            onChange={(e) => setTimeSpan(parseInt(e.target.value) || 10)}
-            className="h-8 text-sm" 
-          />
-        </div>
-        <div>
-          <Label htmlFor="timeStep" className="mb-1 text-xs block">Time Step [sec]:</Label>
-          <Input 
-            id="timeStep" 
-            value={timeStep} 
-            onChange={(e) => setTimeStep(parseInt(e.target.value) || 60)}
-            className="h-8 text-sm" 
-          />
-        </div>
-      </div>
+    <div className="relative h-full w-full bg-black overflow-hidden">
+      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
       
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Checkbox 
-            id="visibleOnly" 
-            checked={visibleOnly} 
-            onCheckedChange={(checked) => setVisibleOnly(checked as boolean)}
-          />
-          <Label htmlFor="visibleOnly" className="text-xs">Visible Only</Label>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Label htmlFor="riseSet" className="text-xs">Rise/Set Azimuth:</Label>
-          <Select 
-            value={azimuthFormat} 
-            onValueChange={setAzimuthFormat}
-          >
-            <SelectTrigger className="h-7 w-40 text-xs">
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="compass">Compass Points</SelectItem>
-              <SelectItem value="degrees">Degrees</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      
-      <div className="flex-1 overflow-auto">
-        <table className="satellite-table w-full text-xs">
-          <thead>
-            <tr>
-              <th className="w-8">#</th>
-              <th>Rise Time</th>
-              <th>Rise Az</th>
-              <th>Set Time</th>
-              <th>Set Az</th>
-              <th>Duration</th>
-              <th className="w-6">V</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentPageData.map((pass) => (
-              <tr key={pass.id} className={pass.visibility === "V" ? "text-green-500" : ""}>
-                <td>{pass.id}</td>
-                <td>{`${pass.rise.date} ${pass.rise.time}`}</td>
-                <td>{azimuthFormat === "compass" ? pass.rise.az : pass.rise.deg}</td>
-                <td>{`${pass.set.date} ${pass.set.time}`}</td>
-                <td>{azimuthFormat === "compass" ? pass.set.az : pass.set.deg}</td>
-                <td>{pass.duration}</td>
-                <td>{pass.visibility}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      
-      {totalPages > 1 && (
-        <div className="mt-3">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  className={`cursor-pointer ${page === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
-              </PaginationItem>
-              
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink 
-                    isActive={page === i + 1}
-                    onClick={() => setPage(i + 1)}
-                    className="cursor-pointer"
-                  >
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  className={`cursor-pointer ${page === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
-      
-      <div className="mt-3 flex justify-between items-center">
-        <div className="text-xs">
-          Next update in: {nextUpdateTime}s
-        </div>
-        <Button variant="secondary" size="sm" className="text-xs">Go to Pass</Button>
+      <div className="absolute bottom-2 left-2 text-xs text-gray-400 z-10 bg-black/50 px-2 py-1 rounded">
+        Satellite: {selectedSatellite.name}
       </div>
     </div>
   );
 };
 
-const TrackingTool2 = () => {
+const BasicInfoContent = () => {
+  const { selectedSatellite } = useSatelliteContext();
+  
+  if (!selectedSatellite) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-sm text-gray-500">No satellite selected</p>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="p-4 space-y-4">
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium text-satellite-highlight">Orbital Parameters</h3>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="space-y-1">
+            <div className="flex justify-between">
+              <span className="text-gray-400">Perigee:</span>
+              <span className="text-satellite-text">{selectedSatellite.perigeeAltitude} km</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Eccentricity:</span>
+              <span className="text-satellite-text">{selectedSatellite.eccentricity}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Inclination:</span>
+              <span className="text-satellite-text">{selectedSatellite.inclination}°</span>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="flex justify-between">
+              <span className="text-gray-400">RAAN:</span>
+              <span className="text-satellite-text">{selectedSatellite.longitudeOfAscendingNode}°</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Arg. Periapsis:</span>
+              <span className="text-satellite-text">{selectedSatellite.argumentOfPeriapsis}°</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PassPredictionsContent = () => {
+  const { selectedSatellite } = useSatelliteContext();
+  
+  if (!selectedSatellite) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-sm text-gray-500">No satellite selected</p>
+      </div>
+    );
+  }
+  
+  const generatePassPredictions = () => {
+    const now = new Date();
+    const predictions = [];
+    
+    for (let i = 0; i < 5; i++) {
+      const passTime = new Date(now.getTime() + (i + 1) * 90 * 60 * 1000);
+      const duration = Math.floor(5 + Math.random() * 15);
+      const maxElevation = Math.floor(20 + Math.random() * 70);
+      
+      predictions.push({
+        time: passTime,
+        duration,
+        maxElevation
+      });
+    }
+    
+    return predictions;
+  };
+  
+  const passPredictions = generatePassPredictions();
+  
+  return (
+    <div className="p-2">
+      <h3 className="text-sm font-medium text-satellite-highlight mb-2">Upcoming Passes</h3>
+      <div className="space-y-2">
+        {passPredictions.map((pass, index) => (
+          <div key={index} className="bg-satellite-dark-accent/30 p-2 rounded text-xs">
+            <div className="flex justify-between">
+              <span className="text-gray-300">{pass.time.toLocaleTimeString()}</span>
+              <span className="text-satellite-accent">{pass.time.toLocaleDateString()}</span>
+            </div>
+            <div className="flex justify-between mt-1">
+              <span className="text-gray-400">Duration:</span>
+              <span className="text-white">{pass.duration} min</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Max Elevation:</span>
+              <span className="text-white">{pass.maxElevation}°</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const TrackingTool1 = () => {
   const { selectedSatellite } = useSatelliteContext();
   
   return (
@@ -258,19 +392,19 @@ const TrackingTool2 = () => {
       title={`Tracking Tool (${selectedSatellite ? selectedSatellite.name : "No Selection"})`} 
       className="col-span-1 row-span-2"
     >
-      <Tabs defaultValue="pass" className="h-full flex flex-col">
+      <Tabs defaultValue="polar" className="h-full flex flex-col">
         <TabsList className="bg-satellite-header rounded-none border-b border-satellite-border">
           <TabsTrigger value="basic" className="text-xs">Basic</TabsTrigger>
           <TabsTrigger value="polar" className="text-xs">Polar Plot</TabsTrigger>
           <TabsTrigger value="pass" className="text-xs">Pass Predictions</TabsTrigger>
         </TabsList>
-        <TabsContent value="basic" className="flex-1 p-2">
-          <p className="text-sm">Basic tracking information for {selectedSatellite?.name || "No Selection"}</p>
+        <TabsContent value="basic" className="flex-1 p-0 overflow-auto">
+          <BasicInfoContent />
         </TabsContent>
-        <TabsContent value="polar" className="flex-1 p-2">
-          <p className="text-sm">Polar plot for {selectedSatellite?.name || "No Selection"}</p>
+        <TabsContent value="polar" className="flex-1 m-0 p-0 data-[state=active]:h-full">
+          <PolarPlotContent />
         </TabsContent>
-        <TabsContent value="pass" className="flex-1 m-0 p-0 data-[state=active]:h-full">
+        <TabsContent value="pass" className="flex-1 p-0 overflow-auto">
           <PassPredictionsContent />
         </TabsContent>
       </Tabs>
@@ -278,4 +412,4 @@ const TrackingTool2 = () => {
   );
 };
 
-export default TrackingTool2;
+export default TrackingTool1;

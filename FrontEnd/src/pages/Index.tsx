@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+
 import InfoComponent from "@/components/InfoComponent";
 import Earth2DWindow from "@/components/Earth2DWindow";
 import ObjectList from "@/components/ObjectList";
@@ -19,10 +19,8 @@ const Index = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-satellite-dark">
-      <Header />
-      
-      <main className="flex-1 overflow-hidden p-2">
+    <div className="overflow-hidden bg-satellite-dark h-full">
+      <main className="p-2 h-full">
         <div className="grid grid-cols-4 grid-rows-2 gap-2 h-full">
           {/* Top Row */}
           <InfoComponent />

@@ -4,7 +4,8 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import FromLatLongToXYZ from '../utils/FromLatLongToXYZ';
+import {FromLatLongToXYZ} from '../utils/FromLatLongToXYZ';
+import {projectConeToEarth} from "../utils/FromLatLongToXYZ"
 import { useSatelliteContext } from '@/contexts/SatelliteContext';
 import {
   loadSatelliteModel,
@@ -260,6 +261,7 @@ export default function SatelliteViewer() {
     createEarth();
     createStars();
     createTornado(33.984376, -6.867138);
+
     animate();
   };
 
@@ -597,6 +599,7 @@ export default function SatelliteViewer() {
       0, 
       sensorHeight < 1 ? 0.5 : sensorHeight * 0.5
     );
+    
   };
   
   /**

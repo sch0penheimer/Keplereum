@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { X, ArrowRight } from 'lucide-react';
 import { useBlockchainContext } from '@/contexts/BlockchainContext';
 import BlocksHeader from '@/components/blockchain/BlocksHeader';
 
@@ -24,6 +24,10 @@ const BlockDetails = () => {
   
   const handleClose = () => {
     navigate('/blockchain');
+  };
+  
+  const handleTransactionClick = (txId: string) => {
+    navigate(`/blockchain/transaction/${txId}`);
   };
   
   // Calculate time ago
@@ -112,89 +116,52 @@ const BlockDetails = () => {
             </div>
             
             <div className="p-4 border-t border-satellite-border">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-xl text-white mb-4">Expected Block</h3>
-                  <div className="w-full h-60 bg-satellite-dark-header rounded">
-                    <div className="w-full h-full flex flex-wrap content-start overflow-hidden p-2">
-                      {Array.from({ length: 100 }).map((_, i) => {
-                        const size = Math.random();
-                        let cellSize = 'w-2 h-2';
-                        let color = 'bg-green-800';
+              <h3 className="text-xl text-white mb-4">Transactions ({block.transactionCount})</h3>
+              <div className="max-h-80 overflow-y-auto pr-2">
+                <div className="space-y-2">
+                  {block.transactions.slice(0, 20).map((tx) => (
+                    <div 
+                      key={tx.id} 
+                      className="bg-satellite-dark-header border border-satellite-border rounded p-3 hover:bg-satellite-dark-header/80 transition-all cursor-pointer"
+                      onClick={() => handleTransactionClick(tx.id)}
+                    >
+                      <div className="grid grid-cols-7 gap-2">
+                        <div className="col-span-2">
+                          <div className="text-xs text-satellite-accent font-mono truncate">
+                            {tx.hash.substring(0, 10)}...
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            {Math.floor(Math.random() * 10) + 1}m ago
+                          </div>
+                        </div>
                         
-                        if (size > 0.98) {
-                          cellSize = 'w-12 h-12';
-                          color = 'bg-blue-500';
-                        } else if (size > 0.95) {
-                          cellSize = 'w-8 h-8';
-                          color = 'bg-green-600';
-                        } else if (size > 0.85) {
-                          cellSize = 'w-4 h-4';
-                          color = 'bg-green-700';
-                        }
+                        <div className="col-span-3 flex items-center">
+                          <div className="text-xs text-white/70 truncate w-24">
+                            {tx.from.substring(0, 7)}...
+                          </div>
+                          <ArrowRight className="h-3 w-3 mx-2 text-satellite-accent" />
+                          <div className="text-xs text-white/70 truncate w-24">
+                            {tx.to.substring(0, 7)}...
+                          </div>
+                        </div>
                         
-                        return (
-                          <div 
-                            key={i} 
-                            className={`${cellSize} ${color} rounded m-[1px]`}
-                          />
-                        );
-                      })}
+                        <div className="col-span-2 text-right">
+                          <div className="text-xs text-green-500">
+                            {tx.amount.toFixed(4)} SAT
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            Fee: {tx.fee.toFixed(5)}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h3 className="text-xl text-white mb-4">Actual Block</h3>
-                  <div className="w-full h-60 bg-satellite-dark-header rounded">
-                    <div className="w-full h-full flex flex-wrap content-start overflow-hidden p-2">
-                      {Array.from({ length: 100 }).map((_, i) => {
-                        const size = Math.random();
-                        let cellSize = 'w-2 h-2';
-                        let color = 'bg-green-800';
-                        
-                        if (size > 0.98) {
-                          cellSize = 'w-12 h-12';
-                          color = 'bg-blue-500';
-                        } else if (size > 0.95) {
-                          cellSize = 'w-8 h-8';
-                          color = 'bg-green-600';
-                        } else if (size > 0.85) {
-                          cellSize = 'w-4 h-4';
-                          color = 'bg-green-700';
-                        }
-                        
-                        return (
-                          <div 
-                            key={i} 
-                            className={`${cellSize} ${color} rounded m-[1px]`}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
+                  ))}
                   
-                  <div className="mt-4 bg-satellite-dark-header p-3 rounded">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="text-gray-400">Transaction</div>
-                      <div className="text-satellite-accent font-mono">529c11c...166f245f</div>
-                      
-                      <div className="text-gray-400">Confirmed</div>
-                      <div className="text-white">After 7 minutes</div>
-                      
-                      <div className="text-gray-400">Amount</div>
-                      <div className="text-white">0.14089144 <span className="text-xs">ETH</span></div>
-                      
-                      <div className="text-gray-400">Fee</div>
-                      <div className="text-white">9.924 <span className="text-xs">sat</span> <span className="text-green-500 ml-1">$8.26</span></div>
+                  {block.transactionCount > 20 && (
+                    <div className="text-center text-white/50 text-sm py-2">
+                      + {block.transactionCount - 20} more transactions
                     </div>
-                    
-                    <div className="mt-2 flex justify-end space-x-2">
-                      <div className="bg-blue-900/50 text-blue-400 text-xs rounded px-2 py-1">RBF enabled</div>
-                      <div className="bg-blue-900/50 text-blue-400 text-xs rounded px-2 py-1">Version 2</div>
-                      <div className="bg-blue-900/50 text-blue-400 text-xs rounded px-2 py-1">Consolidation</div>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

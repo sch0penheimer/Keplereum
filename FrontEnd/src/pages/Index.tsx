@@ -1,4 +1,3 @@
-
 import InfoComponent from "@/components/InfoComponent";
 import Earth2DWindow from "@/components/Earth2DWindow";
 import ObjectList from "@/components/ObjectList";

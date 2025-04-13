@@ -25,7 +25,7 @@ const ObjectList = () => {
   };
 
   return (
-    <SatelliteWindow title="Object List" className="col-span-1 row-span-1">
+    <SatelliteWindow title="Object List" className="col-span-2 row-span-1">
       <div className="p-2">
         <div className="mb-4">
           <h3 className="flex items-center gap-1 text-sm mb-2 font-medium">

@@ -20,7 +20,7 @@ const Index = () => {
   return (
     <div className="overflow-hidden bg-satellite-dark h-full">
       <main className="p-2 h-full">
-        <div className="grid grid-cols-4 grid-rows-2 gap-2 h-full">
+        <div className="grid grid-cols-8 grid-rows-2 gap-2 h-full">
           {/* Top Row */}
           <InfoComponent />
           <Earth2DWindow />

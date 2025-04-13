@@ -8,7 +8,7 @@ const Earth3DWindow = () => {
   const { selectedSatellite } = useSatelliteContext();
   const containerRef = useRef<HTMLDivElement>(null);
   
-  //** Resize handling **//
+  //** Resize handling for proper scaling **//
   useEffect(() => {
     const handleResize = () => {
       window.dispatchEvent(new Event('resize'));
@@ -19,7 +19,7 @@ const Earth3DWindow = () => {
   }, []);
   
   return (
-    <SatelliteWindow title="3D Earth Window" className="col-span-2 row-span-1">
+    <SatelliteWindow title="3D Earth Window" className="col-span-4 row-span-1">
       <div ref={containerRef} className="h-full w-full bg-[#121619] flex items-center justify-center text-gray-400 flex-col relative">
         <SatelliteViewer />
         {selectedSatellite && (

@@ -1,10 +1,17 @@
 
-
 import { earthRadiusSceneUnits } from './constants';
 import * as THREE from 'three'
 
-export  function FromLatLongToXYZ(lat:number,lon:number,radius:number=4):Array<number>{
-  
+
+/**
+ * Converts geographic coordinates (latitude and longitude) to 3D Cartesian coordinates (x, y, z).
+ * 
+ * @param lat - The latitude in degrees. Positive values indicate north, and negative values indicate south.
+ * @param lon - The longitude in degrees. Positive values indicate east, and negative values indicate west.
+ * @param radius - The radius of the sphere. Defaults to 4 if not provided.
+ * @returns An array containing the 3D Cartesian coordinates [x, y, z].
+ */
+export function FromLatLongToXYZ(lat:number,lon:number,radius:number=4):Array<number>{  
     const phi   = (90-lat)*(Math.PI/180);
     const theta = (lon+180)*(Math.PI/18)
     const x = -(radius * Math.sin(phi)*Math.cos(theta));

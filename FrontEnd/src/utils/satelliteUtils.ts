@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { 
   SatelliteTelemetryData,
   SatelliteData
- } from '../contexts/SatelliteContext';
+ } from '@/types/satellite';
 
   /**
     * Load the satellite model
@@ -36,8 +36,6 @@ import {
       }
     );
   }
-
-
 
   /**
     * Calculate the satellite's orbital trajectory

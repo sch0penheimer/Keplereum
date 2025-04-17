@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { X, ArrowRight } from 'lucide-react';
 import { useBlockchainContext } from '@/contexts/BlockchainContext';

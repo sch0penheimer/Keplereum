@@ -5,10 +5,9 @@ import { useSatelliteContext } from "@/contexts/SatelliteContext";
 import {
   getCurrentSatelliteTelemetry
 } from "@/utils/satelliteUtils";
-import SatellitePreviewer from "./SatellitePreviewer";
 
 const InfoComponent = () => {
-  const { selectedSatellite, setSatellites} = useSatelliteContext();
+  const { selectedSatellite, setSatellites } = useSatelliteContext();
   const [telemetryData, setTelemetryData] = useState<{ property: string; value: string | number }[]>([]);
   
   useEffect(() => {
@@ -36,28 +35,32 @@ const InfoComponent = () => {
   }, [selectedSatellite, setSatellites]);
 
   return (
-    <SatelliteWindow title={selectedSatellite.name} className="col-span-1 row-span-1">
-      <div className="h-full overflow-y-auto">
-        <table className="satellite-table w-full">
-          <thead>
-            <tr>
-              <th className="w-1/2">Property</th>
-              <th className="w-1/2">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {telemetryData.map((item, index) => (
-              <tr key={index}>
-                <td className={item.property.toString().includes(":") ? "font-bold" : ""}>
-                  {item.property}
-                </td>
-                <td className={item.value ? "font-mono" : ""}>
-                  {item.value ? item.value.toString() : ""}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <SatelliteWindow title="Satellite Info" className="col-span-2 row-span-1">
+      <div className="p-2 h-full overflow-hidden">
+        {selectedSatellite ? (
+          <div className="space-y-2">
+            <div className="p-1 pl-3 bg-satellite-dark-accent rounded">
+              <h3 className="text-xs font-medium text-satellite-highlight">{selectedSatellite.name} Telemetry</h3>
+            </div>
+            <div className="text-xs space-y-1">
+              {telemetryData.map((item, index) => (
+                <div 
+                  key={index} 
+                  className={`flex justify-between p-1 ${
+                    index % 2 === 0 ? 'bg-satellite-dark-accent/30' : ''
+                  }`}
+                >
+                  <span className="text-gray-400">{item.property}</span>
+                  <span className="text-satellite-text font-mono">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="h-full flex items-center justify-center text-gray-500 text-sm">
+            No satellite selected
+          </div>
+        )}
       </div>
     </SatelliteWindow>
   );

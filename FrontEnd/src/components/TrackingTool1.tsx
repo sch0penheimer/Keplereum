@@ -389,8 +389,8 @@ const TrackingTool1 = () => {
   
   return (
     <SatelliteWindow 
-      title={`Tracking Tool (${selectedSatellite ? selectedSatellite.name : "No Selection"})`} 
-      className="col-span-1 row-span-2"
+      title={`Tracking Tool 1 (${selectedSatellite ? selectedSatellite.name : "No Selection"})`} 
+      className="col-span-2 row-span-2"
     >
       <Tabs defaultValue="polar" className="h-full flex flex-col">
         <TabsList className="bg-satellite-header rounded-none border-b border-satellite-border">

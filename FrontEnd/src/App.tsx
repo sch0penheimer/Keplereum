@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BlockchainDashboard from "./pages/BlockchainDashboard";
 import BlockDetails from "./pages/BlockDetails";
+import TransactionDetails from "./pages/TransactionDetails";
 import { SatelliteProvider } from "./contexts/SatelliteContext";
 import { BlockchainProvider } from "./contexts/BlockchainContext";
 import Header from "./components/Header";
@@ -30,6 +31,7 @@ const App = () => {
                     <Route path="/" element={<Index />} />
                     <Route path="/blockchain" element={<BlockchainDashboard />} />
                     <Route path="/blockchain/block/:blockNumber" element={<BlockDetails />} />
+                    <Route path="/blockchain/transaction/:transactionId" element={<TransactionDetails />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </div>
@@ -43,4 +45,5 @@ const App = () => {
 };
 
 export default App;
+
 

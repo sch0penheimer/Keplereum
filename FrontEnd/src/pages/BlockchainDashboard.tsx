@@ -35,8 +35,8 @@ const BlockchainDashboard = () => {
           </div>
         </div>
         
-        {/* 2/4 height for TransactionMemoryPool and MemoryUsage */}
-        <div className="h-2/4 grid grid-cols-2 gap-2 p-2 flex-shrink-0 overflow-hidden">
+        {/* 2/4 height for TransactionMemoryPool and MemoryUsage with fixed height */}
+        <div className="h-2/4 grid grid-cols-2 gap-2 p-2 flex-shrink-0">
           <div className="col-span-1 h-full overflow-hidden">
             <TransactionMemoryPool />
           </div>

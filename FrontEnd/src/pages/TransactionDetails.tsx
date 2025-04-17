@@ -6,24 +6,29 @@ import { useBlockchainContext, BlockTransaction } from '@/contexts/BlockchainCon
 import BlocksHeader from '@/components/blockchain/BlocksHeader';
 
 const TransactionDetails = () => {
-  const { transactionId } = useParams();
+  const { transactionId } = useParams<{ transactionId: string }>();
   const { blocks, pendingTransactions } = useBlockchainContext();
   const navigate = useNavigate();
   const [transaction, setTransaction] = useState<BlockTransaction | null>(null);
   
   useEffect(() => {
+    if (!transactionId) return;
+    console.log("Looking for transaction:", transactionId);
+    
     // Find transaction in blocks or pending transactions
     let foundTransaction: BlockTransaction | null = null;
     
     // First check in pending transactions
     const pendingTx = pendingTransactions.find(tx => tx.id === transactionId);
     if (pendingTx) {
+      console.log("Found in pending transactions");
       foundTransaction = pendingTx;
     } else {
       // Then check in blocks
       for (const block of blocks) {
         const blockTx = block.transactions.find(tx => tx.id === transactionId);
         if (blockTx) {
+          console.log("Found in block:", block.number);
           foundTransaction = blockTx;
           break;
         }
@@ -32,7 +37,9 @@ const TransactionDetails = () => {
     
     if (foundTransaction) {
       setTransaction(foundTransaction);
-    } else {
+    } else if (blocks.length > 0 && pendingTransactions.length > 0) {
+      // Only navigate away if we've loaded data and still can't find the transaction
+      console.log("Transaction not found, redirecting");
       navigate('/blockchain');
     }
   }, [transactionId, blocks, pendingTransactions, navigate]);
@@ -42,7 +49,14 @@ const TransactionDetails = () => {
   };
   
   if (!transaction) {
-    return null;
+    return (
+      <div className="flex flex-col h-screen bg-satellite-dark">
+        <BlocksHeader />
+        <div className="flex items-center justify-center flex-1">
+          <h1 className="text-white text-xl">Loading Transaction Data...</h1>
+        </div>
+      </div>
+    );
   }
   
   // Calculate time ago

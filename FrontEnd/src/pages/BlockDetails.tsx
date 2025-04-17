@@ -6,20 +6,31 @@ import { useBlockchainContext } from '@/contexts/BlockchainContext';
 import BlocksHeader from '@/components/blockchain/BlocksHeader';
 
 const BlockDetails = () => {
-  const { blockNumber } = useParams();
+  const { blockNumber } = useParams<{ blockNumber: string }>();
   const { blocks } = useBlockchainContext();
   const navigate = useNavigate();
   
-  const block = blocks.find(b => b.number === Number(blockNumber));
+  // Convert blockNumber to a number for comparison
+  const blockNum = blockNumber ? parseInt(blockNumber, 10) : null;
+  const block = blocks.find(b => b.number === blockNum);
   
   useEffect(() => {
-    if (!block) {
+    // Only redirect if we have blocks loaded and the requested block doesn't exist
+    if (!block && blocks.length > 0 && blockNum !== null && !isNaN(blockNum)) {
+      console.log("Block not found, redirecting to blockchain dashboard");
       navigate('/blockchain');
     }
-  }, [block, navigate]);
+  }, [block, blocks, blockNum, navigate]);
   
   if (!block) {
-    return null;
+    return (
+      <div className="flex flex-col h-screen bg-satellite-dark">
+        <BlocksHeader />
+        <div className="flex items-center justify-center flex-1">
+          <h1 className="text-white text-xl">Loading Block Data...</h1>
+        </div>
+      </div>
+    );
   }
   
   const handleClose = () => {

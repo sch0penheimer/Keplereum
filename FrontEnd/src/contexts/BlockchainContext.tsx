@@ -1,67 +1,20 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-
-// Types for blocks and transactions
-export interface BlockTransaction {
-  id: string;
-  hash: string;
-  from: string;
-  to: string;
-  amount: number;
-  fee: number;
-  status: 'confirmed' | 'pending';
-  timestamp: Date;
-  gasPrice: number;
-  gasLimit: number;
-  gasUsed: number;
-}
-
-export interface Block {
-  number: number;
-  hash: string;
-  timestamp: Date;
-  validator: string;
-  size: number;
-  gasUsed: number;
-  gasLimit: number;
-  transactions: BlockTransaction[];
-  transactionCount: number;
-  totalFees: number;
-}
-
-export interface Validator {
-  address: string;
-  name: string;
-  blocksValidated: number;
-  isActive: boolean;
-}
-
-interface NetworkStats {
-  avgBlockTime: number;
-  pendingTransactions: number;
-  activeValidators: number;
-  totalBlocks: number;
-  gasPrice: {
-    low: number;
-    medium: number;
-    high: number;
-  };
-}
-
-interface BlockchainContextType {
-  blocks: Block[];
-  latestBlock: Block | null;
-  pendingTransactions: BlockTransaction[];
-  validators: Validator[];
-  networkStats: NetworkStats;
-  loading: boolean;
-  selectedBlock: Block | null;
-  setSelectedBlock: (block: Block | null) => void;
-}
+import {
+  BlockTransaction,
+  Block,
+  Validator,
+  NetworkStats,
+  BlockchainContextType
+} from "@/types/blockchain";
 
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
 
-// Mock data generator functions
+
+/**
+ * Temporary Function to generate Dummy / Mock Validators 
+ * @param id
+ */
 const generateMockValidator = (id: number): Validator => {
   const names = ["Satellite Alpha", "Satellite Beta", "Satellite Gamma", "Satellite Delta", "Satellite Epsilon"];
   return {
@@ -72,6 +25,11 @@ const generateMockValidator = (id: number): Validator => {
   };
 };
 
+/**
+ * Temporary Function to generate Dummy / Mock Transactions
+ * @param blockNumber
+ * @param id
+ */
 const generateMockTransaction = (blockNumber: number, id: number): BlockTransaction => {
   const now = new Date();
   const timestamp = new Date(now.getTime() - Math.random() * 3600000);
@@ -92,6 +50,10 @@ const generateMockTransaction = (blockNumber: number, id: number): BlockTransact
   };
 };
 
+/**
+ * Temporary Function to generate Dummy / Mock Blocks
+ * @param blockNumber 
+ */
 const generateMockBlock = (blockNumber: number): Block => {
   const transactionCount = Math.floor(Math.random() * 200) + 50;
   const transactions = Array.from({ length: transactionCount }, (_, i) => 
@@ -133,19 +95,18 @@ export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }
     },
   });
 
-  // Initialize blockchain data
   useEffect(() => {
-    // Generate mock blocks
+    //** Generate mock blocks **//
     const mockBlocks = Array.from({ length: 10 }, (_, i) => 
       generateMockBlock(891695 - i)
     );
     
-    // Generate pending transactions
+    //** Generate pending transactions **//
     const mockPendingTxs = Array.from({ length: 50 }, (_, i) => 
       generateMockTransaction(0, i)
     ).filter(tx => tx.status === 'pending');
     
-    // Generate validators
+    //** Generate validators **//
     const mockValidators = Array.from({ length: 6 }, (_, i) => 
       generateMockValidator(i)
     );
@@ -162,7 +123,7 @@ export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }
     setLoading(false);
   }, []);
 
-  // Simulate new blocks arriving
+  //** New blocks Simulation **//
   useEffect(() => {
     if (loading) return;
     
@@ -172,7 +133,7 @@ export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }
       
       setBlocks(prev => [newBlock, ...prev.slice(0, 9)]);
       
-      // Update pending transactions, removing those included in the new block
+      //** Update pending transactions, removing those included in the new block **//
       const newPendingTxIDs = new Set(newBlock.transactions.map(tx => tx.id));
       setPendingTransactions(prev => 
         prev.filter(tx => !newPendingTxIDs.has(tx.id))
@@ -181,13 +142,13 @@ export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }
           ).filter(tx => tx.status === 'pending'))
       );
       
-      // Update network stats
+      //** Update network stats **//
       setNetworkStats(prev => ({
         ...prev,
         avgBlockTime: parseFloat((Math.random() * 2 + 9).toFixed(1)),
         totalBlocks: prev.totalBlocks + 1,
       }));
-    }, 60000); // New block every minute
+    }, 60000); //* --> minute *//
     
     return () => clearInterval(interval);
   }, [blocks, loading]);

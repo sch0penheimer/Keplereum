@@ -3,7 +3,6 @@ import BlockchainWindow from './BlockchainWindow';
 import { ChartContainer } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useBlockchainContext } from '@/contexts/BlockchainContext';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 const MemoryUsage = () => {
   const { pendingTransactions } = useBlockchainContext();
@@ -29,15 +28,14 @@ const MemoryUsage = () => {
   
   const data = generateChartData();
   
-  // Calculate memory usage based on pending transactions
+  // Calculate memory usage based on pending transactions //
   const memoryUsage = Math.floor(10.6 + (pendingTransactions.length * 0.02));
   const memoryPercentage = (memoryUsage / 300) * 100;
   
   return (
     <BlockchainWindow title="MEMORY USAGE & TRANSACTIONS" className="h-full">
-      <ScrollArea className="h-full">
         <div className="p-3 flex flex-col">
-          <div className="grid grid-cols-3 gap-4 mb-3">
+          <div className="grid grid-cols-3 gap-24 mb-3">
             <div className="bg-satellite-dark p-2 rounded">
               <div className="text-xs text-gray-400 mb-1">Minimum fee</div>
               <div className="text-xl text-white">1.00 <span className="text-xs">sat/vB</span></div>
@@ -60,10 +58,10 @@ const MemoryUsage = () => {
             </div>
           </div>
           
-          <div className="flex-grow h-60">
+          <div className="flex-grow">
             <div className="text-xs text-gray-400 mb-1">Incoming Transactions</div>
             <div className="h-56">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="130%">
                 <ChartContainer config={{
                   transactions: { color: "#3498DB" },
                   peaks: { color: "#f59e0b" }
@@ -94,7 +92,6 @@ const MemoryUsage = () => {
             </div>
           </div>
         </div>
-      </ScrollArea>
     </BlockchainWindow>
   );
 };

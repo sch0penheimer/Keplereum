@@ -35,8 +35,8 @@ const TransactionMemoryPool = () => {
                   onClick={() => handleTransactionClick(tx.id)}
                 >
                   <div className="flex justify-between items-start">
-                    <div className="text-xs text-satellite-accent font-mono truncate w-24">
-                      {tx.hash.substring(0, 10)}...
+                    <div className="text-xs text-satellite-accent font-mono w-24">
+                      {tx.hash}
                     </div>
                     <div className="flex items-center text-xs text-white/70">
                       <Clock className="h-3 w-3 mr-1" />
@@ -45,15 +45,24 @@ const TransactionMemoryPool = () => {
                   </div>
                   
                   <div className="flex items-center mt-2 text-xs">
-                    <div className="text-white/70 truncate w-20">
-                      {tx.from.substring(0, 7)}...
+                    <div className="text-white/70 w-20">
+                      {tx.from}
                     </div>
-                    <ArrowRight className="h-3 w-3 mx-2 text-satellite-accent" />
-                    <div className="text-white/70 truncate w-20">
-                      {tx.to.substring(0, 7)}...
+                    <ArrowRight className="h-3 w-3 mx-16 text-satellite-accent" />
+                    <div className="text-white/70 w-20">
+                      {tx.to}
                     </div>
                     <div className="ml-auto text-green-500 font-medium">
                       {tx.amount.toFixed(4)} SAT
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center mt-2 text-xs">
+                    <div className="text-white/50">
+                      Transaction Type: <span className="text-satellite-accent">{tx.fee.toFixed(5)} SAT</span>
+                    </div>
+                    <div className="text-white/50">
+                      Gas: {tx.gasLimit}
                     </div>
                   </div>
                   

@@ -1,6 +1,6 @@
 
 import BlocksHeader from '@/components/blockchain/BlocksHeader';
-import TransactionFees from '@/components/blockchain/TransactionFees';
+import ValidationQueue from '@/components/blockchain/ValidationQueue';
 import BlockchainStats from '@/components/blockchain/BlockchainStats';
 import TransactionMemoryPool from '@/components/blockchain/TransactionMemoryPool';
 import MemoryUsage from '@/components/blockchain/MemoryUsage';
@@ -24,10 +24,10 @@ const BlockchainDashboard = () => {
           <BlocksHeader />
         </div>
         
-        {/* 1/4 height for TransactionFees and BlockchainStats */}
+        {/* 1/4 height for ValidationQueue and BlockchainStats */}
         <div className="h-1/4 grid grid-cols-2 gap-2 p-2 flex-shrink-0">
           <div className="col-span-1 h-full">
-            <TransactionFees />
+            <ValidationQueue />
           </div>
           
           <div className="col-span-1 h-full">

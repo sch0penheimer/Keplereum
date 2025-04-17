@@ -1,4 +1,4 @@
-### Decentralized Satellite Communication Network Using Blockchain: A Secure and Scalable Microservices Architecture
+### Keplereum: An Ethereum Decentralized Satellite Communication Network
 
 ---
 

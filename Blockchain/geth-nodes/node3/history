@@ -1,0 +1,84 @@
+
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+miner.start()
+miner.stop()
+clique.propose("0x586c6a428dfa031a56360e634cd8d87ea38441c1", true)
+'
+miner.start()
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+miner.start()
+exit#
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+clique.proposals
+clique.propose("0x90501ed9e1d4466512a09fe41157a1fad6ed76e7", true);
+miner.start()
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+miner.start()
+miner.stop()
+admin.nodeInfo.enode
+admin.peers
+admin.addPeer("enode://9260f803223fa1cbc29dafbd3220b3350c6148513518cbb39bce537e26ca7df03579273a9d113b1142f1434a6d8b5478905daf33d627aa3019f754c1c6447458@127.0.0.1:30305?discport=0")
+miner.start()
+eth.coinbase
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+admin.addPeer("enode://9260f803223fa1cbc29dafbd3220b3350c6148513518cbb39bce537e26ca7df03579273a9d113b1142f1434a6d8b5478905daf33d627aa3019f754c1c6447458@127.0.0.1:30305?discport=0")
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+admin.nodeInfo.enode
+admin.addPeer('enode://eeaabc99f05ac07f9156fa698a7e4a2c5214f3fe82fc468c8f6a97ce334f8f695a69c874372ee56c425069e52281d970785b8081bb889b6abb91ef1f0e245a96@127.0.0.1:30304?discport=0')
+admin.addPeer("enode://fc9725fe356d84219c2d939b5d9348d45b28f9f36661441147ae62cc956a62cd4ab9f1a8c70d1fc807d6fa7c3772514d1c9440529405ef196310c4b360647d70@127.0.0.1:30305?discport=0")
+clique.propose("0xe6427a00f96f7ca5688f1de97ba66c21daf77afe", true)
+clique.propose("0xe680c674b7ee03080c8c11099d499c68895088cb", true)
+miner.start()
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+admin.addPeer('enode://eeaabc99f05ac07f9156fa698a7e4a2c5214f3fe82fc468c8f6a97ce334f8f695a69c874372ee56c425069e52281d970785b8081bb889b6abb91ef1f0e245a96@127.0.0.1:30304?discport=0')
+admin.addPeer("enode://fc9725fe356d84219c2d939b5d9348d45b28f9f36661441147ae62cc956a62cd4ab9f1a8c70d1fc807d6fa7c3772514d1c9440529405ef196310c4b360647d70@127.0.0.1:30305?discport=0")
+miner.start()
+miner.stop()
+clique.propose("0xE6427A00f96f7CA5688f1DE97ba66c21dAF77AFe", true)
+clique.propose("0xE680C674B7EE03080C8c11099D499C68895088cB", true)
+clique.getSigners()
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+admin.addPeer('enode://eeaabc99f05ac07f9156fa698a7e4a2c5214f3fe82fc468c8f6a97ce334f8f695a69c874372ee56c425069e52281d970785b8081bb889b6abb91ef1f0e245a96@127.0.0.1:30304?discport=0')
+admin.addPeer("enode://fc9725fe356d84219c2d939b5d9348d45b28f9f36661441147ae62cc956a62cd4ab9f1a8c70d1fc807d6fa7c3772514d1c9440529405ef196310c4b360647d70@127.0.0.1:30305?discport=0")
+miner.start()
+clique.propose("0xE6427A00f96f7CA5688f1DE97ba66c21dAF77AFe", true)
+clique.propose("0xE680C674B7EE03080C8c11099D499C68895088cB", true)
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+admin.nodeInfo.enode
+admin.addPeer(enode://11d0f330d6ad52bb7aab9d90281fd85522ec42c8a788866a1660228db29fb09025d39cb7890c62d072a2abd451e1162eefb0af86261db3a188f07abcef88602f@127.0.0.1:30305?discport=0)
+admin.addPeer("enode://11d0f330d6ad52bb7aab9d90281fd85522ec42c8a788866a1660228db29fb09025d39cb7890c62d072a2abd451e1162eefb0af86261db3a188f07abcef88602f@127.0.0.1:30305?discport=0")
+admin.peers
+miner.start()
+eth.getBlock(1)
+eth.getBlock(2)
+miner.stop()
+miner.start()
+eth.syncing
+miner.stop()
+clique.getSigners()
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+miner.start()
+eth.getBlock(8#)
+eth.getBlock(8)
+eth.getBlock(7)
+eth.getBlock(8)
+miner.stop()
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+miner.start()
+miner.setEtherbase("0x586c6a428dfa031a56360e634cd8d87ea38441c1")
+miner.start()
+miner.stop()
+const signers = await clique.getSigners();
+clique.getSigners()
+miner.start()
+miner.stop()
+admin.peers
+enode://29764898987c3f786b888b58dbfce0083bcc5aaefc5067ee2f3c0d08f863b85f950b15b77f3fc744f0dc1c4a5ad62aea453d0efd60b6b6aceed0d5d726f7ec69@127.0.0.1:30304
+admin.nodeInfo.enode
+admin.peers

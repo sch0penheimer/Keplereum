@@ -1,0 +1,98 @@
+
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+eth.getBalance
+eth.getBalance()
+miner.start()
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+miner.start()
+miner.stop()
+miner.start()
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+miner.start()
+clique.getSigners()
+eth.getBlock(23)
+eth.getBlock(22)
+miner.start()
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+miner.start()
+clique.propose("0x586c6a428dfa031a56360e634cd8d87ea38441c1", true);
+clique.propose("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44", true);
+clique.propose("0xe680c674b7ee03080c8c11099d499c68895088cb", true);
+clique.propose("0x90501ed9e1d4466512a09fe41157a1fad6ed76e7", true);
+miner.start()
+miner.stop()
+miner.start()
+clique.getSigners()
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+eth.getBlock(25)
+eth.getBlock(24)
+eth.getBlock(23)
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+clique.propose("0x90501ed9e1d4466512a09fe41157a1fad6ed76e7", true);
+clique.proposals
+miner.start()
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+miner.start()
+miner.stop()
+admin.peers
+admin.nodeInfo.enode
+admin.peers
+miner.start()
+eth.coinbase
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+admin.addPeer('enode://5388bc235538eb53e190b2db97a0259229c0310da81be4463b298c23e5ede0692fd6f683f05384a2019c7ad0c6cbd2908c2621ac0ad3feb662d6583de053c2d0@127.0.0.1:30304?discport=0')
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+admin.nodeInfo.enode
+admin.addPeer('enode://eeaabc99f05ac07f9156fa698a7e4a2c5214f3fe82fc468c8f6a97ce334f8f695a69c874372ee56c425069e52281d970785b8081bb889b6abb91ef1f0e245a96@127.0.0.1:30304?discport=0')
+clique.propose("0xe6427a00f96f7ca5688f1de97ba66c21daf77afe", true)
+clique.propose("0xe680c674b7ee03080c8c11099d499c68895088cb", true)
+miner.start()
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+admin.addPeer('enode://eeaabc99f05ac07f9156fa698a7e4a2c5214f3fe82fc468c8f6a97ce334f8f695a69c874372ee56c425069e52281d970785b8081bb889b6abb91ef1f0e245a96@127.0.0.1:30304?discport=0')
+miner.start()
+miner.stop()
+clique.propose("0xE6427A00f96f7CA5688f1DE97ba66c21dAF77AFe", true)
+clique.propose("0xE680C674B7EE03080C8c11099D499C68895088cB", true)
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+admin.addPeer('enode://eeaabc99f05ac07f9156fa698a7e4a2c5214f3fe82fc468c8f6a97ce334f8f695a69c874372ee56c425069e52281d970785b8081bb889b6abb91ef1f0e245a96@127.0.0.1:30304?discport=0')
+miner.start()
+clique.propose("0xE6427A00f96f7CA5688f1DE97ba66c21dAF77AFe", true)
+clique.propose("0xE680C674B7EE03080C8c11099D499C68895088cB", true)
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+clique.getSigners()
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+clique.getSigners()
+admin.nodeInfo.enode
+admin.peers
+miner.start()
+eth.syncing
+miner.stop()
+miner.start()
+eth.getBlock()
+eth.getBlock(2)
+eth.getBlock(1)
+miner.stop()
+exit#
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+admin.peers
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+admin.peers
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+miner.start()
+eth.getBlock(8)
+miner.stop()
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+miner.start()
+eth.getBlock(13)
+> debug.printBlock(12)
+debug.printBlock(12)
+miner.setEtherbase("0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44")
+miner.start()
+miner.stop()
+miner.start()
+miner.stop()
+admin.peers
+exitz
+admin.peers

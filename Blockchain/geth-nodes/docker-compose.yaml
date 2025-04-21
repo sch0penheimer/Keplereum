@@ -1,0 +1,158 @@
+# File: Blockchain/geth-nodes/docker-compose.yaml
+# Version: 3.8
+services:
+  geth-node1:
+    image: ethereum/client-go:v1.13.5
+    container_name: geth-node1
+    volumes:
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node1:/geth
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+    ports:
+      - "30304:30304"
+      - "8545:8545"
+    networks:
+      - geth-net
+    command: >
+      --datadir /geth
+      --networkid 12345
+      --port 30304
+      --syncmode full
+      --http
+      --http.addr "0.0.0.0"
+      --http.port 8545
+      --http.corsdomain "*"
+      --http.api "eth,net,web3,personal,miner,clique"
+      --authrpc.port 8552
+      --allow-insecure-unlock
+      --unlock "0xe6427a00f96f7ca5688f1de97ba66c21daf77afe"
+      --password /geth/password.txt
+    tty: true
+    stdin_open: true
+
+  geth-node2:
+    image: ethereum/client-go:v1.13.5
+    container_name: geth-node2
+    depends_on:
+      - geth-node1
+    volumes:
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node2:/geth
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+    ports:
+      - "30305:30305"
+      - "8546:8546"
+    networks:
+      - geth-net
+    command: >
+      --datadir /geth
+      --networkid 12345
+      --port 30305
+      --bootnodes "enode://29764898987c3f786b888b58dbfce0083bcc5aaefc5067ee2f3c0d08f863b85f950b15b77f3fc744f0dc1c4a5ad62aea453d0efd60b6b6aceed0d5d726f7ec69@geth-node1:30304"
+      --syncmode full
+      --http
+      --http.addr "0.0.0.0"
+      --http.port 8546
+      --http.corsdomain "*"
+      --http.api "eth,net,web3,personal,miner,clique"
+      --authrpc.port 8553
+      --allow-insecure-unlock
+      --unlock "0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44"
+      --password /geth/password.txt
+    tty: true
+    stdin_open: true
+
+  geth-node3:
+    image: ethereum/client-go:v1.13.5
+    container_name: geth-node3
+    depends_on:
+      - geth-node1
+    volumes:
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node3:/geth
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+    ports:
+      - "30306:30306"
+      - "8547:8547"
+    networks:
+      - geth-net
+    command: >
+      --datadir /geth
+      --networkid 12345
+      --port 30306
+      --bootnodes "enode://29764898987c3f786b888b58dbfce0083bcc5aaefc5067ee2f3c0d08f863b85f950b15b77f3fc744f0dc1c4a5ad62aea453d0efd60b6b6aceed0d5d726f7ec69@geth-node1:30304"
+      --syncmode full
+      --http
+      --http.addr "0.0.0.0"
+      --http.port 8547
+      --http.corsdomain "*"
+      --http.api "eth,net,web3,personal,miner,clique"
+      --authrpc.port 8554
+      --allow-insecure-unlock
+      --unlock "0x586c6a428dfa031a56360e634cd8d87ea38441c1"
+      --password /geth/password.txt
+    tty: true
+    stdin_open: true
+
+  geth-node4:
+    image: ethereum/client-go:v1.13.5
+    container_name: geth-node4
+    depends_on:
+      - geth-node1
+    volumes:
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node4:/geth
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+    ports:
+      - "30307:30307"
+      - "8548:8548"
+    networks:
+      - geth-net
+    command: >
+      --datadir /geth
+      --networkid 12345
+      --port 30307
+      --bootnodes "enode://29764898987c3f786b888b58dbfce0083bcc5aaefc5067ee2f3c0d08f863b85f950b15b77f3fc744f0dc1c4a5ad62aea453d0efd60b6b6aceed0d5d726f7ec69@geth-node1:30304"
+      --syncmode full
+      --http
+      --http.addr "0.0.0.0"
+      --http.port 8548
+      --http.corsdomain "*"
+      --http.api "eth,net,web3,personal,miner,clique"
+      --authrpc.port 8555
+      --allow-insecure-unlock
+      --unlock "0xe680c674b7ee03080c8c11099d499c68895088cb"
+      --password /geth/password.txt
+    tty: true
+    stdin_open: true
+
+  geth-node5:
+    image: ethereum/client-go:v1.13.5
+    container_name: geth-node5
+    depends_on:
+      - geth-node1
+    volumes:
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node5:/geth
+      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+    ports:
+      - "30308:30308"
+      - "8549:8549"
+    networks:
+      - geth-net
+    command: >
+      --datadir /geth
+      --networkid 12345
+      --port 30308
+      --bootnodes "enode://29764898987c3f786b888b58dbfce0083bcc5aaefc5067ee2f3c0d08f863b85f950b15b77f3fc744f0dc1c4a5ad62aea453d0efd60b6b6aceed0d5d726f7ec69@geth-node1:30304"
+      --syncmode full
+      --http
+      --http.addr "0.0.0.0"
+      --http.port 8549
+      --http.corsdomain "*"
+      --http.api "eth,net,web3,personal,miner,clique"
+      --authrpc.port 8556
+      --allow-insecure-unlock
+      --unlock "0x90501ed9e1d4466512a09fe41157a1fad6ed76e7"
+      --password /geth/password.txt
+    tty: true
+    stdin_open: true
+
+networks:
+  geth-net:
+    driver: bridge

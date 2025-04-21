@@ -42,7 +42,7 @@ const BlockchainStats = () => {
           {/* Split into Network Hash Rate and Latency */}
           <div className="flex flex-col justify-between">
             {/* Network Hash Rate */}
-            <div className="text-center mb-4">
+            <div className="text-center">
               <div className="text-2xl text-satellite-accent font-bold">
                 {networkStats.hashRate} TH/s
               </div>

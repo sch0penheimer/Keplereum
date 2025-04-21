@@ -89,6 +89,7 @@ services:
       --authrpc.port 8554
       --allow-insecure-unlock
       --unlock "0x586c6a428dfa031a56360e634cd8d87ea38441c1"
+      --miner.etherbase "0x586c6a428dfa031a56360e634cd8d87ea38441c1"
       --password /geth/password.txt
     tty: true
     stdin_open: true
@@ -120,6 +121,7 @@ services:
       --authrpc.port 8555
       --allow-insecure-unlock
       --unlock "0xe680c674b7ee03080c8c11099d499c68895088cb"
+      --miner.etherbase "0xe680c674b7ee03080c8c11099d499c68895088cb"
       --password /geth/password.txt
     tty: true
     stdin_open: true
@@ -151,6 +153,7 @@ services:
       --authrpc.port 8556
       --allow-insecure-unlock
       --unlock "0x90501ed9e1d4466512a09fe41157a1fad6ed76e7"
+      --miner.etherbase "0x90501ed9e1d4466512a09fe41157a1fad6ed76e7"
       --password /geth/password.txt
     tty: true
     stdin_open: true

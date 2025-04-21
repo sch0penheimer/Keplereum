@@ -107,6 +107,9 @@ const generateMockBlock = (blockNumber: number): Block => {
   return {
     number: blockNumber,
     hash: `0x${Math.random().toString(16).substring(2, 42)}`,
+    parentHash: `0x${Math.random().toString(16).substring(2, 42)}`,
+    sha3uncles: `0x${Math.random().toString(16).substring(2, 66)}`,
+    transactionRoot: `0x${Math.random().toString(16).substring(2, 66)}`,
     timestamp: timestamp,
     validator: `0x${Math.random().toString(16).substring(2, 42)}`,
     size: parseFloat((Math.random() * 2 + 0.5).toFixed(2)),

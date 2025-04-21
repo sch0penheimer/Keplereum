@@ -23,6 +23,9 @@ export interface BlockTransaction {
 export interface Block {
   number: number;
   hash: string;
+  parentHash: string;
+  sha3uncles: string;
+  transactionRoot: string;
   timestamp: Date;
   validator: string;
   size: number;

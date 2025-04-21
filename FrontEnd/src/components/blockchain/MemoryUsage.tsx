@@ -1,7 +1,6 @@
 
 import BlockchainWindow from './BlockchainWindow';
-import { ChartContainer } from "@/components/ui/chart";
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useBlockchainContext } from '@/contexts/BlockchainContext';
 
 const MemoryUsage = () => {
@@ -14,7 +13,7 @@ const MemoryUsage = () => {
     
     for (let i = 0; i < timestamps.length; i++) {
       const baseValue = 1000 + Math.random() * 1000;
-      const peakValue = Math.random() > 0.7 ? baseValue + 800 : baseValue;
+      const peakValue = Math.random() > 0.7 ? baseValue + Math.random() * 1000 : baseValue - Math.random() * 1000;
       
       data.push({
         time: timestamps[i],
@@ -34,14 +33,14 @@ const MemoryUsage = () => {
   
   return (
     <BlockchainWindow title="MEMORY USAGE & TRANSACTIONS" className="h-full">
-        <div className="p-3 flex flex-col">
-          <div className="grid grid-cols-3 gap-24 mb-3">
-            <div className="bg-satellite-dark p-2 rounded">
+        <div className="flex flex-col h-full">
+          <div className="flex justify-between items-center mb-3 mt-3">
+            <div className="bg-satellite-dark p-2 rounded ml-6">
               <div className="text-xs text-gray-400 mb-1">Minimum fee</div>
               <div className="text-xl text-white">1.00 <span className="text-xs">sat/vB</span></div>
             </div>
-            
-            <div className="bg-satellite-dark p-2 rounded">
+
+            <div className="bg-satellite-dark p-2 rounded text-center">
               <div className="text-xs text-gray-400 mb-1">Memory Usage</div>
               <div className="text-sm text-white mb-1">{memoryUsage.toFixed(1)} MB / 300 MB</div>
               <div className="w-full bg-gray-700 rounded-full h-2">
@@ -51,46 +50,33 @@ const MemoryUsage = () => {
                 ></div>
               </div>
             </div>
-            
-            <div className="bg-satellite-dark p-2 rounded">
+
+            <div className="bg-satellite-dark p-2 rounded text-right mr-6">
               <div className="text-xs text-gray-400 mb-1">Unconfirmed</div>
               <div className="text-xl text-white">{pendingTransactions.length} <span className="text-xs">TXs</span></div>
             </div>
           </div>
           
-          <div className="flex-grow">
-            <div className="text-xs text-gray-400 mb-1">Incoming Transactions</div>
-            <div className="h-56">
-              <ResponsiveContainer width="100%" height="130%">
-                <ChartContainer config={{
-                  transactions: { color: "#3498DB" },
-                  peaks: { color: "#f59e0b" }
-                }}>
-                  <AreaChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
-                    <defs>
-                      <linearGradient id="colorTransactions" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--color-transactions)" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="var(--color-transactions)" stopOpacity={0.1}/>
-                      </linearGradient>
-                      <linearGradient id="colorPeaks" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="var(--color-peaks)" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="var(--color-peaks)" stopOpacity={0.1}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF' }} />
-                    <YAxis hide={true} domain={[0, 2500]} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1A1F2C', borderColor: '#3D4852', borderRadius: '4px' }}
-                      labelStyle={{ color: '#E2E8F0' }}
-                      itemStyle={{ color: '#E2E8F0' }}
-                    />
-                    <Area type="monotone" dataKey="transactions" stroke="var(--color-transactions)" fillOpacity={1} fill="url(#colorTransactions)" />
-                    <Area type="monotone" dataKey="peaks" stroke="var(--color-peaks)" fillOpacity={0.3} fill="url(#colorPeaks)" />
-                  </AreaChart>
-                </ChartContainer>
-              </ResponsiveContainer>
-            </div>
-          </div>
+          <div className="flex-grow w-full h-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+              <defs>
+                <linearGradient id="colorTx" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#2d7bb2" stopOpacity={0.9}/>
+                  <stop offset="95%" stopColor="#2d7bb2" stopOpacity={0.1}/>
+                </linearGradient>
+                <linearGradient id="colorPeaks" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3d8445" stopOpacity={0.9}/>
+                  <stop offset="95%" stopColor="#3d8445" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="time" tick={{ fontSize: 10 }} />
+              <Tooltip contentStyle={{ fontSize: 12 }} />
+              <Area type="monotone" dataKey="transactions" stroke="#2d7bb2" strokeWidth={3} fillOpacity={1} fill="url(#colorTx)" />
+              <Area type="monotone" dataKey="peaks" stroke="#3d8445" strokeWidth={3} fillOpacity={1} fill="url(#colorPeaks)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
         </div>
     </BlockchainWindow>
   );

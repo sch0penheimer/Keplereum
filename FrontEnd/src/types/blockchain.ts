@@ -11,6 +11,12 @@ export interface BlockTransaction {
   gasPrice: number;
   gasLimit: number;
   gasUsed: number;
+  blockNumber: number | null;
+  alertType?: string;
+  latitude?: number;
+  longitude?: number;
+  confirmsAlertId?: string;
+  action?: 'SWITCH_ORBIT' | 'SWITCH_SENSOR' | 'DEPLOY_DRONES';
 }
 
 //* Block Interface *//
@@ -41,6 +47,12 @@ export interface NetworkStats {
   pendingTransactions: number;
   activeValidators: number;
   totalBlocks: number;
+  difficulty: number;
+  difficultyPercent: number;
+  hashRate: number;
+  hashRateChange: number;
+  latency: number;
+  latencyChange: number;
   gasPrice: {
     low: number;
     medium: number;

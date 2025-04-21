@@ -20,23 +20,23 @@ const BlockchainDashboard = () => {
   return (
     <div className="flex flex-col h-full bg-satellite-dark overflow-hidden">
         {/* 1/4 height for BlocksHeader */}
-        <div className="h-1/4 flex-shrink-0">
+        <div className="h-1/4 flex-shrink-10 overflow-hidden">
           <BlocksHeader />
         </div>
         
         {/* 1/4 height for ValidationQueue and BlockchainStats */}
-        <div className="h-1/4 grid grid-cols-2 gap-2 p-2 flex-shrink-0">
-          <div className="col-span-1 h-full">
+        <div className="h-1/4 grid grid-cols-2 gap-2 p-2">
+          <div className="col-span-1 h-full overflow-hidden">
             <ValidationQueue />
           </div>
           
-          <div className="col-span-1 h-full">
+          <div className="col-span-1 h-full overflow-hidden">
             <BlockchainStats />
           </div>
         </div>
         
         {/* 2/4 height for TransactionMemoryPool and MemoryUsage with fixed height */}
-        <div className="h-2/4 grid grid-cols-2 gap-2 p-2 flex-shrink-0">
+        <div className="h-2/4 grid grid-cols-2 gap-2 p-2">
           <div className="col-span-1 h-full overflow-hidden">
             <TransactionMemoryPool />
           </div>

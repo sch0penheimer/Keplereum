@@ -71,7 +71,11 @@ export default {
 					border: '#3D4852',
 					text: '#E2E8F0',
 					highlight: '#4CAF50'
-				}
+				},
+				scrollbar: {
+					thumb: '#1E3A8A',
+					track: 'transparent',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -102,5 +106,7 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+	],
 } satisfies Config;

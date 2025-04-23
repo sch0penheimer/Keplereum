@@ -47,7 +47,7 @@ services:
       --datadir /geth
       --networkid 12345
       --port 30305
-      --bootnodes "enode://29764898987c3f786b888b58dbfce0083bcc5aaefc5067ee2f3c0d08f863b85f950b15b77f3fc744f0dc1c4a5ad62aea453d0efd60b6b6aceed0d5d726f7ec69@geth-node1:30304"
+      --bootnodes "enode://a7aa8f6cc2f335bfdd5cc7561593805e79a7892336c7a8b77e7a42e379b9b033c383806fbe8fd1ad360542054ffffe075194495b1e40165d842bedcce1ebe012@geth-node1:30304"
       --syncmode full
       --http
       --http.addr "0.0.0.0"
@@ -79,7 +79,7 @@ services:
       --datadir /geth
       --networkid 12345
       --port 30306
-      --bootnodes "enode://29764898987c3f786b888b58dbfce0083bcc5aaefc5067ee2f3c0d08f863b85f950b15b77f3fc744f0dc1c4a5ad62aea453d0efd60b6b6aceed0d5d726f7ec69@geth-node1:30304"
+      --bootnodes "enode://a7aa8f6cc2f335bfdd5cc7561593805e79a7892336c7a8b77e7a42e379b9b033c383806fbe8fd1ad360542054ffffe075194495b1e40165d842bedcce1ebe012@geth-node1:30304"
       --syncmode full
       --http
       --http.addr "0.0.0.0"
@@ -111,7 +111,7 @@ services:
       --datadir /geth
       --networkid 12345
       --port 30307
-      --bootnodes "enode://29764898987c3f786b888b58dbfce0083bcc5aaefc5067ee2f3c0d08f863b85f950b15b77f3fc744f0dc1c4a5ad62aea453d0efd60b6b6aceed0d5d726f7ec69@geth-node1:30304"
+      --bootnodes "enode://a7aa8f6cc2f335bfdd5cc7561593805e79a7892336c7a8b77e7a42e379b9b033c383806fbe8fd1ad360542054ffffe075194495b1e40165d842bedcce1ebe012@geth-node1:30304"
       --syncmode full
       --http
       --http.addr "0.0.0.0"
@@ -143,7 +143,7 @@ services:
       --datadir /geth
       --networkid 12345
       --port 30308
-      --bootnodes "enode://29764898987c3f786b888b58dbfce0083bcc5aaefc5067ee2f3c0d08f863b85f950b15b77f3fc744f0dc1c4a5ad62aea453d0efd60b6b6aceed0d5d726f7ec69@geth-node1:30304"
+      --bootnodes "enode://a7aa8f6cc2f335bfdd5cc7561593805e79a7892336c7a8b77e7a42e379b9b033c383806fbe8fd1ad360542054ffffe075194495b1e40165d842bedcce1ebe012@geth-node1:30304"
       --syncmode full
       --http
       --http.addr "0.0.0.0"

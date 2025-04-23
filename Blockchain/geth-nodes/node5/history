@@ -69,7 +69,7 @@ miner.setEtherbase("0x90501ed9e1d4466512a09fe41157a1fad6ed76e7")
 clique.getSigners()
 miner.setEtherbase("0x90501ed9e1d4466512a09fe41157a1fad6ed76e7")
 exigt
-exi#t
+exit
 miner.setEtherbase("0x90501ed9e1d4466512a09fe41157a1fad6ed76e7")
 clique.getSigners()
 miner.setEtherbase("0x90501ed9e1d4466512a09fe41157a1fad6ed76e7")

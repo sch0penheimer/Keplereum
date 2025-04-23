@@ -31,4 +31,5 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	rsc.io/tmplfunc v0.0.3 // indirect
 )
-replace github.com/mdn753/development-platform-api-tologists/build/satellite => ./build/satellite
+
+replace github.com/mdn753/development-platform-api-tologists/Blockchain/build/SatelliteSystem  => ./build/SatelliteSystem

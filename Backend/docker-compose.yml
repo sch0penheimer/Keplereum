@@ -1,0 +1,30 @@
+services:
+  user-db:
+    image: postgres
+    container_name: user-db
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user
+    ports:
+      - "5432:5432"
+    volumes:
+      - user-db-data:/var/lib/postgres/data
+
+  satellite-db:
+    image: postgres
+    container_name: satellite-db
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: satellite
+    ports:
+      - "5433:5432"
+    volumes:
+      - satellite-db-data:/var/lib/postgresql/data
+
+
+
+volumes:
+  user-db-data:
+  satellite-db-data:

@@ -1,4 +1,4 @@
-package com.example.jeeHamlaoui.Service_User;
+package com.example.jeeHamlaoui;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

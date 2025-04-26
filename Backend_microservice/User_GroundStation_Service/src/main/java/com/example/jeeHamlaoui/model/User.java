@@ -1,9 +1,11 @@
 package com.example.jeeHamlaoui.model;
 
 import com.example.jeeHamlaoui.model.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Builder;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -14,6 +16,7 @@ import java.util.Objects;
 public class User {
 
     @Id
+    @GeneratedValue
     private Long user_id;
 
     private String user_name;
@@ -29,18 +32,29 @@ public class User {
     @JoinColumn(name = "groundStation_id")
     private GroundStation groundStation;
 
+    @CreationTimestamp
+    @Column(updatable = false)
     private Instant created_at;
 
-    public User() {
-    }
-
-    public User(Long user_id, String user_name, String password, String email, UserStatus status, Instant created_at) {
+    public User(Long user_id, String user_name, String password, String email, UserStatus status, GroundStation groundStation, Instant created_at) {
         this.user_id = user_id;
         this.user_name = user_name;
         this.password = password;
         this.email = email;
         this.status = status;
+        this.groundStation = groundStation;
         this.created_at = created_at;
+    }
+
+    public User() {
+    }
+
+    public GroundStation getGroundStation() {
+        return groundStation;
+    }
+
+    public void setGroundStation(GroundStation groundStation) {
+        this.groundStation = groundStation;
     }
 
     @Override

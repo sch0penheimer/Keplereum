@@ -25,8 +25,9 @@ public class UserService {
     }
 
     // Save or update a user
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public UserDto saveUser(User user) {
+        User savedUser = userRepository.save(user);
+        return userMapper.toDto(savedUser);
     }
 
     // Get a user by ID

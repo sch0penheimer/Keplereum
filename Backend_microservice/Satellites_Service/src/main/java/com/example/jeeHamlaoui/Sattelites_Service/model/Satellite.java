@@ -1,13 +1,15 @@
 package com.example.jeeHamlaoui.Sattelites_Service.model;
 
 import com.example.jeeHamlaoui.Sattelites_Service.model.enumeration.SatelliteStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import org.antlr.v4.runtime.misc.NotNull;
 
-import java.io.Serializable;
+
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,14 +19,13 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "satellite")
-public class Satellite implements Serializable {
+public class Satellite {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id")
-    private Long id;
+    @GeneratedValue
+    @Column(name = "satellite_id")
+    private Long satellite_id;
 
     @NotNull
     @Column(name = "name", nullable = false)
@@ -38,19 +39,19 @@ public class Satellite implements Serializable {
     @Column(name = "status", nullable = false)
     private SatelliteStatus status;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "satellite")
-    @JsonIgnoreProperties(value = { "satellite" }, allowSetters = true)
+    @OneToMany( mappedBy = "satellite")
+    @JsonManagedReference
     private Set<Sensor> sensors = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "satellite")
-    @org.springframework.data.annotation.Transient
-    @JsonIgnoreProperties(value = { "satellite" }, allowSetters = true)
+    @OneToMany(mappedBy = "satellite")
     private Set<SatelliteTrajectory> trajectories = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "satellites" }, allowSetters = true)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "SatelliteModelId",referencedColumnName = "SatelliteModelId")
+    @JsonBackReference
     private SatelliteModel model;
 
+    /*
     @JsonIgnoreProperties(value = { "satellite", "blocks", "blockTransactions" }, allowSetters = true)
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "satellite")
     private NetworkNode networkNode;
@@ -58,20 +59,20 @@ public class Satellite implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "satellites" }, allowSetters = true)
     private GroundStation groundStation;
-
+    */
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
-        return this.id;
+        return this.satellite_id;
     }
 
-    public Satellite id(Long id) {
-        this.setId(id);
+    public Satellite satellite_id(Long satellite_id) {
+        this.setId(satellite_id);
         return this;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setId(Long satellite_id) {
+        this.satellite_id = satellite_id;
     }
 
     public String getName() {
@@ -187,7 +188,7 @@ public class Satellite implements Serializable {
         this.setModel(satelliteModel);
         return this;
     }
-
+/*
     public NetworkNode getNetworkNode() {
         return this.networkNode;
     }
@@ -219,7 +220,7 @@ public class Satellite implements Serializable {
         this.setGroundStation(groundStation);
         return this;
     }
-
+    */
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -243,7 +244,7 @@ public class Satellite implements Serializable {
     @Override
     public String toString() {
         return "Satellite{" +
-            "id=" + getId() +
+            "satellite_id=" + getId() +
             ", name='" + getName() + "'" +
             ", launchDate='" + getLaunchDate() + "'" +
             ", status='" + getStatus() + "'" +

@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface SatelliteModelRepository extends JpaRepository<SatelliteModel, Long> {}
+public interface SatelliteModelRepository extends JpaRepository<SatelliteModel, Long> {
+
+}

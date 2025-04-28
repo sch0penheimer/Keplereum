@@ -34,16 +34,17 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User savedUser = userService.saveUser(user);
+    public ResponseEntity<UserDto> createUser(@RequestBody User user) {
+        UserDto savedUser = userService.saveUser(user);
         return ResponseEntity.ok(savedUser);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody User user) {
         try {
             User updatedUser = userService.updateUser(id, user);
-            return ResponseEntity.ok(updatedUser);
+            UserDto dtoUser = userService.saveUser(updatedUser);
+            return ResponseEntity.ok(dtoUser);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }

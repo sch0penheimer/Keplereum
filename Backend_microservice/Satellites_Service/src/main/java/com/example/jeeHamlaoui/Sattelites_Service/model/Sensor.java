@@ -1,6 +1,8 @@
 package com.example.jeeHamlaoui.Sattelites_Service.model;
 
 import com.example.jeeHamlaoui.Sattelites_Service.model.enumeration.SensorActivity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
@@ -14,12 +16,11 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "sensor")
-public class Sensor implements Serializable {
+public class Sensor {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
+    @GeneratedValue
     @Column(name = "id")
     private Long id;
 
@@ -38,8 +39,9 @@ public class Sensor implements Serializable {
     @Column(name = "activity", nullable = false)
     private SensorActivity activity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "sensors", "trajectories", "model", "networkNode", "groundStation" }, allowSetters = true)
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "satellite_id")
     private Satellite satellite;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

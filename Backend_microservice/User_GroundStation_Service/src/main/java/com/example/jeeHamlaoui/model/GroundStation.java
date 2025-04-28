@@ -1,6 +1,8 @@
 package com.example.jeeHamlaoui.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -25,9 +27,14 @@ public class GroundStation {
 
     private String groundStation_Description;
 
+    @JsonBackReference
     @OneToOne(mappedBy = "groundStation")
     private User user;
 
+    @JsonProperty("userId")
+    public Long getUserId() {
+        return user != null ? user.getUser_id() : null;
+    }
     /*
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "groundStation")
     @JsonIgnoreProperties(value = { "sensors", "trajectories", "model", "networkNode", "groundStation" }, allowSetters = true)

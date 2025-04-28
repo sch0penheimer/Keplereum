@@ -2,6 +2,7 @@ package com.example.jeeHamlaoui.model;
 
 import com.example.jeeHamlaoui.model.enums.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Builder;
@@ -28,7 +29,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @JsonIgnoreProperties
     @JoinColumn(name = "groundStation_id")
     private GroundStation groundStation;
 

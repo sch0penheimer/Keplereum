@@ -1,32 +1,25 @@
 package com.example.jeeHamlaoui.Sattelites_Service.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
-import org.antlr.v4.runtime.misc.NotNull;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
-/**
- * A SatelliteModel.
- */
+
+
 @Entity
 @Table(name = "satellite_model")
-public class SatelliteModel implements Serializable {
-
+public class SatelliteModel{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
-    @Column(name = "id")
-    private Long id;
+    @GeneratedValue
+    @Column(name = "SatelliteModelId")
+    private Long SatelliteModelId;
 
-    @NotNull
+    
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotNull
+    
     @Column(name = "manufacturer", nullable = false)
     private String manufacturer;
 
@@ -51,32 +44,38 @@ public class SatelliteModel implements Serializable {
     @Column(name = "dry_mass")
     private Double dryMass;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "model")
-    @JsonIgnoreProperties(value = { "sensors", "trajectories", "model", "networkNode", "groundStation" }, allowSetters = true)
-    private Set<Satellite> satellites = new HashSet<>();
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
 
-    public Long getId() {
-        return this.id;
+    public SatelliteModel() {
     }
 
-    public SatelliteModel id(Long id) {
-        this.setId(id);
-        return this;
+    public SatelliteModel(String name, Double weight, String manufacturer, String dimensions, Double powerCapacity, Integer expectedLifespan, Double designTrajectoryPredictionFactor, Double launchMass, Double dryMass) {
+
+        this.name = name;
+        this.weight = weight;
+        this.manufacturer = manufacturer;
+        this.dimensions = dimensions;
+        this.powerCapacity = powerCapacity;
+        this.expectedLifespan = expectedLifespan;
+        this.designTrajectoryPredictionFactor = designTrajectoryPredictionFactor;
+        this.launchMass = launchMass;
+        this.dryMass = dryMass;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+
+// jhipster-needle-entity-add-field - JHipster will add fields here
+
+
+    public Long getSatelliteModel_id() {
+        return SatelliteModelId;
+    }
+
+    public void setSatelliteModel_id(Long SatelliteModelId) {
+        SatelliteModelId = SatelliteModelId;
     }
 
     public String getName() {
-        return this.name;
-    }
-
-    public SatelliteModel name(String name) {
-        this.setName(name);
-        return this;
+        return name;
     }
 
     public void setName(String name) {
@@ -84,12 +83,7 @@ public class SatelliteModel implements Serializable {
     }
 
     public String getManufacturer() {
-        return this.manufacturer;
-    }
-
-    public SatelliteModel manufacturer(String manufacturer) {
-        this.setManufacturer(manufacturer);
-        return this;
+        return manufacturer;
     }
 
     public void setManufacturer(String manufacturer) {
@@ -97,12 +91,7 @@ public class SatelliteModel implements Serializable {
     }
 
     public Double getWeight() {
-        return this.weight;
-    }
-
-    public SatelliteModel weight(Double weight) {
-        this.setWeight(weight);
-        return this;
+        return weight;
     }
 
     public void setWeight(Double weight) {
@@ -110,12 +99,7 @@ public class SatelliteModel implements Serializable {
     }
 
     public String getDimensions() {
-        return this.dimensions;
-    }
-
-    public SatelliteModel dimensions(String dimensions) {
-        this.setDimensions(dimensions);
-        return this;
+        return dimensions;
     }
 
     public void setDimensions(String dimensions) {
@@ -123,12 +107,7 @@ public class SatelliteModel implements Serializable {
     }
 
     public Double getPowerCapacity() {
-        return this.powerCapacity;
-    }
-
-    public SatelliteModel powerCapacity(Double powerCapacity) {
-        this.setPowerCapacity(powerCapacity);
-        return this;
+        return powerCapacity;
     }
 
     public void setPowerCapacity(Double powerCapacity) {
@@ -136,12 +115,7 @@ public class SatelliteModel implements Serializable {
     }
 
     public Integer getExpectedLifespan() {
-        return this.expectedLifespan;
-    }
-
-    public SatelliteModel expectedLifespan(Integer expectedLifespan) {
-        this.setExpectedLifespan(expectedLifespan);
-        return this;
+        return expectedLifespan;
     }
 
     public void setExpectedLifespan(Integer expectedLifespan) {
@@ -149,12 +123,7 @@ public class SatelliteModel implements Serializable {
     }
 
     public Double getDesignTrajectoryPredictionFactor() {
-        return this.designTrajectoryPredictionFactor;
-    }
-
-    public SatelliteModel designTrajectoryPredictionFactor(Double designTrajectoryPredictionFactor) {
-        this.setDesignTrajectoryPredictionFactor(designTrajectoryPredictionFactor);
-        return this;
+        return designTrajectoryPredictionFactor;
     }
 
     public void setDesignTrajectoryPredictionFactor(Double designTrajectoryPredictionFactor) {
@@ -162,12 +131,7 @@ public class SatelliteModel implements Serializable {
     }
 
     public Double getLaunchMass() {
-        return this.launchMass;
-    }
-
-    public SatelliteModel launchMass(Double launchMass) {
-        this.setLaunchMass(launchMass);
-        return this;
+        return launchMass;
     }
 
     public void setLaunchMass(Double launchMass) {
@@ -175,82 +139,10 @@ public class SatelliteModel implements Serializable {
     }
 
     public Double getDryMass() {
-        return this.dryMass;
-    }
-
-    public SatelliteModel dryMass(Double dryMass) {
-        this.setDryMass(dryMass);
-        return this;
+        return dryMass;
     }
 
     public void setDryMass(Double dryMass) {
         this.dryMass = dryMass;
-    }
-
-    public Set<Satellite> getSatellites() {
-        return this.satellites;
-    }
-
-    public void setSatellites(Set<Satellite> satellites) {
-        if (this.satellites != null) {
-            this.satellites.forEach(i -> i.setModel(null));
-        }
-        if (satellites != null) {
-            satellites.forEach(i -> i.setModel(this));
-        }
-        this.satellites = satellites;
-    }
-
-    public SatelliteModel satellites(Set<Satellite> satellites) {
-        this.setSatellites(satellites);
-        return this;
-    }
-
-    public SatelliteModel addSatellite(Satellite satellite) {
-        this.satellites.add(satellite);
-        satellite.setModel(this);
-        return this;
-    }
-
-    public SatelliteModel removeSatellite(Satellite satellite) {
-        this.satellites.remove(satellite);
-        satellite.setModel(null);
-        return this;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof SatelliteModel)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((SatelliteModel) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
-    }
-
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "SatelliteModel{" +
-            "id=" + getId() +
-            ", name='" + getName() + "'" +
-            ", manufacturer='" + getManufacturer() + "'" +
-            ", weight=" + getWeight() +
-            ", dimensions='" + getDimensions() + "'" +
-            ", powerCapacity=" + getPowerCapacity() +
-            ", expectedLifespan=" + getExpectedLifespan() +
-            ", designTrajectoryPredictionFactor=" + getDesignTrajectoryPredictionFactor() +
-            ", launchMass=" + getLaunchMass() +
-            ", dryMass=" + getDryMass() +
-            "}";
     }
 }

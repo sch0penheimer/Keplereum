@@ -1,10 +1,11 @@
 package com.example.jeeHamlaoui.Sattelites_Service.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jdk.jfr.Timespan;
 import org.antlr.v4.runtime.misc.NotNull;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -12,12 +13,11 @@ import java.time.Instant;
  */
 @Entity
 @Table(name = "satellite_trajectory")
-public class SatelliteTrajectory implements Serializable {
+public class SatelliteTrajectory{
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
+    @GeneratedValue
     @Column(name = "id")
     private Long id;
 
@@ -25,9 +25,14 @@ public class SatelliteTrajectory implements Serializable {
     @Column(name = "status", nullable = false)
     private String status;
 
-    @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(name = "start_time", nullable = false)
     private Instant startTime;
+
+    @PrePersist
+    public void prePersist() {
+        this.startTime = Instant.now();
+    }
 
     @Column(name = "end_time")
     private Instant endTime;
@@ -53,9 +58,11 @@ public class SatelliteTrajectory implements Serializable {
     @Column(name = "change_reason")
     private String changeReason;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JsonIgnoreProperties(value = { "sensors", "trajectories", "model", "networkNode", "groundStation" }, allowSetters = true)
+    @JoinColumn(name = "satellite_id")
     private Satellite satellite;
+
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 

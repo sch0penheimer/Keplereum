@@ -48,7 +48,7 @@ public class Satellite {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "SatelliteModelId",referencedColumnName = "SatelliteModelId")
-    @JsonBackReference
+
     private SatelliteModel model;
 
     /*
@@ -61,6 +61,14 @@ public class Satellite {
     private GroundStation groundStation;
     */
     // jhipster-needle-entity-add-field - JHipster will add fields here
+
+    public Long getSatellite_id() {
+        return satellite_id;
+    }
+
+    public void setSatellite_id(Long satellite_id) {
+        this.satellite_id = satellite_id;
+    }
 
     public Long getId() {
         return this.satellite_id;

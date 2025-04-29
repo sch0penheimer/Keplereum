@@ -66,11 +66,10 @@ public class BlockTransaction {
     @JsonIgnoreProperties(value = { "alert", "confirmations", "blockTransactions", "validareceiverrAction" }, allowSetters = true)
     private Event event;
 
-    @ManyreceiverMany(fetch = FetchType.LAZY, mappedBy = "blockTransactions")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "blockTransactions")
     @org.springframework.data.annotation.Transient
     @JsonIgnoreProperties(value = { "satellite", "blocks", "blockTransactions" }, allowSetters = true)
     private Set<NetworkNode> networkNodes = new HashSet<>();
-
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {

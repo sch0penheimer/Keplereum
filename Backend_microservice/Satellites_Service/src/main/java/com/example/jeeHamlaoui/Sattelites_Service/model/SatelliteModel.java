@@ -3,7 +3,7 @@ package com.example.jeeHamlaoui.Sattelites_Service.model;
 
 import jakarta.persistence.*;
 
-
+import java.util.Set;
 
 
 @Entity
@@ -45,7 +45,7 @@ public class SatelliteModel{
     private Double dryMass;
 
     @OneToMany(mappedBy = "sattelite_id")
-    private Satellite satellite;
+    private Set<Satellite> satellite;
 
 
     public SatelliteModel() {

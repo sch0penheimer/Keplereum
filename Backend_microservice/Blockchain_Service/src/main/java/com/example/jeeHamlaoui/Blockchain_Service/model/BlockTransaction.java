@@ -11,33 +11,19 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * A BlockTransaction.
- */
 @Entity
-@Table(name = "block_transaction")
+@Table(name = "block_transactions")
 public class BlockTransaction {
-
     @Id
-    @GeneratedValue
-    private Long id;
-
-    @NotNull
     @Column(name = "hash", nullable = false, unique = true)
     private String hash;
 
-    @NotNull
-
-    private String sender;
-
-    @NotNull
-    private String receiver;
-
+    @Column(name = "amount")
     private Double amount;
 
+    @Column(name = "fee")
     private Double fee;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private TransactionStatus status;
@@ -54,272 +40,137 @@ public class BlockTransaction {
     @Column(name = "block_number")
     private Long blockNumber;
 
-    @NotNull
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    // Many-to-One: Transaction belongs to a Block
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "transactions", "networkNode" }, allowSetters = true)
+    @JoinColumn(name = "block_height", referencedColumnName = "height")
     private Block block;
 
+    // Many-to-One: Sender (NetworkNode)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "alert", "confirmations", "blockTransactions", "validareceiverrAction" }, allowSetters = true)
-    private Event event;
+    @JoinColumn(name = "sender_public_key", referencedColumnName = "public_key")
+    private NetworkNode sender;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "blockTransactions")
-    @org.springframework.data.annotation.Transient
-    @JsonIgnoreProperties(value = { "satellite", "blocks", "blockTransactions" }, allowSetters = true)
-    private Set<NetworkNode> networkNodes = new HashSet<>();
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    // Many-to-One: Receiver (NetworkNode)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_public_key", referencedColumnName = "public_key")
+    private NetworkNode receiver;
 
-    public Long getId() {
-        return this.id;
+    // One-to-One: AbstractTransactionType (Alert, Confirmation, ValidatorAction)
+    @OneToOne(mappedBy = "blockTransaction", cascade = CascadeType.ALL)
+    private AbstractTransactionType transactionType;
+
+    // Getters and setters
+    public void setTransactionType(AbstractTransactionType transactionType) {
+        if (this.transactionType != null) {
+            this.transactionType.setBlockTransaction(null);  // Unlink old reference
+        }
+        this.transactionType = transactionType;
+        if (transactionType != null && transactionType.getBlockTransaction() != this) {
+            transactionType.setBlockTransaction(this);  // Link new reference
+        }
     }
 
-    public BlockTransaction id(Long id) {
-        this.setId(id);
-        return this;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getHash() {
-        return this.hash;
-    }
-
-    public BlockTransaction hash(String hash) {
-        this.setHash(hash);
-        return this;
+        return hash;
     }
 
     public void setHash(String hash) {
         this.hash = hash;
     }
 
-    public String getsender() {
-        return this.sender;
+    public AbstractTransactionType getTransactionType() {
+        return transactionType;
     }
 
-    public BlockTransaction sender(String sender) {
-        this.setsender(sender);
-        return this;
+    public NetworkNode getReceiver() {
+        return receiver;
     }
 
-    public void setsender(String sender) {
-        this.sender = sender;
-    }
-
-    public String getreceiver() {
-        return this.receiver;
-    }
-
-    public BlockTransaction receiver(String receiver) {
-        this.setreceiver(receiver);
-        return this;
-    }
-
-    public void setreceiver(String receiver) {
+    public void setReceiver(NetworkNode receiver) {
         this.receiver = receiver;
     }
 
-    public Double getAmount() {
-        return this.amount;
+    public NetworkNode getSender() {
+        return sender;
     }
 
-    public BlockTransaction amount(Double amount) {
-        this.setAmount(amount);
-        return this;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public Double getFee() {
-        return this.fee;
-    }
-
-    public BlockTransaction fee(Double fee) {
-        this.setFee(fee);
-        return this;
-    }
-
-    public void setFee(Double fee) {
-        this.fee = fee;
-    }
-
-    public TransactionStatus getStatus() {
-        return this.status;
-    }
-
-    public BlockTransaction status(TransactionStatus status) {
-        this.setStatus(status);
-        return this;
-    }
-
-    public void setStatus(TransactionStatus status) {
-        this.status = status;
-    }
-
-    public Double getGasPrice() {
-        return this.gasPrice;
-    }
-
-    public BlockTransaction gasPrice(Double gasPrice) {
-        this.setGasPrice(gasPrice);
-        return this;
-    }
-
-    public void setGasPrice(Double gasPrice) {
-        this.gasPrice = gasPrice;
-    }
-
-    public Double getGasLimit() {
-        return this.gasLimit;
-    }
-
-    public BlockTransaction gasLimit(Double gasLimit) {
-        this.setGasLimit(gasLimit);
-        return this;
-    }
-
-    public void setGasLimit(Double gasLimit) {
-        this.gasLimit = gasLimit;
-    }
-
-    public Double getGasUsed() {
-        return this.gasUsed;
-    }
-
-    public BlockTransaction gasUsed(Double gasUsed) {
-        this.setGasUsed(gasUsed);
-        return this;
-    }
-
-    public void setGasUsed(Double gasUsed) {
-        this.gasUsed = gasUsed;
-    }
-
-    public Long getBlockNumber() {
-        return this.blockNumber;
-    }
-
-    public BlockTransaction blockNumber(Long blockNumber) {
-        this.setBlockNumber(blockNumber);
-        return this;
-    }
-
-    public void setBlockNumber(Long blockNumber) {
-        this.blockNumber = blockNumber;
-    }
-
-    public Instant getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public BlockTransaction createdAt(Instant createdAt) {
-        this.setCreatedAt(createdAt);
-        return this;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
+    public void setSender(NetworkNode sender) {
+        this.sender = sender;
     }
 
     public Block getBlock() {
-        return this.block;
+        return block;
     }
 
     public void setBlock(Block block) {
         this.block = block;
     }
 
-    public BlockTransaction block(Block block) {
-        this.setBlock(block);
-        return this;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public Event getEvent() {
-        return this.event;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public Long getBlockNumber() {
+        return blockNumber;
     }
 
-    public BlockTransaction event(Event event) {
-        this.setEvent(event);
-        return this;
+    public void setBlockNumber(Long blockNumber) {
+        this.blockNumber = blockNumber;
     }
 
-    public Set<NetworkNode> getNetworkNodes() {
-        return this.networkNodes;
+    public Double getGasUsed() {
+        return gasUsed;
     }
 
-    public void setNetworkNodes(Set<NetworkNode> networkNodes) {
-        if (this.networkNodes != null) {
-            this.networkNodes.forEach(i -> i.removeBlockTransaction(this));
-        }
-        if (networkNodes != null) {
-            networkNodes.forEach(i -> i.addBlockTransaction(this));
-        }
-        this.networkNodes = networkNodes;
+    public void setGasUsed(Double gasUsed) {
+        this.gasUsed = gasUsed;
     }
 
-    public BlockTransaction networkNodes(Set<NetworkNode> networkNodes) {
-        this.setNetworkNodes(networkNodes);
-        return this;
+    public Double getGasLimit() {
+        return gasLimit;
     }
 
-    public BlockTransaction addNetworkNode(NetworkNode networkNode) {
-        this.networkNodes.add(networkNode);
-        networkNode.getBlockTransactions().add(this);
-        return this;
+    public void setGasLimit(Double gasLimit) {
+        this.gasLimit = gasLimit;
     }
 
-    public BlockTransaction removeNetworkNode(NetworkNode networkNode) {
-        this.networkNodes.remove(networkNode);
-        networkNode.getBlockTransactions().remove(this);
-        return this;
+    public Double getGasPrice() {
+        return gasPrice;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof BlockTransaction)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((BlockTransaction) o).getId());
+    public void setGasPrice(Double gasPrice) {
+        this.gasPrice = gasPrice;
     }
 
-    @Override
-    public int hashCode() {
-        // see https://vladmihalcea.com/how-receiver-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
+    public TransactionStatus getStatus() {
+        return status;
     }
 
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "BlockTransaction{" +
-                "id=" + getId() +
-                ", hash='" + getHash() + "'" +
-                ", sender='" + getsender() + "'" +
-                ", receiver='" + getreceiver() + "'" +
-                ", amount=" + getAmount() +
-                ", fee=" + getFee() +
-                ", status='" + getStatus() + "'" +
-                ", gasPrice=" + getGasPrice() +
-                ", gasLimit=" + getGasLimit() +
-                ", gasUsed=" + getGasUsed() +
-                ", blockNumber=" + getBlockNumber() +
-                ", createdAt='" + getCreatedAt() + "'" +
-                "}";
+    public void setStatus(TransactionStatus status) {
+        this.status = status;
+    }
+
+    public Double getFee() {
+        return fee;
+    }
+
+    public void setFee(Double fee) {
+        this.fee = fee;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
     }
 }

@@ -1,7 +1,7 @@
 package com.example.jeeHamlaoui.Blockchain_Service.model;
 
 import com.example.jeeHamlaoui.Blockchain_Service.model.enumerate.TransactionStatus;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.*;
 
 import jakarta.persistence.*;
 import org.antlr.v4.runtime.misc.NotNull;
@@ -45,21 +45,25 @@ public class BlockTransaction {
 
     // Many-to-One: Transaction belongs to a Block
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "block_height", referencedColumnName = "height")
+    @JoinColumn(name = "block_height")
+    @JsonBackReference("block-transactions")  // ← Named reference
     private Block block;
 
-    // Many-to-One: Sender (NetworkNode)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_public_key", referencedColumnName = "public_key")
+    @JoinColumn(name = "sender_public_key")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "publicKey")
+    @JsonIdentityReference(alwaysAsId = true)
     private NetworkNode sender;
 
-    // Many-to-One: Receiver (NetworkNode)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_public_key", referencedColumnName = "public_key")
+    @JoinColumn(name = "receiver_public_key")
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "publicKey")
+    @JsonIdentityReference(alwaysAsId = true)// ← Named reference
     private NetworkNode receiver;
 
     // One-to-One: AbstractTransactionType (Alert, Confirmation, ValidatorAction)
-    @OneToOne(mappedBy = "blockTransaction", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "transaction_type_id")
     private AbstractTransactionType transactionType;
 
     // Getters and setters

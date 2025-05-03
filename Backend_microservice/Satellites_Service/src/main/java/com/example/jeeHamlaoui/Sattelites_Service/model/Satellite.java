@@ -44,23 +44,34 @@ public class Satellite {
     private Set<Sensor> sensors = new HashSet<>();
 
     @OneToMany(mappedBy = "satellite")
+    @JsonManagedReference
     private Set<SatelliteTrajectory> trajectories = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "SatelliteModelId",referencedColumnName = "SatelliteModelId")
-
     private SatelliteModel model;
 
-    /*
-    @JsonIgnoreProperties(value = { "satellite", "blocks", "blockTransactions" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "satellite")
-    private NetworkNode networkNode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "satellites" }, allowSetters = true)
-    private GroundStation groundStation;
-    */
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    private String networkNodeId;
+
+
+    private Long groundStationId;
+
+    public String getNetworkNodeId() {
+        return networkNodeId;
+    }
+
+    public void setNetworkNodeId(String networkNodeId) {
+        this.networkNodeId = networkNodeId;
+    }
+
+    public Long getGroundStationId() {
+        return groundStationId;
+    }
+
+    public void setGroundStationId(Long groundStationId) {
+        this.groundStationId = groundStationId;
+    }
 
     public Long getSatellite_id() {
         return satellite_id;
@@ -196,40 +207,7 @@ public class Satellite {
         this.setModel(satelliteModel);
         return this;
     }
-/*
-    public NetworkNode getNetworkNode() {
-        return this.networkNode;
-    }
 
-    public void setNetworkNode(NetworkNode networkNode) {
-        if (this.networkNode != null) {
-            this.networkNode.setSatellite(null);
-        }
-        if (networkNode != null) {
-            networkNode.setSatellite(this);
-        }
-        this.networkNode = networkNode;
-    }
-
-    public Satellite networkNode(NetworkNode networkNode) {
-        this.setNetworkNode(networkNode);
-        return this;
-    }
-
-    public GroundStation getGroundStation() {
-        return this.groundStation;
-    }
-
-    public void setGroundStation(GroundStation groundStation) {
-        this.groundStation = groundStation;
-    }
-
-    public Satellite groundStation(GroundStation groundStation) {
-        this.setGroundStation(groundStation);
-        return this;
-    }
-    */
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {

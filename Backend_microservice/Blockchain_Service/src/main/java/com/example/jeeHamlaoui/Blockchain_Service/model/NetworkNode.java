@@ -1,6 +1,9 @@
 package com.example.jeeHamlaoui.Blockchain_Service.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -14,25 +17,37 @@ public class NetworkNode {
     @Column(name = "public_key", nullable = false, unique = true)
     private String publicKey;
 
+    public String getNodeName() {
+        return NodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        NodeName = nodeName;
+    }
+
+    private String NodeName;
+
     @Column(name = "authority_status", nullable = false)
     private boolean authorityStatus;
 
     @Column(name = "blocks_validated")
-    private Integer blocksValidated;
+    private Integer blocksValidated = 0;
 
     @Column(name = "last_active", nullable = false)
     private Instant lastActive;
 
     // Owning side of the Satellite relationship (1:1)
+    /*
     @OneToOne(mappedBy = "networkNode")
     private Satellite satellite;
-
+    */
     // Transactions sent by this node (One-to-Many)
     @OneToMany(mappedBy = "sender")
+    @JsonIgnore // ← Matches sender reference
     private List<BlockTransaction> sentTransactions = new ArrayList<>();
 
-    // Transactions received by this node (One-to-Many)
     @OneToMany(mappedBy = "receiver")
+    @JsonIgnore  // ← Matches receiver reference
     private List<BlockTransaction> receivedTransactions = new ArrayList<>();
 
     // Getters and setters
@@ -41,14 +56,14 @@ public class NetworkNode {
     public NetworkNode() {
     }
 
-    public NetworkNode(String publicKey, List<BlockTransaction> receivedTransactions, List<BlockTransaction> sentTransactions, Satellite satellite, Instant lastActive, Integer blocksValidated, boolean authorityStatus) {
+    public NetworkNode(String publicKey, List<BlockTransaction> receivedTransactions, List<BlockTransaction> sentTransactions, Instant lastActive, Integer blocksValidated, boolean authorityStatus , String nodeName) {
         this.publicKey = publicKey;
         this.receivedTransactions = receivedTransactions;
         this.sentTransactions = sentTransactions;
-        this.satellite = satellite;
         this.lastActive = lastActive;
         this.blocksValidated = blocksValidated;
         this.authorityStatus = authorityStatus;
+        this.NodeName = nodeName;
     }
 
     public List<BlockTransaction> getReceivedTransactions() {
@@ -67,6 +82,7 @@ public class NetworkNode {
         this.sentTransactions = sentTransactions;
     }
 
+    /*
     public Satellite getSatellite() {
         return satellite;
     }
@@ -74,7 +90,7 @@ public class NetworkNode {
     public void setSatellite(Satellite satellite) {
         this.satellite = satellite;
     }
-
+   */
     public Instant getLastActive() {
         return lastActive;
     }

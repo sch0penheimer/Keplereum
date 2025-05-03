@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "validator_actions")
+@DiscriminatorValue("VALIDATOR_ACTION")
 public class ValidatorAction extends AbstractTransactionType {
 
     @Enumerated(EnumType.STRING)

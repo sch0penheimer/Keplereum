@@ -44,7 +44,7 @@ public class SatelliteModel{
     @Column(name = "dry_mass")
     private Double dryMass;
 
-    @OneToMany(mappedBy = "sattelite_id")
+    @OneToMany(mappedBy = "satellite_id")
     private Set<Satellite> satellite;
 
 

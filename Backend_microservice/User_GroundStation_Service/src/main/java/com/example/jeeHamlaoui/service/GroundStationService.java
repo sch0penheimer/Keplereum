@@ -1,5 +1,6 @@
 package com.example.jeeHamlaoui.service;
 
+import com.example.jeeHamlaoui.client.SatelliteClient;
 import com.example.jeeHamlaoui.model.GroundStation;
 import com.example.jeeHamlaoui.repository.GroundStationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,14 @@ import java.util.Optional;
 public class GroundStationService {
 
     private final GroundStationRepository groundStationRepository;
+    private SatelliteClient satelliteClient;
 
     @Autowired
-    public GroundStationService(GroundStationRepository groundStationRepository) {
+    public GroundStationService(GroundStationRepository groundStationRepository, SatelliteClient satelliteClient) {
         this.groundStationRepository = groundStationRepository;
+        this.satelliteClient = satelliteClient;
     }
+
 
     public List<GroundStation> findAllGroundStations() {
         return groundStationRepository.findAll();
@@ -46,5 +50,15 @@ public class GroundStationService {
 
     public void deleteGroundStation(Long id) {
         groundStationRepository.deleteById(id);
+    }
+
+
+    public SatelliteByGroundStationResponse findSatelliteByUserId(Long id) {
+        var groundStation = groundStationRepository.findByUser_UserId(id);
+        if (groundStation.isEmpty()) {
+            throw new RuntimeException("GroundStation not found with id: " + id);
+        }
+        var satellites = satelliteClient.findAllSatellitesByGroundStationId(groundStation.get().getGroundStation_id());
+        return new SatelliteByGroundStationResponse(satellites);
     }
 }

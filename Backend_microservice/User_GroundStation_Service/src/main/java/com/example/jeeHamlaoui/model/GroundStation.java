@@ -30,11 +30,6 @@ public class GroundStation {
     @JsonBackReference
     @OneToOne(mappedBy = "groundStation")
     private User user;
-
-    @JsonProperty("userId")
-    public Long getUserId() {
-        return user != null ? user.getUser_id() : null;
-    }
     /*
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "groundStation")
     @JsonIgnoreProperties(value = { "sensors", "trajectories", "model", "networkNode", "groundStation" }, allowSetters = true)

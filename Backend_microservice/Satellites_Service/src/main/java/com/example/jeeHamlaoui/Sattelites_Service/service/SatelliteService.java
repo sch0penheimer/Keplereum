@@ -51,4 +51,8 @@ public class SatelliteService {
     public Optional<Satellite> findByName(String name) {
         return satelliteRepository.findByName(name);
     }
+
+    public List<Satellite> findAllByGroundStationId(Long userId) {
+        return satelliteRepository.findAllByGroundStationId(userId);
+    }
 }

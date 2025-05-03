@@ -26,4 +26,6 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-
+application:
+  config:
+    satellite-url: http://localhost:8070/api/v1/satellites

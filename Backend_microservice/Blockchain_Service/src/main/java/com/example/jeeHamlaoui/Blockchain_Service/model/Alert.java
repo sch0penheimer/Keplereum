@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "alerts")
+@DiscriminatorValue("ALERT")
 public class Alert extends AbstractTransactionType {
 
     @Enumerated(EnumType.STRING)

@@ -2,6 +2,7 @@ package com.example.jeeHamlaoui.controller;
 
 import com.example.jeeHamlaoui.model.GroundStation;
 import com.example.jeeHamlaoui.service.GroundStationService;
+import com.example.jeeHamlaoui.service.SatelliteByGroundStationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,5 +53,12 @@ public class GroundStationController {
     public ResponseEntity<Void> deleteGroundStation(@PathVariable Long id) {
         groundStationService.deleteGroundStation(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/satellites/{user-id}")
+    public ResponseEntity<SatelliteByGroundStationResponse> findAllSatellites(
+            @PathVariable("user-id") Long userId
+    ){
+        return ResponseEntity.ok(groundStationService.findSatelliteByUserId(userId));
     }
 }

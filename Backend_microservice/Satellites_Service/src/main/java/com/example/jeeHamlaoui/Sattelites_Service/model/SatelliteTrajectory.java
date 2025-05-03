@@ -1,6 +1,8 @@
 package com.example.jeeHamlaoui.Sattelites_Service.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jdk.jfr.Timespan;
@@ -59,7 +61,7 @@ public class SatelliteTrajectory{
     private String changeReason;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "sensors", "trajectories", "model", "networkNode", "groundStation" }, allowSetters = true)
+    @JsonBackReference
     @JoinColumn(name = "satellite_id")
     private Satellite satellite;
 

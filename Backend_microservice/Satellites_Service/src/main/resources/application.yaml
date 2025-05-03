@@ -12,7 +12,7 @@ server:
 
 spring:
   application:
-    name: Satellites
+    name: satellite-service
   config:
     import: optional:configserver:http://localhost:8888
 
@@ -28,9 +28,6 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 
-application:
-  config:
-    groundStation-url: http://localhost:8090/api/v1/
 
 
 

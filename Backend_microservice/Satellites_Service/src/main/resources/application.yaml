@@ -12,7 +12,7 @@ server:
 
 spring:
   application:
-    name: satellite-service
+    name: SATELLITE-SERVICE
   config:
     import: optional:configserver:http://localhost:8888
 

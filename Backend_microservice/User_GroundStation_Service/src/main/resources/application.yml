@@ -12,7 +12,8 @@ server:
 
 spring:
   application:
-    name: User_GroundStation
+    name: USER-SERVICE
+
   config:
     import: optional:configserver:http://localhost:8888
   datasource:

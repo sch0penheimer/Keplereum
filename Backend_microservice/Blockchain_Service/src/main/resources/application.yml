@@ -12,7 +12,7 @@ server:
 
 spring:
   application:
-    name: Blockchain_Service
+    name: BLOCKCHAIN-SERVICE
   config:
     import: optional:configserver:http://localhost:8888
   datasource:

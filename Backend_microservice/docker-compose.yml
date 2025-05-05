@@ -19,3 +19,19 @@ services:
       POSTGRES_DB: satellite
     ports:
       - "5433:5432"
+
+  blockchain-db:
+    image: postgres
+    container_name: blockchain-db
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: blockchain
+    ports:
+      - "5434:5432"
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"

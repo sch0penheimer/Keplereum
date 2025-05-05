@@ -1,192 +1,150 @@
 package com.example.jeeHamlaoui.Blockchain_Service.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import org.antlr.v4.runtime.misc.NotNull;
 
-import java.io.Serializable;
+
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
+
 import java.util.List;
-import java.util.Set;
 
-/**
- * A Block.
- */
+import jakarta.persistence.*;
+
 @Entity
-@Table(name = "block")
-public class Block implements Serializable {
-
-
+@Table(name = "blocks")
+public class Block {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @Column(name = "id")
-    private Long id;
-
-    @NotNull
     @Column(name = "height", nullable = false, unique = true)
     private Long height;
 
-    @NotNull
-    @Column(name = "previous_block_hash", nullable = false)
+    @Column(name = "previous_block_hash")
     private String previousBlockHash;
 
-    @NotNull
     @Column(name = "current_block_hash", nullable = false, unique = true)
     private String currentBlockHash;
 
-    @NotNull
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "block")
+    @Column(name = "block_weight", nullable = false)
+    private Double blockWeight;
+
+    @Column(name = "transaction_root", nullable = false)
+    private String transactionRoot;
+
+    @Column(name = "sha3_uncles", nullable = false)
+    private String sha3Uncles;
+
+    @Column(name = "block_size", nullable = false)
+    private String blockSize;
+
+    // One Block has many Transactions (1:N)
+    @OneToMany(mappedBy = "block", cascade = CascadeType.ALL)
+    @JsonManagedReference("block-transactions")
     private List<BlockTransaction> transactions = new ArrayList<>();
 
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "satellite", "blocks", "blockTransactions" }, allowSetters = true)
-    private NetworkNode networkNode;
+    @JoinColumn(name = "validator_public_key", referencedColumnName = "public_key")
+    private NetworkNode validator;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
-
-    public Long getId() {
-        return this.id;
+    public NetworkNode getValidator() {
+        return validator;
     }
 
-    public Block id(Long id) {
-        this.setId(id);
-        return this;
+    public void setValidator(NetworkNode validator) {
+        this.validator = validator;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Block() {
+    }
+
+    public Block(Long height,NetworkNode validator, List<BlockTransaction> transactions, String blockSize, String sha3Uncles, String transactionRoot, Double blockWeight, Instant createdAt, String currentBlockHash, String previousBlockHash) {
+        this.height = height;
+        this.transactions = transactions;
+        this.blockSize = blockSize;
+        this.sha3Uncles = sha3Uncles;
+        this.transactionRoot = transactionRoot;
+        this.blockWeight = blockWeight;
+        this.createdAt = createdAt;
+        this.currentBlockHash = currentBlockHash;
+        this.previousBlockHash = previousBlockHash;
+        this.validator = validator;
     }
 
     public Long getHeight() {
-        return this.height;
-    }
-
-    public Block height(Long height) {
-        this.setHeight(height);
-        return this;
+        return height;
     }
 
     public void setHeight(Long height) {
         this.height = height;
     }
 
-    public String getPreviousBlockHash() {
-        return this.previousBlockHash;
+    public List<BlockTransaction> getTransactions() {
+        return transactions;
     }
 
-    public Block previousBlockHash(String previousBlockHash) {
-        this.setPreviousBlockHash(previousBlockHash);
-        return this;
+    public void setTransactions(List<BlockTransaction> transactions) {
+        this.transactions = transactions;
     }
 
-    public void setPreviousBlockHash(String previousBlockHash) {
-        this.previousBlockHash = previousBlockHash;
+    public String getBlockSize() {
+        return blockSize;
     }
 
-    public String getCurrentBlockHash() {
-        return this.currentBlockHash;
+    public void setBlockSize(String blockSize) {
+        this.blockSize = blockSize;
     }
 
-    public Block currentBlockHash(String currentBlockHash) {
-        this.setCurrentBlockHash(currentBlockHash);
-        return this;
+    public String getSha3Uncles() {
+        return sha3Uncles;
     }
 
-    public void setCurrentBlockHash(String currentBlockHash) {
-        this.currentBlockHash = currentBlockHash;
+    public void setSha3Uncles(String sha3Uncles) {
+        this.sha3Uncles = sha3Uncles;
+    }
+
+    public String getTransactionRoot() {
+        return transactionRoot;
+    }
+
+    public void setTransactionRoot(String transactionRoot) {
+        this.transactionRoot = transactionRoot;
+    }
+
+    public Double getBlockWeight() {
+        return blockWeight;
+    }
+
+    public void setBlockWeight(Double blockWeight) {
+        this.blockWeight = blockWeight;
     }
 
     public Instant getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public Block createdAt(Instant createdAt) {
-        this.setCreatedAt(createdAt);
-        return this;
+        return createdAt;
     }
 
     public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Set<BlockTransaction> getTransactions() {
-        return this.transactions;
+    public String getCurrentBlockHash() {
+        return currentBlockHash;
     }
 
-    public void setTransactions(Set<BlockTransaction> blockTransactions) {
-        if (this.transactions != null) {
-            this.transactions.forEach(i -> i.setBlock(null));
-        }
-        if (blockTransactions != null) {
-            blockTransactions.forEach(i -> i.setBlock(this));
-        }
-        this.transactions = blockTransactions;
+    public void setCurrentBlockHash(String currentBlockHash) {
+        this.currentBlockHash = currentBlockHash;
     }
 
-    public Block transactions(Set<BlockTransaction> blockTransactions) {
-        this.setTransactions(blockTransactions);
-        return this;
+    public String getPreviousBlockHash() {
+        return previousBlockHash;
     }
 
-    public Block addTransaction(BlockTransaction blockTransaction) {
-        this.transactions.add(blockTransaction);
-        blockTransaction.setBlock(this);
-        return this;
+    public void setPreviousBlockHash(String previousBlockHash) {
+        this.previousBlockHash = previousBlockHash;
     }
 
-    public Block removeTransaction(BlockTransaction blockTransaction) {
-        this.transactions.remove(blockTransaction);
-        blockTransaction.setBlock(null);
-        return this;
-    }
+// Getters and setters
 
-    public NetworkNode getNetworkNode() {
-        return this.networkNode;
-    }
-
-    public void setNetworkNode(NetworkNode networkNode) {
-        this.networkNode = networkNode;
-    }
-
-    public Block networkNode(NetworkNode networkNode) {
-        this.setNetworkNode(networkNode);
-        return this;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof Block)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((Block) o).getId());
-    }
-
-    @Override
-    public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
-    }
-
-    // prettier-ignore
-    @Override
-    public String toString() {
-        return "Block{" +
-            "id=" + getId() +
-            ", height=" + getHeight() +
-            ", previousBlockHash='" + getPreviousBlockHash() + "'" +
-            ", currentBlockHash='" + getCurrentBlockHash() + "'" +
-            ", createdAt='" + getCreatedAt() + "'" +
-            "}";
-    }
 }

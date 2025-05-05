@@ -5,8 +5,8 @@ services:
     image: ethereum/client-go:v1.13.5
     container_name: geth-node1
     volumes:
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node1:/geth
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+      - ./node1:/geth
+      - ./password.txt:/geth/password.txt
     ports:
       - "30304:30304"
       - "8545:8545"
@@ -17,11 +17,11 @@ services:
       --networkid 12345
       --port 30304
       --syncmode full
-      --http
-      --http.addr "0.0.0.0"
-      --http.port 8545
-      --http.corsdomain "*"
-      --http.api "eth,net,web3,personal,miner,clique"
+      --ws
+      --ws.addr "0.0.0.0"
+      --ws.port 8545
+      --ws.origins "*"
+      --ws.api "eth,net,web3,personal,miner,clique"
       --authrpc.port 8552
       --allow-insecure-unlock
       --unlock "0xe6427a00f96f7ca5688f1de97ba66c21daf77afe"
@@ -36,8 +36,8 @@ services:
     depends_on:
       - geth-node1
     volumes:
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node2:/geth
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+      - ./node2:/geth
+      - ./password.txt:/geth/password.txt
     ports:
       - "30305:30305"
       - "8546:8546"
@@ -68,8 +68,8 @@ services:
     depends_on:
       - geth-node1
     volumes:
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node3:/geth
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+      - ./node3:/geth
+      - ./password.txt:/geth/password.txt
     ports:
       - "30306:30306"
       - "8547:8547"
@@ -100,8 +100,8 @@ services:
     depends_on:
       - geth-node1
     volumes:
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node4:/geth
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+      - ./node4:/geth
+      - ./password.txt:/geth/password.txt
     ports:
       - "30307:30307"
       - "8548:8548"
@@ -132,8 +132,8 @@ services:
     depends_on:
       - geth-node1
     volumes:
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\node5:/geth
-      - C:\Users\Legion\development-platform-api-tologists\Blockchain\geth-nodes\password.txt:/geth/password.txt
+      - ./node5:/geth
+      - ./password.txt:/geth/password.txt
     ports:
       - "30308:30308"
       - "8549:8549"

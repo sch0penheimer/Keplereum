@@ -61,7 +61,7 @@ public class BlockService {
         return blockRepository.existsByCurrentBlockHash(hash);
     }
     @Transactional
-    public Block createBlock(BlockDTO blockDTO) {
+    public Void createBlock(BlockDTO blockDTO) {
         // Validate block uniqueness first
         if (blockRepository.existsById(blockDTO.getNumber())) {
             throw new IllegalStateException("Block height exists: " + blockDTO.getNumber());
@@ -133,6 +133,7 @@ public class BlockService {
             block.setTransactions(transactions);
         }
 
-        return blockRepository.save(block);
+        blockRepository.save(block);
+        return null;
     }
 }

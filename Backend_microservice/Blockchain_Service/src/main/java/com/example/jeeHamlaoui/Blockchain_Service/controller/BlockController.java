@@ -35,7 +35,7 @@ public class BlockController {
         return blockService.getBlockByHash(hash);
     }
     @PostMapping
-    public ResponseEntity<Block> saveBlock(@RequestBody BlockDTO block) {
+    public ResponseEntity<Void> saveBlock(@RequestBody BlockDTO block) {
         if (blockService.blockExists(block.getNumber())){
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }

@@ -16,7 +16,7 @@ export interface BlockTransaction {
   latitude?: number;
   longitude?: number;
   confirmsAlertId?: string;
-  action?: 'SWITCH_ORBIT' | 'SWITCH_SENSOR' | 'DEPLOY_DRONES';
+  action?: 'SWITCH_ORBIT' | 'SWITCH_SENSOR';
 }
 
 //* Block Interface *//

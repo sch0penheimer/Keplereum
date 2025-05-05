@@ -1,6 +1,5 @@
 package com.example.jeeHamlaoui.Blockchain_Service.model.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;

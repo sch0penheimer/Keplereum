@@ -1,0 +1,38 @@
+
+Eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: true
+    service-url:
+      defaultzone: http://localhost:8761/eureka
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+
+      routes:
+        - id: user-route
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/v1/groundstations/**, /api/v1/users/**
+
+        - id: sattelite-route
+          uri: lb://SATELLITE-SERVICE
+          predicates:
+            - Path=/api/v1/satellites/**, /api/v1/models/**, /api/v1/trajectories/**, /api/v1/sensors/**
+
+        - id: Blockchain-route
+          uri: lb://BLOCKCHAIN-SERVICE
+          predicates:
+            - Path=/api/v1/blocks/**, /api/v1/transactions/**, /api/v1/nodes/**
+
+
+
+  application:
+    name: GATEWAY
+
+server:
+  port: 8222

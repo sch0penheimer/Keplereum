@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-@FeignClient(name = "satellite-service",url = "${application.config.satellite-url}")
+@FeignClient(name = "SATELLITE-SERVICE")
 public interface SatelliteClient {
 
     @GetMapping("/groundStation/{groundStation-id}")

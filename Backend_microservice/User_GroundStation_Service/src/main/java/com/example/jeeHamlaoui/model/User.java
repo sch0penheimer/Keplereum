@@ -1,6 +1,7 @@
 package com.example.jeeHamlaoui.model;
 
 import com.example.jeeHamlaoui.model.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -18,7 +19,7 @@ public class User {
 
     @Id
     @GeneratedValue
-    private Long user_id;
+    private Long userId;
 
     private String user_name;
     private String password;
@@ -31,16 +32,17 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JsonManagedReference
-    @JsonIgnoreProperties
     @JoinColumn(name = "groundStation_id")
+    @JsonIgnoreProperties(value = "user",allowSetters = true)
     private GroundStation groundStation;
 
     @CreationTimestamp
     @Column(updatable = false)
+
     private Instant created_at;
 
-    public User(Long user_id, String user_name, String password, String email, UserStatus status, GroundStation groundStation, Instant created_at) {
-        this.user_id = user_id;
+    public User(Long userId, String user_name, String password, String email, UserStatus status, GroundStation groundStation, Instant created_at) {
+        this.userId = userId;
         this.user_name = user_name;
         this.password = password;
         this.email = email;
@@ -64,20 +66,20 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User user)) return false;
-        return Objects.equals(user_id, user.user_id) && Objects.equals(user_name, user.user_name) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && status == user.status && Objects.equals(created_at, user.created_at);
+        return Objects.equals(userId, user.userId) && Objects.equals(user_name, user.user_name) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && status == user.status && Objects.equals(created_at, user.created_at);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(user_id, user_name, password, email, status, created_at);
+        return Objects.hash(userId, user_name, password, email, status, created_at);
     }
 
     public Long getUser_id() {
-        return user_id;
+        return userId;
     }
 
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+    public void setUser_id(Long userId) {
+        this.userId = userId;
     }
 
     public String getUser_name() {
@@ -121,10 +123,10 @@ public class User {
     }
 
     public void setId(Long id) {
-        this.user_id = id;
+        this.userId = id;
     }
 
     public Long getId() {
-        return user_id;
+        return userId;
     }
 }

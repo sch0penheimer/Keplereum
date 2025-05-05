@@ -8,6 +8,7 @@ import com.example.jeeHamlaoui.Sattelites_Service.model.dto.SatelliteTrajectoryR
 import com.example.jeeHamlaoui.Sattelites_Service.model.util.OrbitalTrajectoryResponse;
 import com.example.jeeHamlaoui.Sattelites_Service.model.util.Point3D;
 import com.example.jeeHamlaoui.Sattelites_Service.repository.SatelliteTrajectoryRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -179,6 +180,7 @@ public class SatelliteTrajectoryService {
         }
     }
 
+    @Transactional
     public SatelliteTrajectoryResponse createTrajectory(
             SatelliteTrajectoryRequest request
     ) {
@@ -190,10 +192,11 @@ public class SatelliteTrajectoryService {
         SatelliteTrajectory lastTrajectory = satelliteTrajectoryRepository.findTopBySatelliteOrderByEndTimeDesc(satellite);
         SatelliteTrajectory trajectory = new SatelliteTrajectory();
 
+        trajectory.setStartTime(Instant.now());
+
         if (lastTrajectory != null) {
-            trajectory.setStartTime(lastTrajectory.getEndTime());
-        } else {
-            trajectory.setStartTime(Instant.now()); // or some default value
+            lastTrajectory.setEndTime(trajectory.getStartTime());
+            satelliteTrajectoryRepository.save(lastTrajectory);
         }
 
         // 2. Map Request to Entity

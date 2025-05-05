@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -60,4 +61,11 @@ public class SatelliteController {
         return satellite.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
+    @GetMapping("/groundStation/{groundStation-id}")
+    public ResponseEntity<List<Satellite>> findAllByUserId(@PathVariable("groundStation-id") Long UserId) {
+        return ResponseEntity.ok(satelliteService.findAllByGroundStationId(UserId));
+    }
+
+
 }

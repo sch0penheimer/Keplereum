@@ -10,7 +10,7 @@ import java.time.Instant;
 
 public class UserDto {
 
-    private Long user_id;
+    private Long userId;
     private String user_name;
     private String email;
     private UserStatus status;
@@ -20,8 +20,8 @@ public class UserDto {
     public UserDto() {
     }
 
-    public UserDto(Long user_id, Instant created_at, GroundStation groundStation, UserStatus status, String email, String user_name) {
-        this.user_id = user_id;
+    public UserDto(Long userId, Instant created_at, GroundStation groundStation, UserStatus status, String email, String user_name) {
+        this.userId = userId;
         this.created_at = created_at;
         this.groundStation = groundStation;
         this.status = status;
@@ -30,11 +30,11 @@ public class UserDto {
     }
 
     public Long getUser_id() {
-        return user_id;
+        return userId;
     }
 
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+    public void setUser_id(Long userId) {
+        this.userId = userId;
     }
 
     public GroundStation getGroundStation() {

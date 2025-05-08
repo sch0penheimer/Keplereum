@@ -1,10 +1,9 @@
 eureka:
-  instance:
-    hostname: localhost
   client:
     service-url:
-      defaultzone: http://localhost:8761/eureka
-
+      defaultzone: http://keplereum-discovery-server:8761/eureka
+    registerWithEureka: true
+    fetchRegistry: true
 
 server:
   port: 8090
@@ -15,7 +14,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/user
+    url: jdbc:postgresql://keplereum-user-db:5432/user
     username: username
     password: password
   jpa:

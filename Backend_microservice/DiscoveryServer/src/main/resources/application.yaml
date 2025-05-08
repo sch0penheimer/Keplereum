@@ -1,7 +1,23 @@
-
-
 spring:
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:http://keplereum-config-server:8888
   application:
     name: DISCOVERY
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        initial-interval: 1000
+        max-attempts: 6
+        max-interval: 2000
+        multiplier: 1.1
+
+server:
+  port: 8761
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    wait-time-in-ms-when-sync-empty: 0

@@ -2,5 +2,5 @@ spring:
   application:
     name: USER-SERVICE
   config:
-    import: configserver:http://localhost:8888
+    import: configserver:http://keplereum-config-server:8888
 

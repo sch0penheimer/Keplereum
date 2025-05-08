@@ -10,4 +10,13 @@ spring:
     config:
       server:
         native:
-          search-locations: classpath:/configurations
+          search-locations: classpath:/configurations/{application}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info  # /actuator/health and /actuator/info
+  endpoint:
+    health:
+      show-details: always

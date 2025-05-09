@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import {
   BlockTransaction,
@@ -9,7 +8,6 @@ import {
 } from "@/types/blockchain";
 
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
-
 
 /**
  * Temporary Function to generate Dummy / Mock Validators 
@@ -95,53 +93,96 @@ const generateMockTransaction = (blockNumber: number, id: number): BlockTransact
  * Temporary Function to generate Dummy / Mock Blocks
  * @param blockNumber 
  */
-const generateMockBlock = (blockNumber: number): Block => {
-  const transactionCount = Math.floor(Math.random() * 200) + 50;
-  const transactions = Array.from({ length: transactionCount }, (_, i) => 
-    generateMockTransaction(blockNumber, i)
-  );
+// const generateMockBlock = (blockNumber: number): Block => {
+//   const transactionCount = Math.floor(Math.random() * 200) + 50;
+//   const transactions = Array.from({ length: transactionCount }, (_, i) => 
+//     generateMockTransaction(blockNumber, i)
+//   );
   
-  const now = new Date();
-  const timestamp = new Date(now.getTime() - (891695 - blockNumber) * 12000);
+//   const now = new Date();
+//   const timestamp = new Date(now.getTime() - (891695 - blockNumber) * 12000);
   
+//   return {
+//     number: blockNumber,
+//     hash: `0x${Math.random().toString(16).substring(2, 42)}`,
+//     parentHash: `0x${Math.random().toString(16).substring(2, 42)}`,
+//     sha3uncles: `0x${Math.random().toString(16).substring(2, 66)}`,
+//     transactionRoot: `0x${Math.random().toString(16).substring(2, 66)}`,
+//     timestamp: timestamp,
+//     validator: `0x${Math.random().toString(16).substring(2, 42)}`,
+//     size: parseFloat((Math.random() * 2 + 0.5).toFixed(2)),
+//     gasUsed: Math.floor(Math.random() * 8000000) + 2000000,
+//     gasLimit: 10000000,
+//     transactions: transactions,
+//     transactionCount: transactions.length,
+//     totalFees: transactions.reduce((sum, tx) => sum + tx.fee, 0),
+//   };
+// };
+
+/**
+ * Generate mock stats for the network
+ * @returns 
+ */
+// const generateNetworkStats = (): NetworkStats => {
+//   const baseDifficulty = Math.floor(Math.random() * 100000) + 50000;
+//   const hashRate = Math.floor(Math.random() * 500) + 100;
+  
+//   return {
+//     avgBlockTime: parseFloat((Math.random() * 2 + 9).toFixed(1)),
+//     pendingTransactions: Math.floor(Math.random() * 200),
+//     activeValidators: Math.floor(Math.random() * 5) + 3,
+//     totalBlocks: 891695 + Math.floor(Math.random() * 100),
+//     difficulty: baseDifficulty,
+//     difficultyPercent: Math.min(100, Math.floor((baseDifficulty / 150000) * 100)),
+//     hashRate: hashRate,
+//     hashRateChange: parseFloat((Math.random() * 10 - 5).toFixed(2)), // -5% to +5%
+//     latency: Math.floor(Math.random() * 150) + 50, // 50-200ms
+//     latencyChange: parseFloat((Math.random() * 20 - 10).toFixed(2)), // -10% to +10%
+//     gasPrice: {
+//       low: Math.floor(Math.random() * 3) + 1,
+//       medium: Math.floor(Math.random() * 5) + 3,
+//       high: Math.floor(Math.random() * 10) + 6,
+//     },
+//   };
+// };
+
+const parseBlock = (data: any): Block => {
   return {
-    number: blockNumber,
-    hash: `0x${Math.random().toString(16).substring(2, 42)}`,
-    parentHash: `0x${Math.random().toString(16).substring(2, 42)}`,
-    sha3uncles: `0x${Math.random().toString(16).substring(2, 66)}`,
-    transactionRoot: `0x${Math.random().toString(16).substring(2, 66)}`,
-    timestamp: timestamp,
-    validator: `0x${Math.random().toString(16).substring(2, 42)}`,
-    size: parseFloat((Math.random() * 2 + 0.5).toFixed(2)),
-    gasUsed: Math.floor(Math.random() * 8000000) + 2000000,
-    gasLimit: 10000000,
-    transactions: transactions,
-    transactionCount: transactions.length,
-    totalFees: transactions.reduce((sum, tx) => sum + tx.fee, 0),
+    number: data.number,
+    hash: data.hash,
+    parentHash: data.parentHash,
+    sha3uncles: data.sha3uncles,
+    transactionRoot: data.transactionRoot,
+    timestamp: new Date(data.timestamp),
+    validator: data.validator,
+    size: data.size,
+    gasUsed: data.gasUsed,
+    gasLimit: data.gasLimit,
+    transactions: data.transactions || [], 
+    transactionCount: data.transactionCount,
+    totalFees: data.totalFees
   };
 };
 
-const generateNetworkStats = (): NetworkStats => {
-  const baseDifficulty = Math.floor(Math.random() * 100000) + 50000;
-  const hashRate = Math.floor(Math.random() * 500) + 100;
-  
-  return {
-    avgBlockTime: parseFloat((Math.random() * 2 + 9).toFixed(1)),
-    pendingTransactions: Math.floor(Math.random() * 200),
-    activeValidators: Math.floor(Math.random() * 5) + 3,
-    totalBlocks: 891695 + Math.floor(Math.random() * 100),
-    difficulty: baseDifficulty,
-    difficultyPercent: Math.min(100, Math.floor((baseDifficulty / 150000) * 100)),
-    hashRate: hashRate,
-    hashRateChange: parseFloat((Math.random() * 10 - 5).toFixed(2)), // -5% to +5%
-    latency: Math.floor(Math.random() * 150) + 50, // 50-200ms
-    latencyChange: parseFloat((Math.random() * 20 - 10).toFixed(2)), // -10% to +10%
-    gasPrice: {
-      low: Math.floor(Math.random() * 3) + 1,
-      medium: Math.floor(Math.random() * 5) + 3,
-      high: Math.floor(Math.random() * 10) + 6,
-    },
-  };
+const placeholderNetworkStats: NetworkStats = {
+  avgBlockTime: 0,
+  pendingTransactions: 0,
+  activeValidators: 0,
+  totalBlocks: 0,
+  difficulty: 0,
+  difficultyPercent: 0,
+  hashRate: 0,
+  hashRateChange: 0,
+  latency: 0,
+  latencyChange: 0,
+  gasPrice: {
+    low: 0,
+    medium: 0,
+    high: 0,
+  },
+  memoryUsage: {
+    total: 0,
+  },
 };
 
 export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }) => {
@@ -150,13 +191,95 @@ export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }
   const [validators, setValidators] = useState<Validator[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
-  const [networkStats, setNetworkStats] = useState<NetworkStats>(generateNetworkStats());
+  const [networkStats, setNetworkStats] = useState<NetworkStats>(placeholderNetworkStats);
 
+  const parseNetworkStats = (metrics: any): NetworkStats => {
+    return {
+      avgBlockTime: parseFloat((metrics.averageBlockTime || 0).toFixed(3)),
+      pendingTransactions: metrics.pendingTransactions || 0,
+      activeValidators: metrics.activeValidators || 0,
+      totalBlocks: blocks.length,
+      difficulty: parseFloat((parseInt(metrics.difficulty, 10) || 0).toFixed(3)),
+      difficultyPercent: parseFloat(
+        Math.min(100, (parseInt(metrics.difficulty, 10) / 150000) * 100).toFixed(3)
+      ),
+      hashRate: parseFloat((parseInt(metrics.hashrate, 16) || 0).toFixed(3)),
+      hashRateChange: parseFloat((0).toFixed(3)), // Placeholder for now
+      latency: parseFloat((metrics.latency || 0).toFixed(3)),
+      latencyChange: parseFloat((0).toFixed(3)), // Placeholder for now
+      gasPrice: {
+        low: parseFloat((metrics.gasPrice?.low || 0).toFixed(3)),
+        medium: parseFloat((metrics.gasPrice?.medium || 0).toFixed(3)),
+        high: parseFloat((metrics.gasPrice?.high || 0).toFixed(3)),
+      },
+      memoryUsage: {
+        total: metrics.memoryUsage,
+      },
+    };
+  };
+
+  /** WebSocket connection to fetch latest
+    * blocks and subscribe to new blocks
+    ***/
   useEffect(() => {
-    const mockBlocks = Array.from({ length: 10 }, (_, i) => 
-      generateMockBlock(891695 - i)
-    );
+    const socket = new WebSocket("ws://localhost:8080/ws");
+
+    socket.onopen = () => {
+      console.log("WebSocket connected");
+
+      // Fetch 6 latest blocks
+      socket.send(
+        JSON.stringify({
+          type: "latestblocks",
+          payload: { count: 6 },
+        })
+      );
+
+      // Subscribe to new blocks
+      socket.send(
+        JSON.stringify({
+          type: "subscribe",
+        })
+      );
+    };
+
+    socket.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        console.log("Message received:", message);
     
+        switch (message.type) {
+          case "latestBlocks":
+            setBlocks(message.data.map(parseBlock));
+            setNetworkStats(parseNetworkStats(message.metrics));
+            console.log("Latest METRICS SET TO:", message.metrics);
+            setLoading(false);
+            break;
+          case "newblock":
+            setBlocks((prevBlocks) => [parseBlock(message.data), ...prevBlocks.slice(0, 9)]);
+            break;
+          default:
+            console.log("Unknown message type:", message.type);
+        }
+      } catch (err) {
+        console.error("Error processing message:", err);
+      }
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket disconnected");
+    };
+
+    socket.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+  
+  useEffect(() => {
     const mockPendingTxs = Array.from({ length: 50 }, (_, i) => 
       generateMockTransaction(0, i)
     ).filter(tx => tx.status === 'pending');
@@ -165,43 +288,10 @@ export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }
       generateMockValidator(i)
     );
     
-    setBlocks(mockBlocks);
     setPendingTransactions(mockPendingTxs);
     setValidators(mockValidators);
-    setNetworkStats(generateNetworkStats());
     setLoading(false);
   }, []);
-
-  useEffect(() => {
-    if (loading) return;
-    
-    const blockInterval = setInterval(() => {
-      const latestBlockNumber = blocks.length > 0 ? blocks[0].number + 1 : 891696;
-      const newBlock = generateMockBlock(latestBlockNumber);
-      
-      setBlocks(prev => [newBlock, ...prev.slice(0, 9)]);
-      
-      const newPendingTxIDs = new Set(newBlock.transactions.map(tx => tx.id));
-      setPendingTransactions(prev => 
-        prev.filter(tx => !newPendingTxIDs.has(tx.id))
-          .concat(Array.from({ length: Math.floor(Math.random() * 10) }, (_, i) => 
-            generateMockTransaction(0, i)
-          ).filter(tx => tx.status === 'pending'))
-      );
-    }, 60000); // New block every minute
-
-    const statsInterval = setInterval(() => {
-      setNetworkStats(prev => ({
-        ...generateNetworkStats(),
-        totalBlocks: prev.totalBlocks + 1
-      }));
-    }, 15000); // Update stats every 15 seconds
-
-    return () => {
-      clearInterval(blockInterval);
-      clearInterval(statsInterval);
-    };
-  }, [blocks, loading]);
 
   const value = {
     blocks,

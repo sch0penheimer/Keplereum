@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/blockchain")
@@ -124,6 +125,17 @@ public class BlockchainController {
         try {
             var alertDetails = smartContractService.getAlertById(id);
             return ResponseEntity.ok(alertDetails);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    // GET: Get all alert submitted events
+    @GetMapping("/contract/alerts")
+    public ResponseEntity<?> getAllAlertSubmittedEvents() {
+        try {
+            List<Map<String, Object>> alertEvents = smartContractService.getAllAlertSubmittedEvents();
+            return ResponseEntity.ok(alertEvents);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }

@@ -4,7 +4,10 @@ import com.example.jeeHamlaoui.Blockchain_Service.web3j.Web3JSingleton;
 import com.example.jeeHamlaoui.Blockchain_Service.contracts.SatelliteSystem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.web3j.abi.EventEncoder;
 import org.web3j.crypto.Credentials;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
@@ -90,4 +93,44 @@ public class SmartContractService {
                 "confirmers", confirmers
         );
     }
+
+    public List<Map<String, Object>> getAllAlertSubmittedEvents() throws Exception {
+
+        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738"; // Replace with a valid private key
+        Credentials credentials = Credentials.create(defaultPrivateKey);
+        // Load the contract
+        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
+
+        // Get the latest block number
+        BigInteger latestBlock = web3JSingleton.getWeb3jInstance()
+                .ethBlockNumber()
+                .send()
+                .getBlockNumber();
+
+        // Create a filter for the AlertSubmitted events
+        EthFilter filter = new EthFilter(
+                DefaultBlockParameter.valueOf(BigInteger.ZERO), // Start block
+                DefaultBlockParameter.valueOf(latestBlock),    // End block
+                contractAddress                                // Contract address
+        );
+        filter.addSingleTopic(EventEncoder.encode(SatelliteSystem.ALERTSUBMITTED_EVENT));
+
+        // Retrieve the events using the filter
+        List<Map<String, Object>> alertEvents = new ArrayList<>();
+        web3JSingleton.getWeb3jInstance()
+                .ethLogFlowable(filter)
+                .subscribe(log -> {
+                    SatelliteSystem.AlertSubmittedEventResponse event = contract.getAlertSubmittedEventFromLog(log);
+                    alertEvents.add(Map.of(
+                            "alertId", event.alertId,
+                            "alertType", event.alertType,
+                            "latitude", event.latitude,
+                            "longitude", event.longitude,
+                            "sender", event.sender // Replace submitter with sender
+                    ));
+                }).dispose(); // Dispose the subscription after processing
+
+        return alertEvents;
+    }
+
 }

@@ -24,7 +24,7 @@ services:
       --ws.addr "0.0.0.0"
       --ws.port 8545
       --ws.origins "*"
-      --ws.api "eth,net,web3,personal,miner,clique"
+      --ws.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8552
       --allow-insecure-unlock
       --unlock "0xe6427a00f96f7ca5688f1de97ba66c21daf77afe"
@@ -53,7 +53,7 @@ services:
       --http.addr "0.0.0.0"
       --http.port 8546
       --http.corsdomain "*"
-      --http.api "eth,net,web3,personal,miner,clique"
+      --http.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8553
       --allow-insecure-unlock
       --unlock "0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44"
@@ -85,7 +85,7 @@ services:
       --http.addr "0.0.0.0"
       --http.port 8547
       --http.corsdomain "*"
-      --http.api "eth,net,web3,personal,miner,clique"
+      --http.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8554
       --allow-insecure-unlock
       --unlock "0x586c6a428dfa031a56360e634cd8d87ea38441c1"
@@ -117,7 +117,7 @@ services:
       --http.addr "0.0.0.0"
       --http.port 8548
       --http.corsdomain "*"
-      --http.api "eth,net,web3,personal,miner,clique"
+      --http.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8555
       --allow-insecure-unlock
       --unlock "0xe680c674b7ee03080c8c11099d499c68895088cb"
@@ -149,7 +149,7 @@ services:
       --http.addr "0.0.0.0"
       --http.port 8549
       --http.corsdomain "*"
-      --http.api "eth,net,web3,personal,miner,clique"
+      --http.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8556
       --allow-insecure-unlock
       --unlock "0x90501ed9e1d4466512a09fe41157a1fad6ed76e7"

@@ -18,6 +18,7 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class BlockchainService {
@@ -28,16 +29,18 @@ public class BlockchainService {
     }
 
     // Get all mempool transactions
-    public List<EthBlock.TransactionResult> getPendingTransactions() throws Exception {
-        EthBlock pendingBlock = web3JSingleton.getWeb3jInstance()
-                .ethGetBlockByNumber(DefaultBlockParameterName.PENDING, true)
-                .send();
+    public List<Transaction> getPendingTransactions() throws Exception {
+        // Get the pending block (which contains proposed transactions)
+        EthBlock block = web3JSingleton.getWeb3jInstance().ethGetBlockByNumber(DefaultBlockParameterName.PENDING, true).send();
 
-        if (pendingBlock.getBlock() != null) {
-            return pendingBlock.getBlock().getTransactions();
-        } else {
-            throw new RuntimeException("No pending transactions found.");
+        if (block.hasError()) {
+            throw new RuntimeException("Error: " + block.getError().getMessage());
         }
+
+        // Extract transactions from the block
+        return block.getBlock().getTransactions().stream()
+                .map(tx -> (Transaction) tx.get())
+                .collect(Collectors.toList());
     }
 
     // Get a block by number
@@ -62,7 +65,7 @@ public class BlockchainService {
                                      BigInteger gasPrice, BigInteger gasLimit) throws Exception {
 
         // Get the chain ID dynamically (or hardcode it if you know the network)
-        long chainId = 12345;
+        BigInteger chainId = web3JSingleton.getWeb3jInstance().ethChainId().send().getChainId();
 
         // 3. Create credentials from the private key
         Credentials credentials = Credentials.create(privateKey);
@@ -82,7 +85,7 @@ public class BlockchainService {
         );
 
         // 4. Sign Offline (like web3.eth.accounts.signTransaction)
-        byte[] signedMessage = TransactionEncoder.signMessage(rawTx, chainId, credentials);
+        byte[] signedMessage = TransactionEncoder.signMessage(rawTx, chainId.longValue(), credentials);
         String hexValue = Numeric.toHexString(signedMessage);
 
         // 5. Send Signed Payload (like web3.eth.sendSignedTransaction)

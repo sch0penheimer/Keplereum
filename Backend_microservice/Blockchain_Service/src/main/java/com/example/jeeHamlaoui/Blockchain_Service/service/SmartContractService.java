@@ -12,9 +12,11 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.tuples.generated.Tuple7;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -49,32 +51,94 @@ public class SmartContractService {
     }
 
     // Confirm an alert
-    public void confirmAlert(String privateKey, byte[] alertId) throws Exception {
+    public Map<String, String> confirmAlert(String privateKey, byte[] alertId) throws Exception {
+        // Ensure the alertId is padded to 32 bytes
+        if (alertId.length != 32) {
+            throw new IllegalArgumentException("alertId must be exactly 32 bytes long");
+        }
+
         Credentials credentials = Credentials.create(privateKey);
-        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
-        contract.confirmAlert(alertId).send();
+
+        // Fetch the chain ID from the Ethereum network
+        BigInteger chainId = web3JSingleton.getWeb3jInstance().ethChainId().send().getChainId();
+
+        // Create a transaction manager with the chain ID
+        TransactionManager transactionManager = new RawTransactionManager(
+                web3JSingleton.getWeb3jInstance(),
+                credentials,
+                chainId.longValue()
+        );
+
+        // Load the contract with the transaction manager
+        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), transactionManager, new DefaultGasProvider());
+
+        // Send the transaction
+        TransactionReceipt receipt = contract.confirmAlert(alertId).send();
+
+        // Return the transaction hash and a success message
+        return Map.of(
+                "transactionHash", receipt.getTransactionHash(),
+                "message", "Alert confirmed successfully"
+        );
     }
 
     // Trigger an action
-    public void triggerAction(String privateKey, String satellite, BigInteger action, byte[] alertId) throws Exception {
+    public Map<String, String> triggerAction(String privateKey, String satellite, BigInteger action, byte[] alertId) throws Exception {
         Credentials credentials = Credentials.create(privateKey);
-        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
-        contract.triggerAction(satellite, action, alertId).send();
+
+        // Fetch the chain ID from the Ethereum network
+        BigInteger chainId = web3JSingleton.getWeb3jInstance().ethChainId().send().getChainId();
+
+        // Create a transaction manager with the chain ID
+        TransactionManager transactionManager = new RawTransactionManager(
+                web3JSingleton.getWeb3jInstance(),
+                credentials,
+                chainId.longValue()
+        );
+
+        // Load the contract with the transaction manager
+        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), transactionManager, new DefaultGasProvider());
+
+        // Send the transaction
+        TransactionReceipt receipt = contract.triggerAction(satellite, action, alertId).send();
+
+        // Return the transaction hash and a success message
+        return Map.of(
+                "transactionHash", receipt.getTransactionHash(),
+                "message", "Action triggered successfully"
+        );
     }
 
     // Get all alerts with confirmations
     public List<Map<String, Object>> getAllAlertsWithConfirmations() throws Exception {
-        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), (Credentials) null, new DefaultGasProvider());
+        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738"; // Replace with a valid private key
+        Credentials credentials = Credentials.create(defaultPrivateKey);
+        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
 
         BigInteger alertCount = contract.getAlertCount().send();
         List<Map<String, Object>> alerts = new ArrayList<>();
 
         for (BigInteger i = BigInteger.ZERO; i.compareTo(alertCount) < 0; i = i.add(BigInteger.ONE)) {
+            // Fetch alert ID
             byte[] alertId = contract.alertIds(i).send();
+
+            // Fetch alert details using the alerts(byte[]) method
+            Tuple7<String, String, BigInteger, BigInteger, BigInteger, BigInteger, Boolean> alertDetails = contract.alerts(alertId).send();
+
+            // Extract details from the tuple
+            String alertType = alertDetails.component2(); // Assuming the second component is the alert type
+            BigInteger latitude = alertDetails.component3(); // Assuming the third component is latitude
+            BigInteger longitude = alertDetails.component4(); // Assuming the fourth component is longitude
+
+            // Fetch confirmers
             List<String> confirmers = contract.getAlertConfirmers(alertId).send();
 
+            // Add all details to the response
             alerts.add(Map.of(
-                    "alertId", alertId,
+                    "alertId", Base64.getEncoder().encodeToString(alertId), // Encode alertId as Base64 for readability
+                    "alertType", alertType,
+                    "latitude", latitude,
+                    "longitude", longitude,
                     "confirmers", confirmers
             ));
         }
@@ -126,7 +190,8 @@ public class SmartContractService {
                             "alertType", event.alertType,
                             "latitude", event.latitude,
                             "longitude", event.longitude,
-                            "sender", event.sender // Replace submitter with sender
+                            "sender", event.sender, // Replace submitter with sender
+                            "transactionHash", log.getTransactionHash() // Add transaction hash
                     ));
                 }).dispose(); // Dispose the subscription after processing
 

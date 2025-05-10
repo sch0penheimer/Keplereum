@@ -6,8 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/v1/blockchain")
@@ -88,23 +91,58 @@ public class BlockchainController {
     }
 
     @PostMapping("/contract/alert/confirm")
-    public ResponseEntity<String> confirmAlert(@RequestParam String privateKey, @RequestParam byte[] alertId) {
+    public ResponseEntity<Map<String, String>> confirmAlert(@RequestParam String privateKey, @RequestParam String alertId) {
         try {
-            smartContractService.confirmAlert(privateKey, alertId);
-            return ResponseEntity.ok("Alert confirmed successfully");
+            // Trim the input to remove any extra spaces
+            alertId = alertId.trim();
+
+            // Validate the Base64-encoded alertId
+            if (!isValidBase64(alertId)) {
+                throw new IllegalArgumentException("Invalid Base64-encoded alertId");
+            }
+
+            // Decode the Base64-encoded alertId
+            byte[] alertIdBytes = Base64.getDecoder().decode(alertId);
+
+            // Validate the length of the decoded byte array
+            if (alertIdBytes.length != 32) {
+                throw new IllegalArgumentException("Decoded alertId must be exactly 32 bytes long");
+            }
+
+            // Call the service and return the response
+            Map<String, String> response = smartContractService.confirmAlert(privateKey, alertIdBytes);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            // Handle invalid Base64 strings or length issues
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            // Handle other exceptions
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // Helper method to validate Base64 strings
+    private boolean isValidBase64(String str) {
+        try {
+            Base64.getDecoder().decode(str);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
     }
 
     @PostMapping("/contract/action")
-    public ResponseEntity<String> triggerAction(@RequestParam String privateKey, @RequestParam String satellite,
-                                                 @RequestParam BigInteger action, @RequestParam byte[] alertId) {
+    public ResponseEntity<Map<String, String>> triggerAction(@RequestParam String privateKey, @RequestParam String satellite,
+                                                             @RequestParam BigInteger action, @RequestParam String alertId) {
         try {
-            smartContractService.triggerAction(privateKey, satellite, action, alertId);
-            return ResponseEntity.ok("Action triggered successfully");
+            // Decode the Base64-encoded alertId
+            byte[] alertIdBytes = Base64.getDecoder().decode(alertId);
+
+            // Call the service and return the response
+            Map<String, String> response = smartContractService.triggerAction(privateKey, satellite, action, alertIdBytes);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
 

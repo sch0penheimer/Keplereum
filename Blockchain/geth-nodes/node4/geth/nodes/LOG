@@ -501,3 +501,34 @@
 =============== May 5, 2025 (UTC) ===============
 12:41:03.654280 db@close closing
 12:41:03.662535 db@close done T·8.25288ms
+=============== May 10, 2025 (UTC) ===============
+18:56:33.397971 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+18:56:33.422142 version@stat F·[0 2] S·2MiB[0B 2MiB] Sc·[0.00 0.02]
+18:56:33.422705 db@open opening
+18:56:33.424084 journal@recovery F·1
+18:56:33.424827 journal@recovery recovering @132
+18:56:33.518931 memdb@flush created L0@136 N·19576 S·343KiB "n:\x00..ing,v1536631":"n:\xff..ail,v1533053"
+18:56:33.522280 version@stat F·[1 2] S·2MiB[343KiB 2MiB] Sc·[0.25 0.02]
+18:56:33.552494 db@janitor F·6 G·1
+18:56:33.552889 db@janitor removing table-91
+18:56:33.554793 db@open done T·131.921036ms
+18:56:33.735697 table@compaction L0·1 -> L1·2 S·2MiB Q·1537196
+18:56:33.937195 table@build created L1@139 N·44138 S·2MiB "loc..seq,v1002453":"n:\xda..ail,v1456227"
+18:56:33.966061 table@build created L1@140 N·7400 S·344KiB "n:\xda..ail,v1497926":"version,v1"
+18:56:33.966292 version@stat F·[0 2] S·2MiB[0B 2MiB] Sc·[0.00 0.02]
+18:56:33.970517 table@compaction committed F-1 S-313KiB Ke·0 D·19081 T·234.554101ms
+18:56:33.972045 table@remove removed @134
+18:56:33.973276 table@remove removed @135
+20:56:03.419299 memdb@flush N·44455 S·3MiB
+20:56:03.536045 memdb@flush created L0@142 N·44455 S·935KiB "loc..seq,v1537197":"n:\xff..ong,d1562834"
+20:56:03.536317 version@stat F·[1 2] S·3MiB[935KiB 2MiB] Sc·[0.25 0.02]
+20:56:03.538985 memdb@flush committed F·1 T·119.106743ms
+20:56:03.540746 journal@remove removed @137
+20:56:42.846273 table@compaction L0·1 -> L1·2 S·3MiB Q·1581937
+20:56:42.988361 table@build created L1@143 N·49063 S·2MiB "loc..seq,v1537197":"n:\xcc..ail,v1567885"
+20:56:43.013128 table@build created L1@144 N·11435 S·479KiB "n:\xcc..ing,v1544139":"version,v1"
+20:56:43.013304 version@stat F·[0 2] S·2MiB[0B 2MiB] Sc·[0.00 0.02]
+20:56:43.015122 table@compaction committed F-1 S-797KiB Ke·0 D·35495 T·168.530978ms
+20:56:43.016241 table@remove removed @142
+20:56:43.017588 table@remove removed @139
+20:56:43.018480 table@remove removed @140

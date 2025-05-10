@@ -1,7 +1,10 @@
 package com.example.jeeHamlaoui.Blockchain_Service.service;
 
+import com.example.jeeHamlaoui.Blockchain_Service.web3j.RpcClientSingleton;
 import com.example.jeeHamlaoui.Blockchain_Service.web3j.Web3JSingleton;
 import com.example.jeeHamlaoui.Blockchain_Service.contracts.SatelliteSystem;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
@@ -14,33 +17,62 @@ import org.web3j.crypto.Credentials;
 import org.web3j.tx.TransactionManager;
 import org.web3j.utils.Numeric;
 
+import java.io.OutputStream;
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.net.HttpURLConnection;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class BlockchainService {
     private final Web3JSingleton web3JSingleton;
+    private final RpcClientSingleton rpcClientSingleton;
+    private final ObjectMapper objectMapper;
 
-    public BlockchainService(Web3JSingleton web3JSingleton) {
+    public BlockchainService(Web3JSingleton web3JSingleton, RpcClientSingleton rpcClientSingleton, ObjectMapper objectMapper) {
         this.web3JSingleton = web3JSingleton;
+        this.rpcClientSingleton = rpcClientSingleton;
+        this.objectMapper = objectMapper;
     }
 
     // Get all mempool transactions
-    public List<Transaction> getPendingTransactions() throws Exception {
-        // Get the pending block (which contains proposed transactions)
-        EthBlock block = web3JSingleton.getWeb3jInstance().ethGetBlockByNumber(DefaultBlockParameterName.PENDING, true).send();
+    public List<JsonNode> getPendingTransactions() throws Exception {
+        HttpURLConnection con = rpcClientSingleton.getConnection();
 
-        if (block.hasError()) {
-            throw new RuntimeException("Error: " + block.getError().getMessage());
+        String requestBody = """
+            {
+              "jsonrpc": "2.0",
+              "method": "txpool_content",
+              "params": [],
+              "id": 1
+            }
+        """;
+
+        try (OutputStream os = con.getOutputStream()) {
+            os.write(requestBody.getBytes());
+            os.flush();
         }
 
-        // Extract transactions from the block
-        return block.getBlock().getTransactions().stream()
-                .map(tx -> (Transaction) tx.get())
-                .collect(Collectors.toList());
+        JsonNode response = objectMapper.readTree(con.getInputStream());
+
+        // Navigate to result.pending
+        JsonNode pending = response.path("result").path("pending");
+
+        List<JsonNode> allPendingTxs = new ArrayList<>();
+
+        // Structure: pending[sender][nonce] = transaction
+        for (Iterator<String> senders = pending.fieldNames(); senders.hasNext(); ) {
+            String sender = senders.next();
+            JsonNode nonceMap = pending.get(sender);
+
+            for (Iterator<String> nonces = nonceMap.fieldNames(); nonces.hasNext(); ) {
+                String nonce = nonces.next();
+                JsonNode tx = nonceMap.get(nonce);
+                allPendingTxs.add(tx);
+            }
+        }
+
+        return allPendingTxs;
     }
 
     // Get a block by number
@@ -102,36 +134,59 @@ public class BlockchainService {
     }
 
     // Get a transaction by hash (with event details if applicable)
-    public Object getTransactionByHash(String transactionHash) throws Exception {
-        // Fetch the transaction details
-        EthTransaction transaction = web3JSingleton.getWeb3jInstance()
-                .ethGetTransactionByHash(transactionHash)
-                .send();
+    public Map<String, Object> getTransactionByHash(String transactionHash) throws Exception {
+        // Set up the connection to the RPC node
+        HttpURLConnection con = rpcClientSingleton.getConnection();
 
-        if (!transaction.getTransaction().isPresent()) {
+        // Create the request body for 'eth_getTransactionByHash'
+        String requestBodyTx = objectMapper.writeValueAsString(Map.of(
+                "jsonrpc", "2.0",
+                "method", "eth_getTransactionByHash",
+                "params", List.of(transactionHash),
+                "id", 1
+        ));
+
+        // Send the request to get the transaction
+        con.setDoOutput(true);
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+
+        try (OutputStream os = con.getOutputStream()) {
+            os.write(requestBodyTx.getBytes());
+            os.flush();
+        }
+
+        // Get the response and parse the transaction
+        JsonNode txResponse = objectMapper.readTree(con.getInputStream());
+        JsonNode transaction = txResponse.path("result");
+
+        if (transaction.isNull()) {
             throw new RuntimeException("Transaction not found.");
         }
 
-        // Fetch the transaction receipt to check for events
-        EthGetTransactionReceipt receiptResponse = web3JSingleton.getWeb3jInstance()
-                .ethGetTransactionReceipt(transactionHash)
-                .send();
+        // Create the request body for 'eth_getTransactionReceipt'
+        String requestBodyReceipt = objectMapper.writeValueAsString(Map.of(
+                "jsonrpc", "2.0",
+                "method", "eth_getTransactionReceipt",
+                "params", List.of(transactionHash),
+                "id", 1
+        ));
 
-        if (!receiptResponse.getTransactionReceipt().isPresent()) {
-            return transaction.getTransaction().get(); // Return transaction details if no receipt
+        // Send the request to get the receipt
+        con = rpcClientSingleton.getConnection();  // Reinitialize the connection
+        try (OutputStream os = con.getOutputStream()) {
+            os.write(requestBodyReceipt.getBytes());
+            os.flush();
         }
 
-        var receipt = receiptResponse.getTransactionReceipt().get();
+        // Get the response and parse the receipt
+        JsonNode receiptResponse = objectMapper.readTree(con.getInputStream());
+        JsonNode receipt = receiptResponse.path("result");
 
-        // Check for specific events (AlertConfirmed, ActionTriggered)
-        List<SatelliteSystem.AlertConfirmedEventResponse> alertEvents = SatelliteSystem.getAlertConfirmedEvents(receipt);
-        List<SatelliteSystem.ActionTriggeredEventResponse> actionEvents = SatelliteSystem.getActionTriggeredEvents(receipt);
-
-        // Return transaction details along with events
+        // Return both the transaction and the receipt (or "pending" if no receipt)
         return Map.of(
-                "transaction", transaction.getTransaction().get(),
-                "alertEvents", alertEvents,
-                "actionEvents", actionEvents
+                "transaction", transaction,
+                "receipt", receipt.isNull() ? "pending" : receipt
         );
     }
 }

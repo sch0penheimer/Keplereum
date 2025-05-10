@@ -48,6 +48,30 @@ public class BlockchainController {
         }
     }
 
+    // POST: Submit a transaction
+    @PostMapping("/transaction")
+    public ResponseEntity<String> submitTransaction(@RequestParam String privateKey, @RequestParam String toAddress,
+                                                     @RequestParam BigInteger value, @RequestParam BigInteger gasPrice,
+                                                     @RequestParam BigInteger gasLimit) {
+        try {
+            String transactionHash = blockchainService.publishTransaction(privateKey, toAddress, value, gasPrice, gasLimit);
+            return ResponseEntity.ok(transactionHash);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    // GET: Get a transaction by hash (with event details if applicable)
+    @GetMapping("/transaction")
+    public ResponseEntity<?> getTransactionByHash(@RequestParam String hash) {
+        try {
+            var transactionDetails = blockchainService.getTransactionByHash(hash);
+            return ResponseEntity.ok(transactionDetails);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
     //**************************************** Smart Contracts ***********************************************//
     //********************************************************************************************************//
 
@@ -83,12 +107,25 @@ public class BlockchainController {
         }
     }
 
-    @GetMapping("/contract/alerts/count")
-    public ResponseEntity<BigInteger> getAlertCount() {
+    // GET: All currently submitted alerts with confirmations
+    @GetMapping("/alerts")
+    public ResponseEntity<?> getAllAlertsWithConfirmations() {
         try {
-            return ResponseEntity.ok(smartContractService.getAlertCount());
+            var alerts = smartContractService.getAllAlertsWithConfirmations();
+            return ResponseEntity.ok(alerts);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(null);
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    // GET: Alert fetch by ID, with confirmations
+    @GetMapping("/alert/{id}")
+    public ResponseEntity<?> getAlertById(@PathVariable String id) {
+        try {
+            var alertDetails = smartContractService.getAlertById(id);
+            return ResponseEntity.ok(alertDetails);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 }

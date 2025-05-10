@@ -33,4 +33,4 @@ management:
 
 blockchain:
   node-url: http://localhost:8546
-  contract-address: 0x357527F8A5CA24A78f9aEEB5e320481Af923659B
+  contract-address: "0x357527F8A5CA24A78f9aEEB5e320481Af923659B"

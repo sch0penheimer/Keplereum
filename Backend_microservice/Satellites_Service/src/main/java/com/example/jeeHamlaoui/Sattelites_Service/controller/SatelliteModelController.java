@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/models")
+@CrossOrigin(origins = "*")
 public class SatelliteModelController {
 
     private final SatelliteModelService satelliteModelService;

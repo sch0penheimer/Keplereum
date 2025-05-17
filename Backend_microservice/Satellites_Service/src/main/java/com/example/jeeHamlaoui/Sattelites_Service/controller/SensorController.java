@@ -17,6 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/sensors")
+@CrossOrigin(origins = "*")
 public class SensorController {
 
     private final SensorService sensorService;

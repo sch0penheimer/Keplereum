@@ -5,7 +5,12 @@ node_modules/
 .vscode/
 .idea/
 
-Blockchain/geth-nodes/
+Blockchain/geth-nodes/bootnode/
+Blockchain/geth-nodes/node1/
+Blockchain/geth-nodes/node2/
+Blockchain/geth-nodes/node3/
+Blockchain/geth-nodes/node4/
+Blockchain/geth-nodes/node5/
 Blockchain/.idea/
 
 

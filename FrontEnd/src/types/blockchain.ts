@@ -39,6 +39,7 @@ export interface Block {
 /** Validator Interface **/
 export interface Validator {
   address: string;
+  privateKey: string;
   name: string;
   blocksValidated: number;
   isActive: boolean;

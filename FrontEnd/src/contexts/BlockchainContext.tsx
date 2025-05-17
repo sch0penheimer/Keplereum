@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import axios from "axios";
 import {
   BlockTransaction,
   Block,
@@ -8,20 +9,6 @@ import {
 } from "@/types/blockchain";
 
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
-
-/**
- * Temporary Function to generate Dummy / Mock Validators 
- * @param id
- */
-const generateMockValidator = (id: number): Validator => {
-  const names = ["Alpha-TCF1", "Beta-CX", "Gamma-II", "Delta", "Epsilon-XIX"];
-  return {
-    address: `0x${Math.random().toString(16).substring(2, 42)}`,
-    name: names[id % names.length],
-    blocksValidated: Math.floor(Math.random() * 1000) + 100,
-    isActive: Math.random() > 0.2,
-  };
-};
 
 /**
  * Temporary Function to generate Dummy / Mock Transactions
@@ -89,63 +76,6 @@ const generateMockTransaction = (blockNumber: number, id: number): BlockTransact
   }
 };
 
-/**
- * Temporary Function to generate Dummy / Mock Blocks
- * @param blockNumber 
- */
-// const generateMockBlock = (blockNumber: number): Block => {
-//   const transactionCount = Math.floor(Math.random() * 200) + 50;
-//   const transactions = Array.from({ length: transactionCount }, (_, i) => 
-//     generateMockTransaction(blockNumber, i)
-//   );
-  
-//   const now = new Date();
-//   const timestamp = new Date(now.getTime() - (891695 - blockNumber) * 12000);
-  
-//   return {
-//     number: blockNumber,
-//     hash: `0x${Math.random().toString(16).substring(2, 42)}`,
-//     parentHash: `0x${Math.random().toString(16).substring(2, 42)}`,
-//     sha3uncles: `0x${Math.random().toString(16).substring(2, 66)}`,
-//     transactionRoot: `0x${Math.random().toString(16).substring(2, 66)}`,
-//     timestamp: timestamp,
-//     validator: `0x${Math.random().toString(16).substring(2, 42)}`,
-//     size: parseFloat((Math.random() * 2 + 0.5).toFixed(2)),
-//     gasUsed: Math.floor(Math.random() * 8000000) + 2000000,
-//     gasLimit: 10000000,
-//     transactions: transactions,
-//     transactionCount: transactions.length,
-//     totalFees: transactions.reduce((sum, tx) => sum + tx.fee, 0),
-//   };
-// };
-
-/**
- * Generate mock stats for the network
- * @returns 
- */
-// const generateNetworkStats = (): NetworkStats => {
-//   const baseDifficulty = Math.floor(Math.random() * 100000) + 50000;
-//   const hashRate = Math.floor(Math.random() * 500) + 100;
-  
-//   return {
-//     avgBlockTime: parseFloat((Math.random() * 2 + 9).toFixed(1)),
-//     pendingTransactions: Math.floor(Math.random() * 200),
-//     activeValidators: Math.floor(Math.random() * 5) + 3,
-//     totalBlocks: 891695 + Math.floor(Math.random() * 100),
-//     difficulty: baseDifficulty,
-//     difficultyPercent: Math.min(100, Math.floor((baseDifficulty / 150000) * 100)),
-//     hashRate: hashRate,
-//     hashRateChange: parseFloat((Math.random() * 10 - 5).toFixed(2)), // -5% to +5%
-//     latency: Math.floor(Math.random() * 150) + 50, // 50-200ms
-//     latencyChange: parseFloat((Math.random() * 20 - 10).toFixed(2)), // -10% to +10%
-//     gasPrice: {
-//       low: Math.floor(Math.random() * 3) + 1,
-//       medium: Math.floor(Math.random() * 5) + 3,
-//       high: Math.floor(Math.random() * 10) + 6,
-//     },
-//   };
-// };
-
 const parseBlock = (data: any): Block => {
   return {
     number: data.number,
@@ -185,13 +115,45 @@ const placeholderNetworkStats: NetworkStats = {
   },
 };
 
-export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [pendingTransactions, setPendingTransactions] = useState<BlockTransaction[]>([]);
   const [validators, setValidators] = useState<Validator[]>([]);
+  const [networkStats, setNetworkStats] = useState<NetworkStats>(placeholderNetworkStats);
   const [loading, setLoading] = useState(true);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
-  const [networkStats, setNetworkStats] = useState<NetworkStats>(placeholderNetworkStats);
+
+  const fetchValidators = async () => {
+    try {
+      const response_blockchain = await axios.get("http://localhost:8222/api/v1/blockchain/validators/queue");
+      const response_back = await axios.get("http://localhost:8222/api/v1/nodes/authorities");
+
+      const blockchainValidators = response_blockchain.data;
+      const authorityNodes = response_back.data;
+
+      // Map each satellite with its corresponding public address
+      const mappedValidators: Validator[] = authorityNodes.map((node: any, index: number) => {
+        const matchingValidator = blockchainValidators.find(
+          (validator: any) => validator.publicAddress === node.publicKey
+        );
+
+        return {
+          address: node.publicKey,
+          name: node.nodeName || `Satellite-${index + 1}`,
+          blocksValidated: matchingValidator?.blocksValidated || node.blocksValidated || 0,
+          isActive: matchingValidator?.isActive || node.authorityStatus || false,
+        };
+      });
+
+      setValidators(mappedValidators);
+    } catch (error) {
+      console.error("Error fetching validators:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchValidators();
+  }, []);
 
   const parseNetworkStats = (metrics: any): NetworkStats => {
     return {
@@ -235,6 +197,15 @@ export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }
         })
       );
 
+      socket.send(
+        JSON.stringify({
+          type: 'togglemining',
+          payload: {
+              start: true
+          }
+        })
+      );
+
       // Subscribe to new blocks
       socket.send(
         JSON.stringify({
@@ -252,10 +223,10 @@ export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }
           case "latestBlocks":
             setBlocks(message.data.map(parseBlock));
             setNetworkStats(parseNetworkStats(message.metrics));
-            console.log("Latest METRICS SET TO:", message.metrics);
             setLoading(false);
             break;
-          case "newblock":
+          case "newBlock":
+            console.log("New block received:", message.data);
             setBlocks((prevBlocks) => [parseBlock(message.data), ...prevBlocks.slice(0, 9)]);
             break;
           default:
@@ -284,12 +255,7 @@ export const BlockchainProvider: React.FC<{children: ReactNode}> = ({ children }
       generateMockTransaction(0, i)
     ).filter(tx => tx.status === 'pending');
     
-    const mockValidators = Array.from({ length: 6 }, (_, i) => 
-      generateMockValidator(i)
-    );
-    
     setPendingTransactions(mockPendingTxs);
-    setValidators(mockValidators);
     setLoading(false);
   }, []);
 

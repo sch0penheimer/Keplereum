@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/trajectories")
+@CrossOrigin(origins = "*")
 public class SatelliteTrajectoryController {
 
     private final SatelliteTrajectoryService satelliteTrajectoryService;

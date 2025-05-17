@@ -5,12 +5,9 @@ node_modules/
 .vscode/
 .idea/
 
-Blockchain/geth-nodes/node1/geth.ipc
-Blockchain/geth-nodes/node2/geth.ipc
-Blockchain/geth-nodes/node3/geth.ipc
-Blockchain/geth-nodes/node4/geth.ipc
-Blockchain/geth-nodes/node5/geth.ipc
+Blockchain/geth-nodes/
 Blockchain/.idea/
+
 
 ###############################################
 ########### Backend subrepository Bypassing 

@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/satellites")
+@CrossOrigin(origins = "*")
 public class SatelliteController {
 
     private final SatelliteService satelliteService;

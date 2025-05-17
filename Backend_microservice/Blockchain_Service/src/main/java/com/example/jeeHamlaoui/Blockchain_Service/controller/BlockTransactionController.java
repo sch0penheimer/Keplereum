@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
+@CrossOrigin(origins = "*")
 public class BlockTransactionController {
     private final BlockTransactionService transactionService;
 

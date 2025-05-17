@@ -10,49 +10,55 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
     private final JwtUtil jwtUtil;
     private final JwtConfig jwtConfig;
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil, JwtConfig jwtConfig) {
         super(Config.class);
         this.jwtUtil = jwtUtil;
         this.jwtConfig = jwtConfig;
+
     }
 
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             String path = exchange.getRequest().getURI().getPath();
-            
-            // Skip authentication for login and register endpoints
-            if (path.contains("/auth/login") || path.contains("/auth/register")) {
-                return chain.filter(exchange);
-            }
+            log.error("Incoming request path: {}", path);
 
-            if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
-            }
             String token = extractToken(exchange.getRequest());
+            log.error("Extracted token: {}", token);
 
-            if (token == null) {
-                return onError(exchange, "Missing JWT", HttpStatus.UNAUTHORIZED);
+            if (token == null || !jwtUtil.validateToken(token)) {
+                log.error("Token is missing or invalid for path: {}", path);
+
+                if (path.contains("/auth/login") || path.contains("/auth/register")) {
+                    log.info("Allowing unauthenticated access to public endpoint: {}", path);
+                    return chain.filter(exchange);
+                } else {
+                    log.error("Blocking unauthorized access to: {}", path);
+                    return onError(exchange, "Unauthorized: JWT required", HttpStatus.UNAUTHORIZED);
+                }
             }
 
-            if (!jwtUtil.validateToken(token)) {
-                return onError(exchange, "Invalid token", HttpStatus.UNAUTHORIZED);
-            }
+            log.info("Token is valid. Forwarding request to: {}", path);
 
-            String username = jwtUtil.extractUsername(token);
-            exchange.getRequest().mutate()
-                    .header("X-Auth-User", username)
+            ServerHttpRequest modifiedRequest = exchange.getRequest()
+                    .mutate()
+                    .header("Authorization", "Bearer " + token)
                     .build();
 
-            return chain.filter(exchange);
+            return chain.filter(exchange.mutate().request(modifiedRequest).build());
         };
     }
+
+
 
     private String extractToken(ServerHttpRequest request) {
         // 1. Check cookie
@@ -60,6 +66,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
             return request.getCookies().getFirst("jwt").getValue();
         }
         // 2. Check Authorization header
+
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader != null && authHeader.startsWith(jwtConfig.getPrefix())) {
             return authHeader.replace(jwtConfig.getPrefix(), "").trim();
@@ -68,6 +75,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {
+        log.error("JWT authentication error: {}", err);
         exchange.getResponse().setStatusCode(httpStatus);
         return exchange.getResponse().setComplete();
     }

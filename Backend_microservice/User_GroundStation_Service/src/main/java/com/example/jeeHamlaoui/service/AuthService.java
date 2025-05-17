@@ -72,7 +72,8 @@ public class AuthService {
         User savedUser = userRepository.save(user);
 
         String token = generateToken(savedUser);
-        setJwtCookie(response, token);
+        setJwtCookie(response, token
+        );
         return new LoginResponse(userMapper.toDto(savedUser));
     }
 

@@ -10,10 +10,12 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.function.Function;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Component
 public class JwtUtil {
     private final JwtConfig jwtConfig;
+    private final Logger log = LoggerFactory.getLogger(JwtUtil.class);
 
     public JwtUtil(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
@@ -46,14 +48,16 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
-            SecretKey key = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
-            Jwts.parser()
-                    .setSigningKey(key)
-                    .parseClaimsJws(token);
+            Claims claims = Jwts.parser()
+                    .setSigningKey(jwtConfig.getSecret())
+                    .parseClaimsJws(token)
+                    .getBody();
+            log.info("Token claims: {}", claims);
             return true;
         } catch (Exception e) {
-
+            log.error("Token validation error: {}", e.getMessage());
             return false;
         }
     }
+
 } 

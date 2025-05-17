@@ -1,9 +1,12 @@
-
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
 spring:
   application:
     name: GATEWAY
-
   config:
     import: optional:configserver:http://localhost:8888
-
 

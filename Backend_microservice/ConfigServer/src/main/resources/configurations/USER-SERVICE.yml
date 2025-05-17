@@ -24,6 +24,10 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+jwt:
+  secret: ${JWT_SECRET:veryverysecretkey12345678901234567890}
+  expiration: ${JWT_EXPIRATION:86400}
+
 management:
   tracing:
     sampling:

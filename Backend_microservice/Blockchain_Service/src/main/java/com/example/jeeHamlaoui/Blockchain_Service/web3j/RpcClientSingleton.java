@@ -12,7 +12,7 @@ public class RpcClientSingleton {
 
     private final URL rpcUrl;
 
-    public RpcClientSingleton(@Value("${blockchain.node-url}") String nodeUrl) {
+    public RpcClientSingleton(@Value("${blockchain.load-balancer-url}") String nodeUrl) {
         try {
             this.rpcUrl = new URL(nodeUrl);
         } catch (Exception e) {

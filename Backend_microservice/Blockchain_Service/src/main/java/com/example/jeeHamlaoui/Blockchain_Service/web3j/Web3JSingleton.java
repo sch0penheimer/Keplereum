@@ -9,7 +9,7 @@ import org.web3j.protocol.http.HttpService;
 public class Web3JSingleton {
     private final Web3j web3j;
 
-    public Web3JSingleton(@Value("${blockchain.node-url}") String nodeUrl) {
+    public Web3JSingleton(@Value("${blockchain.load-balancer-url}") String nodeUrl) {
         this.web3j = Web3j.build(new HttpService(nodeUrl));
     }
 

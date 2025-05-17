@@ -8,6 +8,11 @@ import {
   BlockchainContextType
 } from "@/types/blockchain";
 
+// _______________________ //
+// * Normal Transactions * //
+// _______________________ //
+import { startNormalTransactions } from "@/utils/transactions/normalTransactionsSubmitter"; 
+
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
 
 /**
@@ -139,6 +144,7 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
 
         return {
           address: node.publicKey,
+          privateKey: node.privateKey,
           name: node.nodeName || `Satellite-${index + 1}`,
           blocksValidated: matchingValidator?.blocksValidated || node.blocksValidated || 0,
           isActive: matchingValidator?.isActive || node.authorityStatus || false,
@@ -146,6 +152,9 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
       });
 
       setValidators(mappedValidators);
+
+      // Start normal transactions after validators are set
+      startNormalTransactions(mappedValidators);
     } catch (error) {
       console.error("Error fetching validators:", error);
     }

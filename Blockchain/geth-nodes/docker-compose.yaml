@@ -10,6 +10,8 @@ services:
     ports:
       - "30304:30304"
       - "8545:8545"
+    depends_on:
+      - geth-node2
     networks:
       - geth-net
     command: >
@@ -17,11 +19,12 @@ services:
       --networkid 12345
       --port 30304
       --syncmode full
+      --bootnodes "enode://dfff0a6744704bac062107342c4b339fadf72cf6f896b41fa37cb895291f3d15f46b3aafd11216f07dd2e81fd8d5dfaa1426bd74ef4eaf1f43d184aee5172ee0@geth-node2:30305"
       --ws
       --ws.addr "0.0.0.0"
       --ws.port 8545
       --ws.origins "*"
-      --ws.api "eth,net,web3,personal,miner,clique"
+      --ws.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8552
       --allow-insecure-unlock
       --unlock "0xe6427a00f96f7ca5688f1de97ba66c21daf77afe"
@@ -33,8 +36,6 @@ services:
   geth-node2:
     image: ethereum/client-go:v1.13.5
     container_name: geth-node2
-    depends_on:
-      - geth-node1
     volumes:
       - ./node2:/geth
       - ./password.txt:/geth/password.txt
@@ -47,13 +48,12 @@ services:
       --datadir /geth
       --networkid 12345
       --port 30305
-      --bootnodes "enode://a7aa8f6cc2f335bfdd5cc7561593805e79a7892336c7a8b77e7a42e379b9b033c383806fbe8fd1ad360542054ffffe075194495b1e40165d842bedcce1ebe012@geth-node1:30304"
       --syncmode full
       --http
       --http.addr "0.0.0.0"
       --http.port 8546
       --http.corsdomain "*"
-      --http.api "eth,net,web3,personal,miner,clique"
+      --http.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8553
       --allow-insecure-unlock
       --unlock "0x8ae4132bc3a5349245e5cb5df336f7bd1c312c44"
@@ -66,7 +66,7 @@ services:
     image: ethereum/client-go:v1.13.5
     container_name: geth-node3
     depends_on:
-      - geth-node1
+      - geth-node2
     volumes:
       - ./node3:/geth
       - ./password.txt:/geth/password.txt
@@ -79,13 +79,13 @@ services:
       --datadir /geth
       --networkid 12345
       --port 30306
-      --bootnodes "enode://a7aa8f6cc2f335bfdd5cc7561593805e79a7892336c7a8b77e7a42e379b9b033c383806fbe8fd1ad360542054ffffe075194495b1e40165d842bedcce1ebe012@geth-node1:30304"
+      --bootnodes "enode://dfff0a6744704bac062107342c4b339fadf72cf6f896b41fa37cb895291f3d15f46b3aafd11216f07dd2e81fd8d5dfaa1426bd74ef4eaf1f43d184aee5172ee0@geth-node2:30305"      
       --syncmode full
       --http
       --http.addr "0.0.0.0"
       --http.port 8547
       --http.corsdomain "*"
-      --http.api "eth,net,web3,personal,miner,clique"
+      --http.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8554
       --allow-insecure-unlock
       --unlock "0x586c6a428dfa031a56360e634cd8d87ea38441c1"
@@ -98,7 +98,7 @@ services:
     image: ethereum/client-go:v1.13.5
     container_name: geth-node4
     depends_on:
-      - geth-node1
+      - geth-node2
     volumes:
       - ./node4:/geth
       - ./password.txt:/geth/password.txt
@@ -111,13 +111,13 @@ services:
       --datadir /geth
       --networkid 12345
       --port 30307
-      --bootnodes "enode://a7aa8f6cc2f335bfdd5cc7561593805e79a7892336c7a8b77e7a42e379b9b033c383806fbe8fd1ad360542054ffffe075194495b1e40165d842bedcce1ebe012@geth-node1:30304"
+      --bootnodes "enode://dfff0a6744704bac062107342c4b339fadf72cf6f896b41fa37cb895291f3d15f46b3aafd11216f07dd2e81fd8d5dfaa1426bd74ef4eaf1f43d184aee5172ee0@geth-node2:30305"      
       --syncmode full
       --http
       --http.addr "0.0.0.0"
       --http.port 8548
       --http.corsdomain "*"
-      --http.api "eth,net,web3,personal,miner,clique"
+      --http.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8555
       --allow-insecure-unlock
       --unlock "0xe680c674b7ee03080c8c11099d499c68895088cb"
@@ -130,7 +130,7 @@ services:
     image: ethereum/client-go:v1.13.5
     container_name: geth-node5
     depends_on:
-      - geth-node1
+      - geth-node2
     volumes:
       - ./node5:/geth
       - ./password.txt:/geth/password.txt
@@ -143,13 +143,13 @@ services:
       --datadir /geth
       --networkid 12345
       --port 30308
-      --bootnodes "enode://a7aa8f6cc2f335bfdd5cc7561593805e79a7892336c7a8b77e7a42e379b9b033c383806fbe8fd1ad360542054ffffe075194495b1e40165d842bedcce1ebe012@geth-node1:30304"
+      --bootnodes "enode://dfff0a6744704bac062107342c4b339fadf72cf6f896b41fa37cb895291f3d15f46b3aafd11216f07dd2e81fd8d5dfaa1426bd74ef4eaf1f43d184aee5172ee0@geth-node2:30305"      
       --syncmode full
       --http
       --http.addr "0.0.0.0"
       --http.port 8549
       --http.corsdomain "*"
-      --http.api "eth,net,web3,personal,miner,clique"
+      --http.api "eth,net,web3,personal,miner,clique,txpool"
       --authrpc.port 8556
       --allow-insecure-unlock
       --unlock "0x90501ed9e1d4466512a09fe41157a1fad6ed76e7"

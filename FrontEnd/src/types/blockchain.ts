@@ -56,6 +56,9 @@ export interface NetworkStats {
   hashRateChange: number;
   latency: number;
   latencyChange: number;
+  memoryUsage: {
+    total: number;
+  };
   gasPrice: {
     low: number;
     medium: number;

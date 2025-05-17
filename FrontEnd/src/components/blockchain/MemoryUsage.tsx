@@ -1,11 +1,10 @@
-
 import BlockchainWindow from './BlockchainWindow';
 import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useBlockchainContext } from '@/contexts/BlockchainContext';
 
 const MemoryUsage = () => {
-  const { pendingTransactions } = useBlockchainContext();
-  
+  const { networkStats, pendingTransactions } = useBlockchainContext();
+
   // Generate mock data for incoming transactions chart
   const generateChartData = () => {
     const data = [];
@@ -26,11 +25,11 @@ const MemoryUsage = () => {
   };
   
   const data = generateChartData();
-  
-  // Calculate memory usage based on pending transactions //
-  const memoryUsage = Math.floor(10.6 + (pendingTransactions.length * 0.02));
-  const memoryPercentage = (memoryUsage / 300) * 100;
-  
+
+  // Use memory usage from networkStats
+  const memoryUsage = networkStats?.memoryUsage.total;
+  const memoryPercentage = (memoryUsage / 10) * 100;
+
   return (
     <BlockchainWindow title="MEMORY USAGE & TRANSACTIONS" className="h-full">
         <div className="flex flex-col h-full">
@@ -42,7 +41,7 @@ const MemoryUsage = () => {
 
             <div className="bg-satellite-dark p-2 rounded text-center">
               <div className="text-xs text-gray-400 mb-1">Memory Usage</div>
-              <div className="text-sm text-white mb-1">{memoryUsage.toFixed(1)} MB / 300 MB</div>
+              <div className="text-sm text-white mb-1">{memoryUsage} / 500 MB</div>
               <div className="w-full bg-gray-700 rounded-full h-2">
                 <div 
                   className="bg-satellite-accent h-2 rounded-full transition-all duration-500" 

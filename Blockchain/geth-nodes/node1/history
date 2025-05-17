@@ -1,8 +1,0 @@
-admin.peers
-admin.addPeer("enode://6206590138a2cddda22cc971c407c289ed5f7a17d4463ea25cc9e997560465918c54e2c03afb427bd049705d92117976cc51ee373de2518b7ff2f5f5a9a1bb16@127.0.0.1:30301")
-admin.peers
-miner.setEtherbase("0xe6427a00f96f7ca5688f1de97ba66c21daf77afe")
-admin.nodeInfo.enode
-admin.peers
-clique.getSnapshot("0x1")
-clique.getSnapshot("0x3")

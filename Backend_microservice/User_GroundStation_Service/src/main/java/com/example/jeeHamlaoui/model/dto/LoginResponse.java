@@ -1,23 +1,15 @@
 package com.example.jeeHamlaoui.model.dto;
 
 public class LoginResponse {
-    private String token;
+
     private UserDto user;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(String token, UserDto user) {
-        this.token = token;
+    public LoginResponse( UserDto user) {
+
         this.user = user;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public UserDto getUser() {

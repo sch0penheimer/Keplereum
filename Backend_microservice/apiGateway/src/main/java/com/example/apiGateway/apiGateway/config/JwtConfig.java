@@ -32,4 +32,20 @@ public class JwtConfig {
     public String getPrefix() {
         return prefix;
     }
-} 
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public void setExpiration(long expiration) {
+        this.expiration = expiration;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+}

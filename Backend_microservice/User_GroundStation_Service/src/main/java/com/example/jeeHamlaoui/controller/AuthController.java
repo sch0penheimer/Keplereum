@@ -4,6 +4,8 @@ import com.example.jeeHamlaoui.model.User;
 import com.example.jeeHamlaoui.model.dto.LoginRequest;
 import com.example.jeeHamlaoui.model.dto.LoginResponse;
 import com.example.jeeHamlaoui.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,14 +22,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        LoginResponse response = authService.login(loginRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        LoginResponse loginresponse = authService.login(loginRequest,response);
+        return ResponseEntity.ok(loginresponse);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<LoginResponse> register(@RequestBody User user) {
-        LoginResponse response = authService.register(user);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<LoginResponse> register(@RequestBody User user,HttpServletResponse response) {
+        LoginResponse registerResponse = authService.register(user,response);
+        return ResponseEntity.ok(registerResponse);
     }
 } 

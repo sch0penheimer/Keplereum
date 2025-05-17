@@ -6,6 +6,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -34,15 +35,16 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
             if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
                 return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
             }
+            String token = extractToken(exchange.getRequest());
 
-            String authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
-            String token = authHeader.replace(jwtConfig.getPrefix(), "").trim();
+            if (token == null) {
+                return onError(exchange, "Missing JWT", HttpStatus.UNAUTHORIZED);
+            }
 
             if (!jwtUtil.validateToken(token)) {
                 return onError(exchange, "Invalid token", HttpStatus.UNAUTHORIZED);
             }
 
-            // Add user information to headers
             String username = jwtUtil.extractUsername(token);
             exchange.getRequest().mutate()
                     .header("X-Auth-User", username)
@@ -50,6 +52,19 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 
             return chain.filter(exchange);
         };
+    }
+
+    private String extractToken(ServerHttpRequest request) {
+        // 1. Check cookie
+        if (request.getCookies().containsKey("jwt")) {
+            return request.getCookies().getFirst("jwt").getValue();
+        }
+        // 2. Check Authorization header
+        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith(jwtConfig.getPrefix())) {
+            return authHeader.replace(jwtConfig.getPrefix(), "").trim();
+        }
+        return null;
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {

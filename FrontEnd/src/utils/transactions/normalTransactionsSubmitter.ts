@@ -9,7 +9,7 @@ type Validator = {
 const API_URL = "http://localhost:8222/api/v1/blockchain/transaction";
 const GAS_PRICE = "1000000000";
 const GAS_LIMIT = "21000";
-const INTERVAL_MS = 15000;
+const INTERVAL_MS = 65000;
 
 export function startNormalTransactions(validators: Validator[]) {
   if (!validators || validators.length < 2) {
@@ -46,3 +46,4 @@ export function startNormalTransactions(validators: Validator[]) {
     idx++;
   }, INTERVAL_MS);
 }
+

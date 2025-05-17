@@ -13,6 +13,11 @@ import {
 // _______________________ //
 import { startNormalTransactions } from "@/utils/transactions/normalTransactionsSubmitter"; 
 
+// _______________________ //
+// * Alert Transactions * //
+// _______________________ //
+import { startAlertTransactions } from "@/utils/transactions/alertTransactionsSubmitter";
+
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
 
 /**
@@ -20,66 +25,66 @@ const BlockchainContext = createContext<BlockchainContextType | undefined>(undef
  * @param blockNumber
  * @param id
  */
-const generateMockTransaction = (blockNumber: number, id: number): BlockTransaction => {
-  const now = new Date();
-  const timestamp = new Date(now.getTime() - Math.random() * 3600000);
-  const status = Math.random() > 0.1 ? 'confirmed' : 'pending';
-  const isAlertTx = Math.random() > 0.3;
+// const generateMockTransaction = (blockNumber: number, id: number): BlockTransaction => {
+//   const now = new Date();
+//   const timestamp = new Date(now.getTime() - Math.random() * 3600000);
+//   const status = Math.random() > 0.1 ? 'confirmed' : 'pending';
+//   const isAlertTx = Math.random() > 0.3;
 
-  // Base transaction
-  const baseTx: BlockTransaction = {
-    id: `0x${id.toString(16).padStart(64, '0')}`,
-    hash: `0x${Math.random().toString(16).substring(2, 66)}`,
-    from: `0x${Math.random().toString(16).substring(2, 42)}`,
-    to: `0x${Math.random().toString(16).substring(2, 42)}`,
-    amount: parseFloat((Math.random() * 10).toFixed(4)),
-    fee: parseFloat((Math.random() * 0.1).toFixed(5)),
-    status: status,
-    timestamp: timestamp,
-    gasPrice: Math.floor(Math.random() * 100) + 10,
-    gasLimit: 21000,
-    gasUsed: status === 'confirmed' ? Math.floor(Math.random() * 21000) : 0,
-    blockNumber: status === 'confirmed' ? blockNumber : null,
-  };
+//   // Base transaction
+//   const baseTx: BlockTransaction = {
+//     id: `0x${id.toString(16).padStart(64, '0')}`,
+//     hash: `0x${Math.random().toString(16).substring(2, 66)}`,
+//     from: `0x${Math.random().toString(16).substring(2, 42)}`,
+//     to: `0x${Math.random().toString(16).substring(2, 42)}`,
+//     amount: parseFloat((Math.random() * 10).toFixed(4)),
+//     fee: parseFloat((Math.random() * 0.1).toFixed(5)),
+//     status: status,
+//     timestamp: timestamp,
+//     gasPrice: Math.floor(Math.random() * 100) + 10,
+//     gasLimit: 21000,
+//     gasUsed: status === 'confirmed' ? Math.floor(Math.random() * 21000) : 0,
+//     blockNumber: status === 'confirmed' ? blockNumber : null,
+//   };
 
-  if (!isAlertTx) return baseTx;
+//   if (!isAlertTx) return baseTx;
 
-  // Alert-specific data
-  const alertTypes = ['FIRE', 'CYCLONE', 'TSUNAMI'];
-  const actions: Array<BlockTransaction['action']> = ['SWITCH_ORBIT', 'SWITCH_SENSOR'];
+//   // Alert-specific data
+//   const alertTypes = ['FIRE', 'CYCLONE', 'TSUNAMI'];
+//   const actions: Array<BlockTransaction['action']> = ['SWITCH_ORBIT', 'SWITCH_SENSOR'];
   
-  const txType = Math.random() > 0.5 ? 'ALERT_SUBMISSION' : 
-                 Math.random() > 0.5 ? 'ALERT_CONFIRMATION' : 'VALIDATOR_ACTION';
+//   const txType = Math.random() > 0.5 ? 'ALERT_SUBMISSION' : 
+//                  Math.random() > 0.5 ? 'ALERT_CONFIRMATION' : 'VALIDATOR_ACTION';
 
-  switch (txType) {
-    case 'ALERT_SUBMISSION':
-      return {
-        ...baseTx,
-        to: '0xAlertContractAddress',
-        alertType: alertTypes[Math.floor(Math.random() * alertTypes.length)],
-        latitude: parseFloat((Math.random() * 180 - 90).toFixed(6)),
-        longitude: parseFloat((Math.random() * 360 - 180).toFixed(6)),
-      };
+//   switch (txType) {
+//     case 'ALERT_SUBMISSION':
+//       return {
+//         ...baseTx,
+//         to: '0xAlertContractAddress',
+//         alertType: alertTypes[Math.floor(Math.random() * alertTypes.length)],
+//         latitude: parseFloat((Math.random() * 180 - 90).toFixed(6)),
+//         longitude: parseFloat((Math.random() * 360 - 180).toFixed(6)),
+//       };
 
-    case 'ALERT_CONFIRMATION':
-      return {
-        ...baseTx,
-        to: '0xAlertContractAddress',
-        confirmsAlertId: `0x${Math.random().toString(16).substring(2, 66)}`,
-      };
+//     case 'ALERT_CONFIRMATION':
+//       return {
+//         ...baseTx,
+//         to: '0xAlertContractAddress',
+//         confirmsAlertId: `0x${Math.random().toString(16).substring(2, 66)}`,
+//       };
 
-    case 'VALIDATOR_ACTION':
-      return {
-        ...baseTx,
-        from: '0xValidatorAddress',
-        to: '0xActionContractAddress',
-        action: actions[Math.floor(Math.random() * actions.length)],
-      };
+//     case 'VALIDATOR_ACTION':
+//       return {
+//         ...baseTx,
+//         from: '0xValidatorAddress',
+//         to: '0xActionContractAddress',
+//         action: actions[Math.floor(Math.random() * actions.length)],
+//       };
 
-    default:
-      return baseTx;
-  }
-};
+//     default:
+//       return baseTx;
+//   }
+// };
 
 const parseBlock = (data: any): Block => {
   return {
@@ -127,6 +132,8 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
   const [networkStats, setNetworkStats] = useState<NetworkStats>(placeholderNetworkStats);
   const [loading, setLoading] = useState(true);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
+  const [alerts, setAlerts] = useState<BlockTransaction[]>([]);
+  const [validatorsReady, setValidatorsReady] = useState(false); // Track readiness
 
   const fetchValidators = async () => {
     try {
@@ -152,17 +159,53 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
       });
 
       setValidators(mappedValidators);
+      setValidatorsReady(true);
 
-      // Start normal transactions after validators are set
+      //-- Start normal transactions after validators are set --//
       startNormalTransactions(mappedValidators);
     } catch (error) {
       console.error("Error fetching validators:", error);
     }
   };
 
+  const fetchAlerts = async () => {
+    try {
+      const alerts_response = await axios.get("http://localhost:8222/api/v1/blockchain/contract/alerts");
+      const alertsData = alerts_response.data;
+
+      //-- Fetch full transaction info for each alert by hash --//
+      const alertTransactions = await Promise.all(
+        alertsData.map(async (alert: any) => {
+          try {
+            const txResponse = await axios.get("http://localhost:8222/api/v1/blockchain/transaction", {
+              params: { hash: alert.hash },
+            });
+            return { ...txResponse.data, ...alert };
+          } catch (err) {
+            console.error(`Failed to fetch transaction for alert hash ${alert.hash}:`, err);
+            return null;
+          }
+        })
+      );
+
+      setAlerts(alertTransactions.filter(Boolean));
+      //-- Start alert transactions after alerts are set --//
+      startAlertTransactions(validators, alertTransactions);
+    } catch (error) {
+      console.error("Failed to fetch alerts:", error);
+    }
+  };
+
   useEffect(() => {
     fetchValidators();
   }, []);
+
+  //-- Trigger fetchAlerts only when validators are ready --//
+  useEffect(() => {
+    if (validatorsReady) {
+      fetchAlerts();
+    }
+  }, [validatorsReady]);
 
   const parseNetworkStats = (metrics: any): NetworkStats => {
     return {
@@ -175,9 +218,9 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
         Math.min(100, (parseInt(metrics.difficulty, 10) / 150000) * 100).toFixed(3)
       ),
       hashRate: parseFloat((parseInt(metrics.hashrate, 16) || 0).toFixed(3)),
-      hashRateChange: parseFloat((0).toFixed(3)), // Placeholder for now
+      hashRateChange: parseFloat((0).toFixed(3)),
       latency: parseFloat((metrics.latency || 0).toFixed(3)),
-      latencyChange: parseFloat((0).toFixed(3)), // Placeholder for now
+      latencyChange: parseFloat((0).toFixed(3)),
       gasPrice: {
         low: parseFloat((metrics.gasPrice?.low || 0).toFixed(3)),
         medium: parseFloat((metrics.gasPrice?.medium || 0).toFixed(3)),
@@ -198,7 +241,7 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
     socket.onopen = () => {
       console.log("WebSocket connected");
 
-      // Fetch 6 latest blocks
+      //-- 6 latest blocks fetching --//
       socket.send(
         JSON.stringify({
           type: "latestblocks",
@@ -215,7 +258,7 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
         })
       );
 
-      // Subscribe to new blocks
+      //-- Subscribe to new blocks --//
       socket.send(
         JSON.stringify({
           type: "subscribe",
@@ -247,6 +290,15 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
     };
 
     socket.onclose = () => {
+      socket.send(
+        JSON.stringify({
+          type: 'togglemining',
+          payload: {
+              start: false
+          }
+        })
+      );
+
       console.log("WebSocket disconnected");
     };
 
@@ -259,14 +311,14 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
     };
   }, []);
   
-  useEffect(() => {
-    const mockPendingTxs = Array.from({ length: 50 }, (_, i) => 
-      generateMockTransaction(0, i)
-    ).filter(tx => tx.status === 'pending');
+  // useEffect(() => {
+  //   const mockPendingTxs = Array.from({ length: 50 }, (_, i) => 
+  //     generateMockTransaction(0, i)
+  //   ).filter(tx => tx.status === 'pending');
     
-    setPendingTransactions(mockPendingTxs);
-    setLoading(false);
-  }, []);
+  //   setPendingTransactions(mockPendingTxs);
+  //   setLoading(false);
+  // }, []);
 
   const value = {
     blocks,

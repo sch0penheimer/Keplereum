@@ -1,5 +1,6 @@
 package com.example.jeeHamlaoui.Blockchain_Service.service;
 
+import com.example.jeeHamlaoui.Blockchain_Service.utils.UtilityClass;
 import com.example.jeeHamlaoui.Blockchain_Service.web3j.Web3JSingleton;
 import com.example.jeeHamlaoui.Blockchain_Service.contracts.SatelliteSystem;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +17,7 @@ import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tuples.generated.Tuple7;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class SmartContractService {
@@ -110,94 +108,105 @@ public class SmartContractService {
         );
     }
 
-    // Get all alerts with confirmations
-    public List<Map<String, Object>> getAllAlertsWithConfirmations() throws Exception {
-        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738"; // Replace with a valid private key
-        Credentials credentials = Credentials.create(defaultPrivateKey);
-        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
-
-        BigInteger alertCount = contract.getAlertCount().send();
-        List<Map<String, Object>> alerts = new ArrayList<>();
-
-        for (BigInteger i = BigInteger.ZERO; i.compareTo(alertCount) < 0; i = i.add(BigInteger.ONE)) {
-            // Fetch alert ID
-            byte[] alertId = contract.alertIds(i).send();
-
-            // Fetch alert details using the alerts(byte[]) method
-            Tuple7<String, String, BigInteger, BigInteger, BigInteger, BigInteger, Boolean> alertDetails = contract.alerts(alertId).send();
-
-            // Extract details from the tuple
-            String alertType = alertDetails.component2(); // Assuming the second component is the alert type
-            BigInteger latitude = alertDetails.component3(); // Assuming the third component is latitude
-            BigInteger longitude = alertDetails.component4(); // Assuming the fourth component is longitude
-
-            // Fetch confirmers
-            List<String> confirmers = contract.getAlertConfirmers(alertId).send();
-
-            // Add all details to the response
-            alerts.add(Map.of(
-                    "alertId", Base64.getEncoder().encodeToString(alertId), // Encode alertId as Base64 for readability
-                    "alertType", alertType,
-                    "latitude", latitude,
-                    "longitude", longitude,
-                    "confirmers", confirmers
-            ));
-        }
-
-        return alerts;
-    }
-
-    // Get a specific alert by ID
-    public Map<String, Object> getAlertById(String alertId) throws Exception {
-        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), (Credentials) null, new DefaultGasProvider());
-
-        List<String> confirmers = contract.getAlertConfirmers(alertId.getBytes()).send();
-
-        return Map.of(
-                "alertId", alertId,
-                "confirmers", confirmers
-        );
-    }
-
-    public List<Map<String, Object>> getAllAlertSubmittedEvents() throws Exception {
+    // Get all alerts
+    public List<Map<String, Object>> getAllGlobalAlerts() throws Exception {
         String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738";
         Credentials credentials = Credentials.create(defaultPrivateKey);
         SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
 
+        // Fetch the latest block number
         BigInteger latestBlock = web3JSingleton.getWeb3jInstance()
                 .ethBlockNumber()
                 .send()
                 .getBlockNumber();
 
-        EthFilter filter = new EthFilter(
+        // Set up a filter to fetch all AlertSubmitted events
+        EthFilter submittedFilter = new EthFilter(
                 DefaultBlockParameter.valueOf(BigInteger.ZERO),
                 DefaultBlockParameter.valueOf(latestBlock),
                 contractAddress
         );
-        filter.addSingleTopic(EventEncoder.encode(SatelliteSystem.ALERTSUBMITTED_EVENT));
+        submittedFilter.addSingleTopic(EventEncoder.encode(SatelliteSystem.ALERTSUBMITTED_EVENT));
 
-        // Use a blocking approach to wait for all events
-        List<EthLog.LogResult> logResults = web3JSingleton.getWeb3jInstance()
-                .ethGetLogs(filter)
+        // Fetch logs for AlertSubmitted events
+        List<EthLog.LogResult> submittedLogResults = web3JSingleton.getWeb3jInstance()
+                .ethGetLogs(submittedFilter)
                 .send()
                 .getLogs();
 
-        List<Map<String, Object>> alertEvents = new ArrayList<>();
+        // Set up a filter to fetch all AlertConfirmed events
+        EthFilter confirmedFilter = new EthFilter(
+                DefaultBlockParameter.valueOf(BigInteger.ZERO),
+                DefaultBlockParameter.valueOf(latestBlock),
+                contractAddress
+        );
+        confirmedFilter.addSingleTopic(EventEncoder.encode(SatelliteSystem.ALERTCONFIRMED_EVENT));
 
-        for (EthLog.LogResult logResult : logResults) {
+        // Fetch logs for AlertConfirmed events
+        List<EthLog.LogResult> confirmedLogResults = web3JSingleton.getWeb3jInstance()
+                .ethGetLogs(confirmedFilter)
+                .send()
+                .getLogs();
+
+        // Map to store confirmations by alertId (using hexadecimal format)
+        Map<String, List<Map<String, Object>>> confirmationsMap = new HashMap<>();
+
+        // Process AlertConfirmed logs to build the confirmations map
+        for (EthLog.LogResult logResult : confirmedLogResults) {
             EthLog.LogObject log = (EthLog.LogObject) logResult.get();
-            SatelliteSystem.AlertSubmittedEventResponse event = contract.getAlertSubmittedEventFromLog(log);
-            alertEvents.add(Map.of(
-                    "alertId", event.alertId,
-                    "alertType", event.alertType,
-                    "latitude", event.latitude,
-                    "longitude", event.longitude,
-                    "sender", event.sender,
-                    "transactionHash", log.getTransactionHash()
+            List<String> topics = log.getTopics();
+
+            // Extract alertId and confirmer from the log
+            String alertId = topics.get(1).substring(2); // Remove "0x" prefix
+            String confirmer = "0x" + topics.get(2).substring(26); // Extract the last 20 bytes for the address
+
+            // Add the confirmation to the map
+            confirmationsMap.computeIfAbsent(alertId, k -> new ArrayList<>()).add(Map.of(
+                    "publicAddress", confirmer,
+                    "confirmationHash", log.getTransactionHash()
             ));
         }
 
-        return alertEvents;
+        // Process AlertSubmitted logs to build the global alerts list
+        List<Map<String, Object>> globalAlerts = new ArrayList<>();
+        for (EthLog.LogResult logResult : submittedLogResults) {
+            EthLog.LogObject log = (EthLog.LogObject) logResult.get();
+            SatelliteSystem.AlertSubmittedEventResponse event = contract.getAlertSubmittedEventFromLog(log);
+
+            // Normalize alertId to hexadecimal format
+            String normalizedAlertId = UtilityClass.bytesToHex(event.alertId);
+
+            // Add the alert to the global list
+            globalAlerts.add(Map.of(
+                    "alertId", normalizedAlertId,
+                    "alertType", event.alertType,
+                    "latitude", event.latitude,
+                    "longitude", event.longitude,
+                    "transactionHash", log.getTransactionHash(),
+                    "confirmations", confirmationsMap.getOrDefault(normalizedAlertId, new ArrayList<>())
+            ));
+        }
+
+        return globalAlerts;
+    }
+
+    // Get a specific alert by ID
+    public Map<String, Object> getAlertById(String alertIdHex) throws Exception {
+        byte[] alertIdBytes = UtilityClass.hexToBytes(alertIdHex);
+        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738";
+        Credentials credentials = Credentials.create(defaultPrivateKey);
+
+        // Load the contract
+        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
+
+        // Fetch the confirmers for the alert
+        List<String> confirmers = contract.getAlertConfirmers(alertIdBytes).send();
+
+        // Return the alert details and confirmers
+        return Map.of(
+                "alertId", alertIdHex,
+                "confirmers", confirmers
+        );
     }
 
 }

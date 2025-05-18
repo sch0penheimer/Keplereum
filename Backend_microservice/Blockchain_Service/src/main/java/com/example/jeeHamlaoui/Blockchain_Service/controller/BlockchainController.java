@@ -116,9 +116,11 @@ public class BlockchainController {
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             // Handle invalid Base64 strings or length issues
+            System.err.println("Validation error: " + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             // Handle other exceptions
+            System.err.println("Unexpected error: " + e.getMessage());
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
@@ -143,7 +145,7 @@ public class BlockchainController {
     @GetMapping("/alerts")
     public ResponseEntity<?> getAllAlertsWithConfirmations() {
         try {
-            var alerts = smartContractService.getAllAlertsWithConfirmations();
+            var alerts = smartContractService.getAllGlobalAlerts();
             return ResponseEntity.ok(alerts);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
@@ -156,17 +158,6 @@ public class BlockchainController {
         try {
             var alertDetails = smartContractService.getAlertById(id);
             return ResponseEntity.ok(alertDetails);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
-    }
-
-    // GET: Get all alert submitted events
-    @GetMapping("/contract/alerts")
-    public ResponseEntity<?> getAllAlertSubmittedEvents() {
-        try {
-            List<Map<String, Object>> alertEvents = smartContractService.getAllAlertSubmittedEvents();
-            return ResponseEntity.ok(alertEvents);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }

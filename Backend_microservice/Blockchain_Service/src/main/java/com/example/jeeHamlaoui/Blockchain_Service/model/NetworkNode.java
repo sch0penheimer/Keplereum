@@ -14,6 +14,9 @@ public class NetworkNode {
     @Column(name = "public_key", nullable = false, unique = true)
     private String publicKey;
 
+    @Column(name = "private_key", nullable = false)
+    private String privateKey;
+
     public String getNodeName() {
         return NodeName;
     }
@@ -53,14 +56,13 @@ public class NetworkNode {
     public NetworkNode() {
     }
 
-    public NetworkNode(String publicKey, List<BlockTransaction> receivedTransactions, List<BlockTransaction> sentTransactions, Instant lastActive, Integer blocksValidated, boolean authorityStatus , String nodeName) {
+    public NetworkNode(String publicKey, String privateKey, String nodeName, boolean authorityStatus, Integer blocksValidated, Instant lastActive) {
         this.publicKey = publicKey;
-        this.receivedTransactions = receivedTransactions;
-        this.sentTransactions = sentTransactions;
-        this.lastActive = lastActive;
-        this.blocksValidated = blocksValidated;
-        this.authorityStatus = authorityStatus;
+        this.privateKey = privateKey;
         this.NodeName = nodeName;
+        this.authorityStatus = authorityStatus;
+        this.blocksValidated = blocksValidated;
+        this.lastActive = lastActive;
     }
 
     public List<BlockTransaction> getReceivedTransactions() {
@@ -118,5 +120,13 @@ public class NetworkNode {
 
     public void setPublicKey(String publicKey) {
         this.publicKey = publicKey;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 }

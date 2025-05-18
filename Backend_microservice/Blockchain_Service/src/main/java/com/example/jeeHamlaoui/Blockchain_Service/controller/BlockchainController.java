@@ -124,7 +124,7 @@ public class BlockchainController {
     }
 
     // POST: Trigger an action on the smart contract
-    @PostMapping("/contract/action")
+    @PostMapping("/contract/alert/action")
     public ResponseEntity<Map<String, String>> triggerAction(@RequestParam String privateKey, @RequestParam String satellite,
                                                              @RequestParam BigInteger action, @RequestParam String alertId) {
         try {

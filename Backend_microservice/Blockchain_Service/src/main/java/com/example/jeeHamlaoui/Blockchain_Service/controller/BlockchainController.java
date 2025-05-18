@@ -162,4 +162,15 @@ public class BlockchainController {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
+    // GET: Fetch all validations
+    @GetMapping("/validations")
+    public ResponseEntity<?> getAllValidations() {
+        try {
+            var validations = smartContractService.getAllValidations();
+            return ResponseEntity.ok(validations);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
 }

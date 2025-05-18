@@ -209,4 +209,83 @@ public class SmartContractService {
         );
     }
 
+    // Get all validations
+    public List<Map<String, Object>> getAllValidations() throws Exception {
+        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738";
+        Credentials credentials = Credentials.create(defaultPrivateKey);
+        SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
+
+        // Fetch the latest block number
+        BigInteger latestBlock = web3JSingleton.getWeb3jInstance()
+                .ethBlockNumber()
+                .send()
+                .getBlockNumber();
+
+        // Set up a filter to fetch all ActionTriggered events
+        EthFilter actionFilter = new EthFilter(
+                DefaultBlockParameter.valueOf(BigInteger.ZERO),
+                DefaultBlockParameter.valueOf(latestBlock),
+                contractAddress
+        );
+        actionFilter.addSingleTopic(EventEncoder.encode(SatelliteSystem.ACTIONTRIGGERED_EVENT));
+
+        // Fetch logs for ActionTriggered events
+        List<EthLog.LogResult> actionLogResults = web3JSingleton.getWeb3jInstance()
+                .ethGetLogs(actionFilter)
+                .send()
+                .getLogs();
+
+        // Process logs to extract validation details
+        List<Map<String, Object>> validations = new ArrayList<>();
+        for (EthLog.LogResult logResult : actionLogResults) {
+            EthLog.LogObject log = (EthLog.LogObject) logResult.get();
+            List<String> topics = log.getTopics();
+
+            // Extract alertId and satellite (toAddress) from the log
+            String alertId = topics.get(2).substring(2); // Remove "0x" prefix
+            String toAddress = "0x" + topics.get(1).substring(26); // Extract the last 20 bytes for the address
+
+            // Extract actionType from the data field
+            String data = log.getData();
+            if (data == null || data.length() < 64) {
+                System.err.println("Invalid data field: " + data);
+                continue; // Skip this log if the data field is invalid
+            }
+
+            try {
+                // Remove the "0x" prefix if present
+                if (data.startsWith("0x")) {
+                    data = data.substring(2);
+                }
+
+                // Parse the actionType from the first 32 bytes of the data field
+                BigInteger actionTypeValue = new BigInteger(data.substring(0, 64), 16);
+                String actionType = actionTypeValue.equals(BigInteger.ZERO) ? "SWITCH_ORBIT" : "SWITCH_SENSOR";
+
+                // Fetch the transaction hash from the log
+                String transactionHash = log.getTransactionHash();
+
+                // Fetch the transaction details using the transaction hash
+                String validatorAddress = web3JSingleton.getWeb3jInstance()
+                        .ethGetTransactionByHash(transactionHash)
+                        .send()
+                        .getTransaction()
+                        .orElseThrow(() -> new RuntimeException("Transaction not found"))
+                        .getFrom(); // Get the sender's address
+
+                // Add the validation to the list
+                validations.add(Map.of(
+                        "alertId", alertId, // Return alertId in hexadecimal format
+                        "actionType", actionType, // Return the actual action type as a string
+                        "validatorAddress", validatorAddress, // Fetch the sender's public address
+                        "toAddress", toAddress
+                ));
+            } catch (NumberFormatException e) {
+                System.err.println("Failed to parse actionType from data: " + data);
+            }
+        }
+
+        return validations;
+    }
+
 }

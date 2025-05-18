@@ -5,16 +5,16 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class JwtConfig {
-    @Value("${jwt.secret:your-256-bit-secret}")
+    @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration:86400}")
+    @Value("${jwt.expiration}")
     private long expiration;
 
-    @Value("${jwt.header:Authorization}")
+    @Value("${jwt.header}")
     private String header;
 
-    @Value("${jwt.prefix:Bearer }")
+    @Value("${jwt.prefix}")
     private String prefix;
 
     public String getSecret() {

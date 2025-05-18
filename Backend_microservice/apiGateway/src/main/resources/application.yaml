@@ -4,6 +4,7 @@ logging:
     com.example: DEBUG
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG
+    org.springframework.cloud.gateway: DEBUG
 spring:
   application:
     name: GATEWAY

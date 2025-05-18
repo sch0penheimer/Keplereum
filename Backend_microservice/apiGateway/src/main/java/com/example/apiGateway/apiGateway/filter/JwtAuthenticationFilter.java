@@ -12,6 +12,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
     private final JwtUtil jwtUtil;
@@ -29,6 +30,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+            log.error("JwtAuthenticationFilter triggered for request: {}", exchange.getRequest().getURI().getPath());
             String path = exchange.getRequest().getURI().getPath();
             log.error("Incoming request path: {}", path);
 

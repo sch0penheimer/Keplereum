@@ -16,8 +16,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.disable())
             .authorizeExchange(auth -> auth
-                .pathMatchers("/api/v1/users/auth/**").permitAll()
-                .anyExchange().authenticated()
+                .anyExchange().permitAll()
             )
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable());

@@ -77,9 +77,8 @@ public class AuthService {
         );
         return new LoginResponse(userMapper.toDto(savedUser));
     }
-    private String jwtkey = "d8d34f879600193566e15f11d780ea015707c77dd906bd67c7de5d9abc8d6eb35d70755bfefe7d8d73b584eb908b36376a76e52baae659ab8539914836b156d844a17f830b7075958b9fc7ce09d150ecf5f92f2bfcbdc963b8c722eed7f94def3f992a2895aa83a0ec3e6e5ce7b910f5726f58098da7d197f030260d6cde415c108acd62f2af44538fe3114ca6f8827d544efa5ff2b7c2181cd8c0999c04d86ef85c41f1166ff74fc8c8aadef246ed43aeaf009549b157de7a574f7d402e99d36a9ebdc0cb3ed474961278150f553c2d688c89a081fc77e8bd2b3a5e306407ed1f30781f593a7bc7042f9fca536b2918f08e6d01729bf1ad890dc129e6c26a1a";
     private String generateToken(User user) {
-        byte[] keyBytes = jwtkey.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         SecretKey key = Keys.hmacShaKeyFor(keyBytes);
 
         return Jwts.builder()
@@ -99,5 +98,16 @@ public class AuthService {
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+    }
+    public void performLogout(HttpServletResponse response) {
+        // Clear the JWT cookie
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.setHeader("Set-Cookie", cookie.toString());
     }
 } 

@@ -20,7 +20,7 @@ public class RouteConfig {
 
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-        log.error("✅ Registering custom routes with JWT filter...");
+
         return builder.routes()
                 // Auth routes (no authentication required)
                 .route("user-auth-route", r -> r

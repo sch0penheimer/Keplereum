@@ -30,18 +30,14 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            log.error("JwtAuthenticationFilter triggered for request: {}", exchange.getRequest().getURI().getPath());
             String path = exchange.getRequest().getURI().getPath();
-            log.error("Incoming request path: {}", path);
 
             String token = extractToken(exchange.getRequest());
-            log.error("Extracted token: {}", token);
 
             if (token == null || !jwtUtil.validateToken(token)) {
                 log.error("Token is missing or invalid for path: {}", path);
 
                 if (path.contains("/auth/login") || path.contains("/auth/register")) {
-                    log.info("Allowing unauthenticated access to public endpoint: {}", path);
                     return chain.filter(exchange);
                 } else {
                     log.error("Blocking unauthorized access to: {}", path);

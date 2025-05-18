@@ -7,6 +7,8 @@ import com.example.jeeHamlaoui.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,4 +34,10 @@ public class AuthController {
         LoginResponse registerResponse = authService.register(user,response);
         return ResponseEntity.ok(registerResponse);
     }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        authService.performLogout(response);
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
 } 

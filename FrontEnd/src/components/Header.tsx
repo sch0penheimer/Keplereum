@@ -1,11 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { useSatelliteContext } from "@/contexts/SatelliteContext";
-import { Database, Satellite } from "lucide-react";
+import { Database, Satellite, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const Header = () => {
   const { selectedSatellite } = useSatelliteContext();
+  const { logout } = useAuth();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [missionElapsedTime, setMissionElapsedTime] = useState(0);
   const navigate = useNavigate();
@@ -55,6 +56,17 @@ const Header = () => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
   
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Still navigate to login page even if there's an error
+      navigate('/login');
+    }
+  };
+
   return (
     <header className="bg-satellite-dark-header py-2 px-4 border-b border-satellite-border flex justify-between items-center">
       <div className="flex items-center gap-2">
@@ -86,6 +98,13 @@ const Header = () => {
             title="Blockchain Dashboard"
           >
             <Database className="w-5 h-5" />
+          </button>
+          <button 
+            onClick={handleLogout}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-satellite-dark hover:bg-satellite-accent/30 text-gray-400 hover:text-white"
+            title="Logout"
+          >
+            <LogOut className="w-5 h-5" />
           </button>
         </div>
         

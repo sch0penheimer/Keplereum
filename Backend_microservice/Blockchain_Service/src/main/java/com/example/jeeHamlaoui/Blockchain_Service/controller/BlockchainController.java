@@ -4,6 +4,7 @@ import com.example.jeeHamlaoui.Blockchain_Service.service.BlockchainService;
 import com.example.jeeHamlaoui.Blockchain_Service.service.SmartContractService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.jeeHamlaoui.Blockchain_Service.utils.UtilityClass;
 
 import java.math.BigInteger;
 import java.util.Base64;
@@ -98,7 +99,7 @@ public class BlockchainController {
             alertId = alertId.trim();
 
             // Validate the Base64-encoded alertId
-            if (!isValidBase64(alertId)) {
+            if (!UtilityClass.isValidBase64(alertId)) {
                 throw new IllegalArgumentException("Invalid Base64-encoded alertId");
             }
 
@@ -122,16 +123,7 @@ public class BlockchainController {
         }
     }
 
-    // Helper method to validate Base64 strings
-    private boolean isValidBase64(String str) {
-        try {
-            Base64.getDecoder().decode(str);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
+    // POST: Trigger an action on the smart contract
     @PostMapping("/contract/action")
     public ResponseEntity<Map<String, String>> triggerAction(@RequestParam String privateKey, @RequestParam String satellite,
                                                              @RequestParam BigInteger action, @RequestParam String alertId) {

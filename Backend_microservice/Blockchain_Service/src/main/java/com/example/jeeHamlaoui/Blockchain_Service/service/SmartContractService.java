@@ -8,6 +8,7 @@ import org.web3j.abi.EventEncoder;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.request.EthFilter;
+import org.web3j.protocol.core.methods.response.EthLog;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.TransactionManager;
@@ -159,41 +160,42 @@ public class SmartContractService {
     }
 
     public List<Map<String, Object>> getAllAlertSubmittedEvents() throws Exception {
-
-        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738"; // Replace with a valid private key
+        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738";
         Credentials credentials = Credentials.create(defaultPrivateKey);
-        // Load the contract
         SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
 
-        // Get the latest block number
         BigInteger latestBlock = web3JSingleton.getWeb3jInstance()
                 .ethBlockNumber()
                 .send()
                 .getBlockNumber();
 
-        // Create a filter for the AlertSubmitted events
         EthFilter filter = new EthFilter(
-                DefaultBlockParameter.valueOf(BigInteger.ZERO), // Start block
-                DefaultBlockParameter.valueOf(latestBlock),    // End block
-                contractAddress                                // Contract address
+                DefaultBlockParameter.valueOf(BigInteger.ZERO),
+                DefaultBlockParameter.valueOf(latestBlock),
+                contractAddress
         );
         filter.addSingleTopic(EventEncoder.encode(SatelliteSystem.ALERTSUBMITTED_EVENT));
 
-        // Retrieve the events using the filter
+        // Use a blocking approach to wait for all events
+        List<EthLog.LogResult> logResults = web3JSingleton.getWeb3jInstance()
+                .ethGetLogs(filter)
+                .send()
+                .getLogs();
+
         List<Map<String, Object>> alertEvents = new ArrayList<>();
-        web3JSingleton.getWeb3jInstance()
-                .ethLogFlowable(filter)
-                .subscribe(log -> {
-                    SatelliteSystem.AlertSubmittedEventResponse event = contract.getAlertSubmittedEventFromLog(log);
-                    alertEvents.add(Map.of(
-                            "alertId", event.alertId,
-                            "alertType", event.alertType,
-                            "latitude", event.latitude,
-                            "longitude", event.longitude,
-                            "sender", event.sender, // Replace submitter with sender
-                            "transactionHash", log.getTransactionHash() // Add transaction hash
-                    ));
-                }).dispose(); // Dispose the subscription after processing
+
+        for (EthLog.LogResult logResult : logResults) {
+            EthLog.LogObject log = (EthLog.LogObject) logResult.get();
+            SatelliteSystem.AlertSubmittedEventResponse event = contract.getAlertSubmittedEventFromLog(log);
+            alertEvents.add(Map.of(
+                    "alertId", event.alertId,
+                    "alertType", event.alertType,
+                    "latitude", event.latitude,
+                    "longitude", event.longitude,
+                    "sender", event.sender,
+                    "transactionHash", log.getTransactionHash()
+            ));
+        }
 
         return alertEvents;
     }

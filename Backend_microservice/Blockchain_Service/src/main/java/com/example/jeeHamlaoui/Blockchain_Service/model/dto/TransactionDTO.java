@@ -1,9 +1,7 @@
 package com.example.jeeHamlaoui.Blockchain_Service.model.dto;
 
-import com.example.jeeHamlaoui.Blockchain_Service.model.AbstractTransactionType;
 import com.example.jeeHamlaoui.Blockchain_Service.model.enumerate.ActionType;
 import com.example.jeeHamlaoui.Blockchain_Service.model.enumerate.TransactionStatus;
-import com.example.jeeHamlaoui.Blockchain_Service.model.enumerate.TransactionType;
 
 import java.time.Instant;
 

@@ -1,4 +1,11 @@
 services:
+  ##---------------------------------------##
+  ##--------- Main Micro-Services ---------##
+  ##---------------------------------------##
+
+  ##------------------------------------##
+  ##---------Services DataBases---------##
+  ##------------------------------------##
   user-db:
     image: postgres
     container_name: user-db
@@ -8,7 +15,6 @@ services:
       POSTGRES_DB: user
     ports:
       - "5432:5432"
-
 
   satellite-db:
     image: postgres
@@ -29,7 +35,9 @@ services:
       POSTGRES_DB: blockchain
     ports:
       - "5434:5432"
-
+  ##------------------------------------------------------------------##
+  ##----------------- Zipkin (for flow monitoring) -------------------##
+  ##------------------------------------------------------------------##
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin

@@ -4,6 +4,7 @@ import com.example.jeeHamlaoui.Blockchain_Service.service.BlockchainService;
 import com.example.jeeHamlaoui.Blockchain_Service.service.SmartContractService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.jeeHamlaoui.Blockchain_Service.utils.UtilityClass;
 
 import java.math.BigInteger;
 import java.util.Base64;
@@ -24,7 +25,6 @@ public class BlockchainController {
         this.smartContractService = smartContractService;
     }
 
-    // Blockchain CRUD Endpoints
     @GetMapping("/mempool")
     public ResponseEntity<List<?>> getPendingTransactions() {
         try {
@@ -53,7 +53,6 @@ public class BlockchainController {
         }
     }
 
-    // POST: Submit a transaction
     @PostMapping("/transaction")
     public ResponseEntity<String> submitTransaction(@RequestParam String privateKey, @RequestParam String toAddress,
                                                      @RequestParam BigInteger value, @RequestParam BigInteger gasPrice,
@@ -66,7 +65,6 @@ public class BlockchainController {
         }
     }
 
-    // GET: Get a transaction by hash (with event details if applicable)
     @GetMapping("/transaction")
     public ResponseEntity<?> getTransactionByHash(@RequestParam String hash) {
         try {
@@ -80,7 +78,6 @@ public class BlockchainController {
     //**************************************** Smart Contracts ***********************************************//
     //********************************************************************************************************//
 
-    // Smart Contract CRUD Endpoints
     @PostMapping("/contract/alert")
     public ResponseEntity<String> submitAlert(@RequestParam String privateKey, @RequestParam String alertType,
                                                @RequestParam BigInteger latitude, @RequestParam BigInteger longitude) {
@@ -94,52 +91,35 @@ public class BlockchainController {
     @PostMapping("/contract/alert/confirm")
     public ResponseEntity<Map<String, String>> confirmAlert(@RequestParam String privateKey, @RequestParam String alertId) {
         try {
-            // Trim the input to remove any extra spaces
             alertId = alertId.trim();
 
-            // Validate the Base64-encoded alertId
-            if (!isValidBase64(alertId)) {
+            if (!UtilityClass.isValidBase64(alertId)) {
                 throw new IllegalArgumentException("Invalid Base64-encoded alertId");
             }
 
-            // Decode the Base64-encoded alertId
             byte[] alertIdBytes = Base64.getDecoder().decode(alertId);
 
-            // Validate the length of the decoded byte array
             if (alertIdBytes.length != 32) {
                 throw new IllegalArgumentException("Decoded alertId must be exactly 32 bytes long");
             }
 
-            // Call the service and return the response
             Map<String, String> response = smartContractService.confirmAlert(privateKey, alertIdBytes);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            // Handle invalid Base64 strings or length issues
+            System.err.println("Validation error: " + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            // Handle other exceptions
+            System.err.println("Unexpected error: " + e.getMessage());
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
         }
     }
 
-    // Helper method to validate Base64 strings
-    private boolean isValidBase64(String str) {
-        try {
-            Base64.getDecoder().decode(str);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    @PostMapping("/contract/action")
+    @PostMapping("/contract/alert/action")
     public ResponseEntity<Map<String, String>> triggerAction(@RequestParam String privateKey, @RequestParam String satellite,
                                                              @RequestParam BigInteger action, @RequestParam String alertId) {
         try {
-            // Decode the Base64-encoded alertId
             byte[] alertIdBytes = Base64.getDecoder().decode(alertId);
 
-            // Call the service and return the response
             Map<String, String> response = smartContractService.triggerAction(privateKey, satellite, action, alertIdBytes);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -147,18 +127,16 @@ public class BlockchainController {
         }
     }
 
-    // GET: All currently submitted alerts with confirmations
     @GetMapping("/alerts")
     public ResponseEntity<?> getAllAlertsWithConfirmations() {
         try {
-            var alerts = smartContractService.getAllAlertsWithConfirmations();
+            var alerts = smartContractService.getAllGlobalAlerts();
             return ResponseEntity.ok(alerts);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 
-    // GET: Alert fetch by ID, with confirmations
     @GetMapping("/alert/{id}")
     public ResponseEntity<?> getAlertById(@PathVariable String id) {
         try {
@@ -169,12 +147,11 @@ public class BlockchainController {
         }
     }
 
-    // GET: Get all alert submitted events
-    @GetMapping("/contract/alerts")
-    public ResponseEntity<?> getAllAlertSubmittedEvents() {
+    @GetMapping("/validations")
+    public ResponseEntity<?> getAllValidations() {
         try {
-            List<Map<String, Object>> alertEvents = smartContractService.getAllAlertSubmittedEvents();
-            return ResponseEntity.ok(alertEvents);
+            var validations = smartContractService.getAllValidations();
+            return ResponseEntity.ok(validations);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }

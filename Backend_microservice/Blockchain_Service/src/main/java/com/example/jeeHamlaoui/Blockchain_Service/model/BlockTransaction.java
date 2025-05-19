@@ -4,12 +4,8 @@ import com.example.jeeHamlaoui.Blockchain_Service.model.enumerate.TransactionSta
 import com.fasterxml.jackson.annotation.*;
 
 import jakarta.persistence.*;
-import org.antlr.v4.runtime.misc.NotNull;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "block_transactions")

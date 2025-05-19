@@ -16,7 +16,7 @@ export interface BlockTransaction {
   latitude?: number;
   longitude?: number;
   confirmsAlertId?: string;
-  action?: 'SWITCH_ORBIT' | 'SWITCH_SENSOR' | 'DEPLOY_DRONES';
+  action?: 'SWITCH_ORBIT' | 'SWITCH_SENSOR';
 }
 
 //* Block Interface *//
@@ -39,6 +39,7 @@ export interface Block {
 /** Validator Interface **/
 export interface Validator {
   address: string;
+  privateKey: string;
   name: string;
   blocksValidated: number;
   isActive: boolean;
@@ -56,6 +57,9 @@ export interface NetworkStats {
   hashRateChange: number;
   latency: number;
   latencyChange: number;
+  memoryUsage: {
+    total: number;
+  };
   gasPrice: {
     low: number;
     medium: number;

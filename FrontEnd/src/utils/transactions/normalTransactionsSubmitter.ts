@@ -9,9 +9,12 @@ type Validator = {
 const API_URL = "http://localhost:8222/api/v1/blockchain/transaction";
 const GAS_PRICE = "1000000000";
 const GAS_LIMIT = "21000";
-const INTERVAL_MS = 65000;
+const INTERVAL_MS = 25000;
 
-export function startNormalTransactions(validators: Validator[]) {
+export function startNormalTransactions(
+  validators: Validator[],
+  onTransactionSubmitted?: () => void
+) {
   if (!validators || validators.length < 2) {
     console.warn("Need at least 2 validators to submit transactions.");
     return;
@@ -32,10 +35,15 @@ export function startNormalTransactions(validators: Validator[]) {
           gasLimit: GAS_LIMIT,
         },
       });
+
       console.log(
         `[AutoTx] Sent from ${from.name || from.address} to ${to.name || to.address}:`,
         response.data
       );
+
+      // Call the callback to fetch pending transactions
+      onTransactionSubmitted();
+
     } catch (error: any) {
       console.error(
         `[AutoTx] Failed from ${from.name || from.address} to ${to.name || to.address}:`,

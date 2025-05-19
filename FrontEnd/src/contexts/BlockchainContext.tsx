@@ -16,7 +16,7 @@ import { startNormalTransactions } from "@/utils/transactions/normalTransactions
 // _______________________ //
 // * Alert Transactions * //
 // _______________________ //
-import { startAlertTransactions } from "@/utils/transactions/alertTransactionsSubmitter";
+// import { startAlertTransactions } from "@/utils/transactions/alertTransactionsSubmitter";
 
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
 
@@ -168,44 +168,70 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
     }
   };
 
-  const fetchAlerts = async () => {
-    try {
-      const alerts_response = await axios.get("http://localhost:8222/api/v1/blockchain/contract/alerts");
-      const alertsData = alerts_response.data;
+  // const fetchAlerts = async () => {
+  //   try {
+  //     // Fetch all alerts from the backend
+  //     const alerts_response = await axios.get("http://localhost:8222/api/v1/blockchain/contract/alerts");
+  //     const alertsData = alerts_response.data;
 
-      //-- Fetch full transaction info for each alert by hash --//
-      const alertTransactions = await Promise.all(
-        alertsData.map(async (alert: any) => {
-          try {
-            const txResponse = await axios.get("http://localhost:8222/api/v1/blockchain/transaction", {
-              params: { hash: alert.hash },
-            });
-            return { ...txResponse.data, ...alert };
-          } catch (err) {
-            console.error(`Failed to fetch transaction for alert hash ${alert.hash}:`, err);
-            return null;
-          }
-        })
-      );
+  //     // Remove duplicate alerts based on latitude and longitude
+  //     const uniqueAlerts = alertsData.filter(
+  //       (alert, index, self) =>
+  //         index ===
+  //         self.findIndex(
+  //           (a) => a.latitude === alert.latitude && a.longitude === alert.longitude
+  //         )
+  //     );
 
-      setAlerts(alertTransactions.filter(Boolean));
-      //-- Start alert transactions after alerts are set --//
-      startAlertTransactions(validators, alertTransactions);
-    } catch (error) {
-      console.error("Failed to fetch alerts:", error);
-    }
-  };
+  //     //-- Fetch full transaction info for each alert by hash --//
+  //     const alertTransactions = await Promise.all(
+  //       uniqueAlerts.map(async (alert: any) => {
+  //         try {
+  //           if (!alert.transactionHash) {
+  //             console.warn(`Skipping alert with missing transactionHash:`, alert);
+  //             return null;
+  //           }
+
+  //           const txResponse = await axios.get("http://localhost:8222/api/v1/blockchain/transaction", {
+  //             params: { hash: alert.transactionHash },
+  //           });
+
+  //           // Combine transaction data with alert data
+  //           return { ...txResponse.data, ...alert };
+  //         } catch (err) {
+  //           console.error(`Failed to fetch transaction for alert hash ${alert.transactionHash}:`, err);
+  //           return null;
+  //         }
+  //       })
+  //     );
+
+  //     // Filter out null values (failed fetches)
+  //     const validAlertTransactions = alertTransactions.filter(Boolean);
+
+  //     // Update the alerts state
+  //     setAlerts(validAlertTransactions);
+
+  //     //-- Start alert transactions after alerts are set --//
+  //     if (validators && validators.length > 0) {
+  //       startAlertTransactions(validators, validAlertTransactions);
+  //     } else {
+  //       console.warn("Validators are not ready. Skipping alert transactions.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch alerts:", error);
+  //   }
+  // };
 
   useEffect(() => {
     fetchValidators();
   }, []);
 
   //-- Trigger fetchAlerts only when validators are ready --//
-  useEffect(() => {
-    if (validatorsReady) {
-      fetchAlerts();
-    }
-  }, [validatorsReady]);
+  // useEffect(() => {
+  //   if (validatorsReady) {
+  //     fetchAlerts();
+  //   }
+  // }, [validatorsReady]);
 
   const parseNetworkStats = (metrics: any): NetworkStats => {
     return {
@@ -270,17 +296,24 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
       try {
         const message = JSON.parse(event.data);
         console.log("Message received:", message);
-    
+
         switch (message.type) {
           case "latestBlocks":
             setBlocks(message.data.map(parseBlock));
             setNetworkStats(parseNetworkStats(message.metrics));
             setLoading(false);
             break;
+
           case "newBlock":
             console.log("New block received:", message.data);
+
+            // Add the new block to the list of blocks
             setBlocks((prevBlocks) => [parseBlock(message.data), ...prevBlocks.slice(0, 9)]);
+
+            // [1] Recall fetchPendingTransactions to refresh the mempool
+            fetchPendingTransactions();
             break;
+
           default:
             console.log("Unknown message type:", message.type);
         }
@@ -290,15 +323,6 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
     };
 
     socket.onclose = () => {
-      socket.send(
-        JSON.stringify({
-          type: 'togglemining',
-          payload: {
-              start: false
-          }
-        })
-      );
-
       console.log("WebSocket disconnected");
     };
 
@@ -307,18 +331,82 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
     };
 
     return () => {
+      socket.send(
+        JSON.stringify({
+          type: 'togglemining',
+          payload: {
+              start: false
+          }
+        })
+      );
       socket.close();
     };
   }, []);
   
-  // useEffect(() => {
-  //   const mockPendingTxs = Array.from({ length: 50 }, (_, i) => 
-  //     generateMockTransaction(0, i)
-  //   ).filter(tx => tx.status === 'pending');
-    
-  //   setPendingTransactions(mockPendingTxs);
-  //   setLoading(false);
-  // }, []);
+  const fetchPendingTransactions = async () => {
+    try {
+      // Fetch pending transactions from the mempool API
+      const response = await axios.get("http://localhost:8222/api/v1/blockchain/mempool");
+      const mempoolTransactions = response.data;
+
+      const formattedTransactions: BlockTransaction[] = mempoolTransactions.map((tx: any) => {
+        const hashAsciiDecimal = tx.hash
+          .split('')
+          .reduce((sum: number, char: string) => sum + char.charCodeAt(0), 0)
+          .toString();
+
+        const truncateHash = (hash: string) =>
+          hash.length > 16 ? `${hash.slice(0, 14)}...` : hash;
+
+        return {
+          id: hashAsciiDecimal,
+          hash: `${tx.hash.slice(0, 20)}...`,
+          from: truncateHash(tx.from),
+          to: truncateHash(tx.to),
+          amount: parseFloat(tx.value) / 1e18 || 0, 
+          fee: (parseInt(tx.gas, 16) * parseInt(tx.gasPrice, 16)) / 1e18 || 0,
+          status: 'pending',
+          timestamp: new Date(),
+          gasPrice: parseInt(tx.gasPrice, 16) || 0,
+          gasLimit: parseInt(tx.gas, 16) || 0,
+          gasUsed: 0,
+          blockNumber: null
+        };
+      });
+
+      setPendingTransactions(formattedTransactions);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching pending transactions:", error);
+      setLoading(false); 
+    }
+  };
+
+  useEffect(() => {
+    fetchPendingTransactions();
+  }, []);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
+    const initializeNormalTransactions = async () => {
+      try {
+        if (validatorsReady) {
+          startNormalTransactions(validators, fetchPendingTransactions);
+        }
+      } catch (error) {
+        console.error("Error initializing normal transactions:", error);
+      }
+    };
+
+    initializeNormalTransactions();
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [validatorsReady]);
 
   const value = {
     blocks,

@@ -23,10 +23,12 @@ import java.util.*;
 public class SmartContractService {
     private final Web3JSingleton web3JSingleton;
     private final String contractAddress;
+    private final String defaultPrivate;
 
-    public SmartContractService(Web3JSingleton web3JSingleton, @Value("${blockchain.contract-address}") String contractAddress) {
+    public SmartContractService(Web3JSingleton web3JSingleton, @Value("${blockchain.contract-address}") String contractAddress, @Value("${blockchain.serverside-signing-private-key}") String defaultPrivate) {
         this.web3JSingleton = web3JSingleton;
         this.contractAddress = contractAddress;
+        this.defaultPrivate = defaultPrivate;
     }
 
     public String submitAlert(String privateKey, String alertType, BigInteger latitude, BigInteger longitude) throws Exception {
@@ -90,7 +92,7 @@ public class SmartContractService {
     }
 
     public List<Map<String, Object>> getAllGlobalAlerts() throws Exception {
-        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738";
+        String defaultPrivateKey = defaultPrivate;
         Credentials credentials = Credentials.create(defaultPrivateKey);
         SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
 
@@ -160,7 +162,7 @@ public class SmartContractService {
 
     public Map<String, Object> getAlertById(String alertIdHex) throws Exception {
         byte[] alertIdBytes = UtilityClass.hexToBytes(alertIdHex);
-        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738";
+        String defaultPrivateKey = defaultPrivate;
         Credentials credentials = Credentials.create(defaultPrivateKey);
 
         SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
@@ -174,7 +176,7 @@ public class SmartContractService {
     }
 
     public List<Map<String, Object>> getAllValidations() throws Exception {
-        String defaultPrivateKey = "0xef43f9f547e1a70532ba05824bda6e90d58f1d8c44aeb75ec1354839ad4b7738";
+        String defaultPrivateKey = defaultPrivate;
         Credentials credentials = Credentials.create(defaultPrivateKey);
         SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), credentials, new DefaultGasProvider());
 

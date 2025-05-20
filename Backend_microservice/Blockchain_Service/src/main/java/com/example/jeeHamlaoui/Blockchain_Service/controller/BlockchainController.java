@@ -91,19 +91,7 @@ public class BlockchainController {
     @PostMapping("/contract/alert/confirm")
     public ResponseEntity<Map<String, String>> confirmAlert(@RequestParam String privateKey, @RequestParam String alertId) {
         try {
-            alertId = alertId.trim();
-
-            if (!UtilityClass.isValidBase64(alertId)) {
-                throw new IllegalArgumentException("Invalid Base64-encoded alertId");
-            }
-
-            byte[] alertIdBytes = Base64.getDecoder().decode(alertId);
-
-            if (alertIdBytes.length != 32) {
-                throw new IllegalArgumentException("Decoded alertId must be exactly 32 bytes long");
-            }
-
-            Map<String, String> response = smartContractService.confirmAlert(privateKey, alertIdBytes);
+            Map<String, String> response = smartContractService.confirmAlert(privateKey, alertId);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             System.err.println("Validation error: " + e.getMessage());
@@ -118,9 +106,7 @@ public class BlockchainController {
     public ResponseEntity<Map<String, String>> triggerAction(@RequestParam String privateKey, @RequestParam String satellite,
                                                              @RequestParam BigInteger action, @RequestParam String alertId) {
         try {
-            byte[] alertIdBytes = Base64.getDecoder().decode(alertId);
-
-            Map<String, String> response = smartContractService.triggerAction(privateKey, satellite, action, alertIdBytes);
+            Map<String, String> response = smartContractService.triggerAction(privateKey, satellite, action, alertId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));

@@ -45,8 +45,10 @@ public class SmartContractService {
         return transactionReceipt.getTransactionHash();
     }
 
-    public Map<String, String> confirmAlert(String privateKey, byte[] alertId) throws Exception {
-        if (alertId.length != 32) {
+    public Map<String, String> confirmAlert(String privateKey, String alertId) throws Exception {
+        byte[] bytesAlertId = UtilityClass.hexToBytes(alertId);
+
+        if (bytesAlertId.length != 32) {
             throw new IllegalArgumentException("alertId must be exactly 32 bytes long");
         }
 
@@ -62,7 +64,7 @@ public class SmartContractService {
 
         SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), transactionManager, new DefaultGasProvider());
 
-        TransactionReceipt receipt = contract.confirmAlert(alertId).send();
+        TransactionReceipt receipt = contract.confirmAlert(bytesAlertId).send();
 
         return Map.of(
                 "transactionHash", receipt.getTransactionHash(),
@@ -70,7 +72,9 @@ public class SmartContractService {
         );
     }
 
-    public Map<String, String> triggerAction(String privateKey, String satellite, BigInteger action, byte[] alertId) throws Exception {
+    public Map<String, String> triggerAction(String privateKey, String satellite, BigInteger action, String alertId) throws Exception {
+        byte[] bytesAlertId = UtilityClass.hexToBytes(alertId);
+
         Credentials credentials = Credentials.create(privateKey);
 
         BigInteger chainId = web3JSingleton.getWeb3jInstance().ethChainId().send().getChainId();
@@ -83,7 +87,7 @@ public class SmartContractService {
 
         SatelliteSystem contract = SatelliteSystem.load(contractAddress, web3JSingleton.getWeb3jInstance(), transactionManager, new DefaultGasProvider());
 
-        TransactionReceipt receipt = contract.triggerAction(satellite, action, alertId).send();
+        TransactionReceipt receipt = contract.triggerAction(satellite, action, bytesAlertId).send();
 
         return Map.of(
                 "transactionHash", receipt.getTransactionHash(),

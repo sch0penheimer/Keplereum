@@ -92,16 +92,16 @@ const ValidationQueue = () => {
                     {`${validator.name}`}
                   </div>
 
-                  <div className={`text-s text-center truncate w-3/4 font-bold ${
+                    <div className={`text-s text-center truncate w-3/4 font-bold ${
                       isCurrentValidator
-                        ? 'text-green-500'
-                        : isNextValidator
-                        ? 'text-blue-400'
-                        : 'text-gray-300'
+                      ? 'text-green-500'
+                      : isNextValidator
+                      ? 'text-blue-400'
+                      : 'text-gray-300'
                     }`}>
                     <KeyRound className="inline-block mr-1 mb-1" size={20} />
-                    {`${validator.address}`}
-                  </div>
+                    {`${validator.address.slice(0, 15)}...}`}
+                    </div>
 
                   <div className="text-xs text-gray-400 text-center">
                     {`${validator.blocksValidated} blocks`}

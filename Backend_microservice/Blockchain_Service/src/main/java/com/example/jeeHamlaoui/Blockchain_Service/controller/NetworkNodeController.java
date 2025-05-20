@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/nodes")
+@CrossOrigin(origins = "*")
 public class NetworkNodeController {
     private final NetworkNodeService networkNodeService;
 

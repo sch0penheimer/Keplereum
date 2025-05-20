@@ -30,7 +30,7 @@ spring:
         - id: Blockchain-route
           uri: lb://BLOCKCHAIN-SERVICE
           predicates:
-            - Path=/api/v1/blocks/**, /api/v1/transactions/**, /api/v1/nodes/**
+            - Path=/api/v1/blocks/**, /api/v1/transactions/**, /api/v1/nodes/**, /api/v1/blockchain/**
 
 
 

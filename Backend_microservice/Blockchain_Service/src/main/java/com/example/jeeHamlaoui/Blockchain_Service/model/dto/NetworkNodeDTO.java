@@ -8,6 +8,8 @@ public class NetworkNodeDTO {
     @NotBlank(message = "Public key is required")
     private String publicKey;
 
+    private String privateKey;
+
     private String nodeName;
 
     private boolean authorityStatus;
@@ -54,6 +56,14 @@ public class NetworkNodeDTO {
 
     public void setNodeName(String nodeName) {
         this.nodeName = nodeName;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 
 // Getters and setters

@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/blocks")
+@CrossOrigin(origins = "*")
 public class BlockController {
     private final BlockService blockService;
 

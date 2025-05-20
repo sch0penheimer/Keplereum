@@ -232,7 +232,8 @@ public class SmartContractService {
                         "alertId", alertId,
                         "actionType", actionType,
                         "validatorAddress", validatorAddress,
-                        "toAddress", toAddress
+                        "toAddress", toAddress,
+                        "transactionHash", transactionHash
                 ));
             } catch (NumberFormatException e) {
                 System.err.println("Failed to parse actionType from data: " + data);

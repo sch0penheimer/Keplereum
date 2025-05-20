@@ -55,7 +55,6 @@ const BlocksHeader = () => {
     onClick = null 
   }) => {
     const isPending = type === 'pending';
-    const colorClass = isPending ? 'text-satellite-highlight' : 'text-satellite-accent';
     const bgColorClass = isPending ? 'bg-satellite-highlight' : 'bg-satellite-accent/30';
   
     return (

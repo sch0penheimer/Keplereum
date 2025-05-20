@@ -472,13 +472,13 @@ const BlockDetails = () => {
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-white">Usage</span>
                           <span className="text-gray-400">
-                            {Math.floor(block.size / 4 * 100)}%
+                            {Math.floor(block.size / 4 * 100) % 100}%
                           </span>
                         </div>
                         <div className="w-full bg-satellite-dark rounded-full h-2">
                           <div 
                             className="bg-satellite-accent h-2 rounded-full" 
-                            style={{ width: `${Math.floor(block.size / 4 * 100)}%` }}
+                            style={{ width: `${Math.floor(block.size / 4 * 100) % 100}%` }}
                           ></div>
                         </div>
                       </div>
@@ -533,30 +533,27 @@ const BlockDetails = () => {
                         </div>
                         <div>
                           <div className="text-satellite-accent font-mono text-xs md:text-sm">
-                            {tx.hash}
-                          </div>
-                          <div className="text-gray-400 text-xs mt-1">
-                            {formatDistanceToNow(tx.timestamp, { addSuffix: true })}
+                            {tx.hash.slice(0, 21)}...
                           </div>
                         </div>
                       </div>
                       
                       <div className="flex items-center">
                         <div className="text-xs md:text-sm text-white/70">
-                          {tx.from}
+                          {tx.from.slice(0, 21)}..
                         </div>
                         <ArrowRight className="h-3 w-3 mx-2 text-satellite-accent" />
                         <div className="text-xs md:text-sm text-white/70">
-                          {tx.to}
+                          {tx.to.slice(0, 21)}...
                         </div>
                       </div>
                       
                       <div className="text-right">
                         <div className="text-green-500 text-xs md:text-sm">
-                          {tx.amount.toFixed(4)} SAT
+                          {tx.value.toFixed(4)} SAT
                         </div>
                         <div className="text-gray-400 text-xs mt-1">
-                          Fee: {tx.fee.toFixed(5)} SAT
+                          Gas: {tx.gas} SAT
                         </div>
                       </div>
                     </div>

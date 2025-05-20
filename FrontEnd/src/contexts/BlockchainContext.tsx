@@ -20,6 +20,11 @@ import { startNormalTransactions } from "@/utils/transactions/normalTransactions
 // _______________________ //
 import { startAlertTransactions } from "@/utils/transactions/alertTransactionsSubmitter";
 
+// ________________________________________ //
+// * Confirmations / Actions Transactions * //
+// ________________________________________ //
+import { startConfirmationOrAction } from "@/utils/transactions/confirmationOrActionSubmitter";
+
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
 
 const parseBlock = (data: any): Block => {
@@ -126,12 +131,15 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
   };
 
   //----------------------------//
-  //-- III - Fetch all alerts --//
+  //-- III - Fetch alerts without Validations --//
   //----------------------------//
-  const fetchAlertsWithoutValidations = async (): Promise<AlertTransaction[]> => {
+  const fetchAlertsWithoutValidations = async (validations: AlertValidation[]): Promise<AlertTransaction[]> => {
     try {
       const response = await axios.get("http://localhost:8222/api/v1/blockchain/alerts");
-      return response.data as AlertTransaction[];
+      const allAlerts = response.data as AlertTransaction[];
+
+      const validatedIds = new Set(validations.map(v => v.alertId));
+      return allAlerts.filter(alert => !validatedIds.has(alert.alertId));
     } catch (error) {
       console.error("Error fetching alerts without validations:", error);
       return [];
@@ -192,7 +200,7 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
       setValidations([]);
 
       const validations: AlertValidation[] = await fetchValidations();
-      const alerts: AlertTransaction[] = await fetchAlertsWithoutValidations();
+      const alerts: AlertTransaction[] = await fetchAlertsWithoutValidations(validations);
 
       setValidations(validations);
       setAlerts(alerts);
@@ -345,18 +353,19 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
    * Initialize ALERT transactions with reset callback
    */
   useEffect(() => {
+    if (!alerts.length || !validatorsReady) return;
+
     const initializeAlertTransactions = async () => {
       try {
-        if (validators.length > 0) {
-          startAlertTransactions(validators, alerts, setPendingTransactions, pendingTransactions);
-        }
+        startAlertTransactions(validators, alerts, setPendingTransactions, pendingTransactions);
       } catch (error) {
         console.error("Error initializing alert transactions:", error);
       }
     };
 
     initializeAlertTransactions();
-  }, [alerts, validators]);
+    
+  }, [alerts, validatorsReady]);
 
   const value = {
     blocks,

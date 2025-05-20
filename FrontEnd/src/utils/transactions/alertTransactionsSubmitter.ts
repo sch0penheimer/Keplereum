@@ -7,7 +7,7 @@ type Validator = {
 };
 
 const ALERT_API_URL = "http://localhost:8222/api/v1/blockchain/contract/alert";
-const ALERT_INTERVAL_MS = 40000;
+const ALERT_INTERVAL_MS = 25000;
 
 const ALERT_TYPES = ["FIRE", "TORNADO", "HURRICANE", "TSUNAMI"];
 const LOCATIONS = [
@@ -89,7 +89,6 @@ export function startAlertTransactions(
             hash.length > 16 ? `${hash.slice(0, 14)}...` : hash;
 
             setPendingTransactions([
-            ...pendingTransactions,
             {
               id: hashAsciiDecimal,
               hash: `${txResponse.data.transaction.hash.slice(0, 20)}...`,
@@ -109,6 +108,7 @@ export function startAlertTransactions(
               latitude: location.latitude,
               longitude: location.longitude,
             },
+            ...pendingTransactions
             ]);
         } catch (txError: any) {
           console.error(

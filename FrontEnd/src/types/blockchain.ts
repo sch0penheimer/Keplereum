@@ -19,6 +19,27 @@ export interface BlockTransaction {
   action?: 'SWITCH_ORBIT' | 'SWITCH_SENSOR';
 }
 
+//** 1- Alert Transaction Interface **//
+export interface AlertTransaction {
+  longitude: number;
+  alertId: string;
+  alertType: string;
+  latitude: number;
+  transactionHash: string;
+    confirmations: {
+    publicAddress: string;
+    confirmationHash: string;
+  }[];
+}
+
+//** 2- Alert Validation Interface **//
+export interface AlertValidation {
+  validatorAddress: string;
+  alertId: string;
+  actionType: string;
+  toAddress: string;
+}
+
 //* Block Interface *//
 export interface Block {
   number: number;

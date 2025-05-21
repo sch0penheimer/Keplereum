@@ -5,7 +5,9 @@ import {
   Block,
   Validator,
   NetworkStats,
-  BlockchainContextType
+  BlockchainContextType,
+  AlertTransaction,
+  AlertValidation,
 } from "@/types/blockchain";
 
 // _______________________ //
@@ -18,73 +20,12 @@ import { startNormalTransactions } from "@/utils/transactions/normalTransactions
 // _______________________ //
 import { startAlertTransactions } from "@/utils/transactions/alertTransactionsSubmitter";
 
+// ________________________________________ //
+// * Confirmations / Actions Transactions * //
+// ________________________________________ //
+import { startConfirmationOrAction } from "@/utils/transactions/confirmationOrActionSubmitter";
+
 const BlockchainContext = createContext<BlockchainContextType | undefined>(undefined);
-
-/**
- * Temporary Function to generate Dummy / Mock Transactions
- * @param blockNumber
- * @param id
- */
-// const generateMockTransaction = (blockNumber: number, id: number): BlockTransaction => {
-//   const now = new Date();
-//   const timestamp = new Date(now.getTime() - Math.random() * 3600000);
-//   const status = Math.random() > 0.1 ? 'confirmed' : 'pending';
-//   const isAlertTx = Math.random() > 0.3;
-
-//   // Base transaction
-//   const baseTx: BlockTransaction = {
-//     id: `0x${id.toString(16).padStart(64, '0')}`,
-//     hash: `0x${Math.random().toString(16).substring(2, 66)}`,
-//     from: `0x${Math.random().toString(16).substring(2, 42)}`,
-//     to: `0x${Math.random().toString(16).substring(2, 42)}`,
-//     amount: parseFloat((Math.random() * 10).toFixed(4)),
-//     fee: parseFloat((Math.random() * 0.1).toFixed(5)),
-//     status: status,
-//     timestamp: timestamp,
-//     gasPrice: Math.floor(Math.random() * 100) + 10,
-//     gasLimit: 21000,
-//     gasUsed: status === 'confirmed' ? Math.floor(Math.random() * 21000) : 0,
-//     blockNumber: status === 'confirmed' ? blockNumber : null,
-//   };
-
-//   if (!isAlertTx) return baseTx;
-
-//   // Alert-specific data
-//   const alertTypes = ['FIRE', 'CYCLONE', 'TSUNAMI'];
-//   const actions: Array<BlockTransaction['action']> = ['SWITCH_ORBIT', 'SWITCH_SENSOR'];
-  
-//   const txType = Math.random() > 0.5 ? 'ALERT_SUBMISSION' : 
-//                  Math.random() > 0.5 ? 'ALERT_CONFIRMATION' : 'VALIDATOR_ACTION';
-
-//   switch (txType) {
-//     case 'ALERT_SUBMISSION':
-//       return {
-//         ...baseTx,
-//         to: '0xAlertContractAddress',
-//         alertType: alertTypes[Math.floor(Math.random() * alertTypes.length)],
-//         latitude: parseFloat((Math.random() * 180 - 90).toFixed(6)),
-//         longitude: parseFloat((Math.random() * 360 - 180).toFixed(6)),
-//       };
-
-//     case 'ALERT_CONFIRMATION':
-//       return {
-//         ...baseTx,
-//         to: '0xAlertContractAddress',
-//         confirmsAlertId: `0x${Math.random().toString(16).substring(2, 66)}`,
-//       };
-
-//     case 'VALIDATOR_ACTION':
-//       return {
-//         ...baseTx,
-//         from: '0xValidatorAddress',
-//         to: '0xActionContractAddress',
-//         action: actions[Math.floor(Math.random() * actions.length)],
-//       };
-
-//     default:
-//       return baseTx;
-//   }
-// };
 
 const parseBlock = (data: any): Block => {
   return {
@@ -132,9 +73,13 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
   const [networkStats, setNetworkStats] = useState<NetworkStats>(placeholderNetworkStats);
   const [loading, setLoading] = useState(true);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
-  const [alerts, setAlerts] = useState<BlockTransaction[]>([]);
-  const [validatorsReady, setValidatorsReady] = useState(false); // Track readiness
+  const [alerts, setAlerts] = useState<AlertTransaction[]>([]);
+  const [validations, setValidations] = useState<AlertValidation[]>([]);
+  const [validatorsReady, setValidatorsReady] = useState(false);
 
+  //------------------------------//
+  //-- I - Fetch all validators --//
+  //------------------------------//
   const fetchValidators = async () => {
     try {
       const response_blockchain = await axios.get("http://localhost:8222/api/v1/blockchain/validators/queue");
@@ -143,7 +88,6 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
       const blockchainValidators = response_blockchain.data;
       const authorityNodes = response_back.data;
 
-      // Map each satellite with its corresponding public address
       const mappedValidators: Validator[] = authorityNodes.map((node: any, index: number) => {
         const matchingValidator = blockchainValidators.find(
           (validator: any) => validator.publicAddress === node.publicKey
@@ -168,45 +112,112 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
     }
   };
 
-  const fetchAlerts = async () => {
-    try {
-      const alerts_response = await axios.get("http://localhost:8222/api/v1/blockchain/contract/alerts");
-      const alertsData = alerts_response.data;
-
-      //-- Fetch full transaction info for each alert by hash --//
-      const alertTransactions = await Promise.all(
-        alertsData.map(async (alert: any) => {
-          try {
-            const txResponse = await axios.get("http://localhost:8222/api/v1/blockchain/transaction", {
-              params: { hash: alert.hash },
-            });
-            return { ...txResponse.data, ...alert };
-          } catch (err) {
-            console.error(`Failed to fetch transaction for alert hash ${alert.hash}:`, err);
-            return null;
-          }
-        })
-      );
-
-      setAlerts(alertTransactions.filter(Boolean));
-      //-- Start alert transactions after alerts are set --//
-      startAlertTransactions(validators, alertTransactions);
-    } catch (error) {
-      console.error("Failed to fetch alerts:", error);
-    }
-  };
-
+  // --> Validators Mounting <-- //
   useEffect(() => {
     fetchValidators();
   }, []);
 
-  //-- Trigger fetchAlerts only when validators are ready --//
-  useEffect(() => {
-    if (validatorsReady) {
-      fetchAlerts();
+  //--------------------------------//
+  //-- II - Fetch all validations --//
+  //--------------------------------//
+  const fetchValidations = async (): Promise<AlertValidation[]> => {
+    try {
+      const response = await axios.get("http://localhost:8222/api/v1/blockchain/validations");
+      return response.data as AlertValidation[];
+    } catch (error) {
+      console.error("Error fetching validations:", error);
+      return [];
     }
-  }, [validatorsReady]);
+  };
 
+  //----------------------------//
+  //-- III - Fetch alerts without Validations --//
+  //----------------------------//
+  const fetchAlertsWithoutValidations = async (validations: AlertValidation[]): Promise<AlertTransaction[]> => {
+    try {
+      const response = await axios.get("http://localhost:8222/api/v1/blockchain/alerts");
+      const allAlerts = response.data as AlertTransaction[];
+
+      const validatedIds = new Set(validations.map(v => v.alertId));
+      return allAlerts.filter(alert => !validatedIds.has(alert.alertId));
+    } catch (error) {
+      console.error("Error fetching alerts without validations:", error);
+      return [];
+    }
+  };
+
+  //----------------------------//
+  //-- IV - Fetch pending txs --//
+  //----------------------------//
+  const fetchPendingTransactions = async (current_alerts: AlertTransaction[]) => {
+    try {
+      const response = await axios.get("http://localhost:8222/api/v1/blockchain/mempool");
+      const mempoolTransactions = response.data;
+
+      const formattedTransactions: BlockTransaction[] = mempoolTransactions.map((tx: any) => {
+        const matchingAlert = current_alerts.find(alert => alert.transactionHash === tx.hash);
+        const hashAsciiDecimal = tx.hash
+          .split('')
+          .reduce((sum: number, char: string) => sum + char.charCodeAt(0), 0)
+          .toString();
+
+        const truncateHash = (hash: string) =>
+          hash.length > 16 ? `${hash.slice(0, 14)}...` : hash;
+
+        return {
+          id: hashAsciiDecimal,
+          hash: `${tx.hash.slice(0, 20)}...`,
+          from: truncateHash(tx.from),
+          to: truncateHash(tx.to),
+          amount: parseFloat(tx.value) / 1e18 || 0, 
+          fee: (parseInt(tx.gas, 16) * parseInt(tx.gasPrice, 16)) / 1e18 || 0,
+          status: 'pending',
+          timestamp: new Date(),
+          gasPrice: parseInt(tx.gasPrice, 16) || 0,
+          gasLimit: parseInt(tx.gas, 16) || 0,
+          gasUsed: 0,
+          blockNumber: null,
+          alertType: matchingAlert?.alertType,
+          latitude: matchingAlert?.latitude,
+          longitude: matchingAlert?.longitude,
+        };
+      });
+
+      setPendingTransactions(formattedTransactions);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching pending transactions:", error);
+      setLoading(false); 
+    }
+  };
+
+  //------------------------------------------------//
+  //-- V - Fetch all data (for a Global Callback) --//
+  //------------------------------------------------//
+  const fetchAllData = async () => {
+    try {
+      setAlerts([]);
+      setValidations([]);
+
+      const validations: AlertValidation[] = await fetchValidations();
+      const alerts: AlertTransaction[] = await fetchAlertsWithoutValidations(validations);
+
+      setValidations(validations);
+      setAlerts(alerts);
+      console.log("Recently Fetched alerts:", alerts);
+
+      await fetchPendingTransactions(alerts);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  // --> Data Mounting <-- //
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  //-- Network Stats Parsing --//
   const parseNetworkStats = (metrics: any): NetworkStats => {
     return {
       avgBlockTime: parseFloat((metrics.averageBlockTime || 0).toFixed(3)),
@@ -238,17 +249,17 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
   useEffect(() => {
     const socket = new WebSocket("ws://localhost:8080/ws");
 
+    //-- ON OPEN --//
     socket.onopen = () => {
       console.log("WebSocket connected");
-
-      //-- 6 latest blocks fetching --//
+      //-- 1) 6 latest blocks fetching --//
       socket.send(
         JSON.stringify({
           type: "latestblocks",
           payload: { count: 6 },
         })
       );
-
+      //-- 2) Toggle Mining --//
       socket.send(
         JSON.stringify({
           type: 'togglemining',
@@ -257,8 +268,7 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
           }
         })
       );
-
-      //-- Subscribe to new blocks --//
+      //-- 3) Subscribe to new blocks --//
       socket.send(
         JSON.stringify({
           type: "subscribe",
@@ -266,21 +276,26 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
       );
     };
 
+    //-- ON MESSAGE --//
     socket.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
         console.log("Message received:", message);
-    
+
         switch (message.type) {
           case "latestBlocks":
             setBlocks(message.data.map(parseBlock));
             setNetworkStats(parseNetworkStats(message.metrics));
             setLoading(false);
             break;
+
           case "newBlock":
             console.log("New block received:", message.data);
             setBlocks((prevBlocks) => [parseBlock(message.data), ...prevBlocks.slice(0, 9)]);
+            //-- Fetch all data again --//
+            fetchAllData();
             break;
+
           default:
             console.log("Unknown message type:", message.type);
         }
@@ -289,7 +304,17 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
       }
     };
 
+    //-- ON CLOSE --//
     socket.onclose = () => {
+      console.log("WebSocket disconnected");
+    };
+
+    //-- ON ERROR --//
+    socket.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    return () => {
       socket.send(
         JSON.stringify({
           type: 'togglemining',
@@ -298,27 +323,49 @@ export const BlockchainProvider: React.FC<{ children: ReactNode }> = ({ children
           }
         })
       );
-
-      console.log("WebSocket disconnected");
-    };
-
-    socket.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
-
-    return () => {
       socket.close();
     };
   }, []);
-  
-  // useEffect(() => {
-  //   const mockPendingTxs = Array.from({ length: 50 }, (_, i) => 
-  //     generateMockTransaction(0, i)
-  //   ).filter(tx => tx.status === 'pending');
+
+  /**
+   * Initialize NORMAL transactions with reset callback
+   */
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+    const initializeNormalTransactions = async () => {
+      try {
+        if (validatorsReady) {
+          startNormalTransactions(validators, fetchAllData);
+        }
+      } catch (error) {
+        console.error("Error initializing normal transactions:", error);
+      }
+    };
+    initializeNormalTransactions();
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [validatorsReady]);
+
+  /**
+   * Initialize ALERT transactions with reset callback
+   */
+  useEffect(() => {
+    if (!alerts.length || !validatorsReady) return;
+
+    const initializeAlertTransactions = async () => {
+      try {
+        startAlertTransactions(validators, alerts, setPendingTransactions, pendingTransactions);
+      } catch (error) {
+        console.error("Error initializing alert transactions:", error);
+      }
+    };
+
+    initializeAlertTransactions();
     
-  //   setPendingTransactions(mockPendingTxs);
-  //   setLoading(false);
-  // }, []);
+  }, [alerts, validatorsReady]);
 
   const value = {
     blocks,

@@ -9,9 +9,12 @@ type Validator = {
 const API_URL = "http://localhost:8222/api/v1/blockchain/transaction";
 const GAS_PRICE = "1000000000";
 const GAS_LIMIT = "21000";
-const INTERVAL_MS = 65000;
+const INTERVAL_MS = 25000;
 
-export function startNormalTransactions(validators: Validator[]) {
+export function startNormalTransactions(
+  validators: Validator[],
+  onTransactionSubmitted: () => void
+) {
   if (!validators || validators.length < 2) {
     console.warn("Need at least 2 validators to submit transactions.");
     return;
@@ -23,7 +26,7 @@ export function startNormalTransactions(validators: Validator[]) {
     const to = validators[(idx + 1) % validators.length];
 
     try {
-      const response = await axios.post(API_URL, null, {
+      axios.post(API_URL, null, {
         params: {
           privateKey: from.privateKey,
           toAddress: to.address,
@@ -31,11 +34,21 @@ export function startNormalTransactions(validators: Validator[]) {
           gasPrice: GAS_PRICE,
           gasLimit: GAS_LIMIT,
         },
+      }).then(response => {
+        console.log(
+          `[AutoTx] Sent from ${from.name || from.address} to ${to.name || to.address}:`,
+          response.data
+        );
+      }).catch(error => {
+        console.error(
+          `[AutoTx] Failed from ${from.name || from.address} to ${to.name || to.address}:`,
+          error?.response?.data || error.message
+        );
       });
-      console.log(
-        `[AutoTx] Sent from ${from.name || from.address} to ${to.name || to.address}:`,
-        response.data
-      );
+
+      //-- Call the callback to reset transactions --//
+      onTransactionSubmitted();
+
     } catch (error: any) {
       console.error(
         `[AutoTx] Failed from ${from.name || from.address} to ${to.name || to.address}:`,

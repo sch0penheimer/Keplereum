@@ -35,7 +35,6 @@ public class BlockchainService {
         this.objectMapper = objectMapper;
     }
 
-    // Get all mempool transactions
     public List<JsonNode> getPendingTransactions() throws Exception {
         HttpURLConnection con = rpcClientSingleton.getConnection();
 
@@ -55,12 +54,10 @@ public class BlockchainService {
 
         JsonNode response = objectMapper.readTree(con.getInputStream());
 
-        // Navigate to result.pending
         JsonNode pending = response.path("result").path("pending");
 
         List<JsonNode> allPendingTxs = new ArrayList<>();
 
-        // Structure: pending[sender][nonce] = transaction
         for (Iterator<String> senders = pending.fieldNames(); senders.hasNext(); ) {
             String sender = senders.next();
             JsonNode nonceMap = pending.get(sender);
@@ -75,14 +72,12 @@ public class BlockchainService {
         return allPendingTxs;
     }
 
-    // Get a block by number
     public EthBlock getBlockByNumber(BigInteger blockNumber) throws Exception {
         return web3JSingleton.getWeb3jInstance()
                 .ethGetBlockByNumber(DefaultBlockParameter.valueOf(blockNumber), true)
                 .send();
     }
 
-    // Get Validator Queue
     public List<String> getValidatorQueue() throws Exception {
         Request<?, EthAccounts> request = web3JSingleton.getWeb3jInstance().ethAccounts();
         ((Request<?, ?>) request).setMethod("clique_getSigners");
@@ -92,17 +87,13 @@ public class BlockchainService {
         return response.getAccounts();
     }
 
-    // Publish a transaction
     public String publishTransaction(String privateKey, String toAddress, BigInteger value,
                                      BigInteger gasPrice, BigInteger gasLimit) throws Exception {
 
-        // Get the chain ID dynamically (or hardcode it if you know the network)
         BigInteger chainId = web3JSingleton.getWeb3jInstance().ethChainId().send().getChainId();
 
-        // 3. Create credentials from the private key
         Credentials credentials = Credentials.create(privateKey);
 
-        // 3. Build RawTransaction (like web3.js)
         BigInteger nonce = web3JSingleton.getWeb3jInstance()
                 .ethGetTransactionCount(credentials.getAddress(), DefaultBlockParameterName.PENDING)
                 .send()
@@ -116,16 +107,13 @@ public class BlockchainService {
                 value
         );
 
-        // 4. Sign Offline (like web3.eth.accounts.signTransaction)
         byte[] signedMessage = TransactionEncoder.signMessage(rawTx, chainId.longValue(), credentials);
         String hexValue = Numeric.toHexString(signedMessage);
 
-        // 5. Send Signed Payload (like web3.eth.sendSignedTransaction)
         EthSendTransaction response = web3JSingleton.getWeb3jInstance()
                 .ethSendRawTransaction(hexValue)
                 .send();
 
-        // 6. Error Handling (same as before)
         if (response.hasError()) {
             throw new RuntimeException("Transaction failed: " + response.getError().getMessage());
         }
@@ -133,12 +121,9 @@ public class BlockchainService {
         return response.getTransactionHash();
     }
 
-    // Get a transaction by hash (with event details if applicable)
     public Map<String, Object> getTransactionByHash(String transactionHash) throws Exception {
-        // Set up the connection to the RPC node
         HttpURLConnection con = rpcClientSingleton.getConnection();
 
-        // Create the request body for 'eth_getTransactionByHash'
         String requestBodyTx = objectMapper.writeValueAsString(Map.of(
                 "jsonrpc", "2.0",
                 "method", "eth_getTransactionByHash",
@@ -146,7 +131,6 @@ public class BlockchainService {
                 "id", 1
         ));
 
-        // Send the request to get the transaction
         con.setDoOutput(true);
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
@@ -156,7 +140,6 @@ public class BlockchainService {
             os.flush();
         }
 
-        // Get the response and parse the transaction
         JsonNode txResponse = objectMapper.readTree(con.getInputStream());
         JsonNode transaction = txResponse.path("result");
 
@@ -164,7 +147,6 @@ public class BlockchainService {
             throw new RuntimeException("Transaction not found.");
         }
 
-        // Create the request body for 'eth_getTransactionReceipt'
         String requestBodyReceipt = objectMapper.writeValueAsString(Map.of(
                 "jsonrpc", "2.0",
                 "method", "eth_getTransactionReceipt",
@@ -172,18 +154,15 @@ public class BlockchainService {
                 "id", 1
         ));
 
-        // Send the request to get the receipt
-        con = rpcClientSingleton.getConnection();  // Reinitialize the connection
+        con = rpcClientSingleton.getConnection();
         try (OutputStream os = con.getOutputStream()) {
             os.write(requestBodyReceipt.getBytes());
             os.flush();
         }
 
-        // Get the response and parse the receipt
         JsonNode receiptResponse = objectMapper.readTree(con.getInputStream());
         JsonNode receipt = receiptResponse.path("result");
 
-        // Return both the transaction and the receipt (or "pending" if no receipt)
         return Map.of(
                 "transaction", transaction,
                 "receipt", receipt.isNull() ? "pending" : receipt

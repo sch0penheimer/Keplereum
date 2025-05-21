@@ -109,10 +109,10 @@ class GroundStationServiceTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(new GroundStation());
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation = new GroundStation();
@@ -129,10 +129,10 @@ class GroundStationServiceTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();
@@ -201,10 +201,10 @@ class GroundStationServiceTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(groundStation);
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();
@@ -221,10 +221,10 @@ class GroundStationServiceTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation2);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
 
     GroundStation groundStation3 = new GroundStation();
@@ -242,10 +242,10 @@ class GroundStationServiceTest {
     user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user3.setEmail("jane.doe@example.org");
     user3.setGroundStation(new GroundStation());
-    user3.setId(1L);
+    user3.setUserId(1L);
     user3.setPassword("iloveyou");
     user3.setStatus(UserStatus.ACTIVE);
-    user3.setUser_id(1L);
+    user3.setUserId(1L);
     user3.setUser_name("User name");
 
     GroundStation groundStation4 = new GroundStation();
@@ -262,10 +262,10 @@ class GroundStationServiceTest {
     user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user4.setEmail("jane.doe@example.org");
     user4.setGroundStation(groundStation4);
-    user4.setId(1L);
+    user4.setUserId(1L);
     user4.setPassword("iloveyou");
     user4.setStatus(UserStatus.ACTIVE);
-    user4.setUser_id(1L);
+    user4.setUserId(1L);
     user4.setUser_name("User name");
 
     GroundStation groundStation5 = new GroundStation();
@@ -304,10 +304,10 @@ class GroundStationServiceTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(new GroundStation());
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation = new GroundStation();
@@ -324,10 +324,10 @@ class GroundStationServiceTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();
@@ -355,10 +355,10 @@ class GroundStationServiceTest {
     user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user3.setEmail("jane.doe@example.org");
     user3.setGroundStation(groundStation3);
-    user3.setId(1L);
+    user3.setUserId(1L);
     user3.setPassword("iloveyou");
     user3.setStatus(UserStatus.ACTIVE);
-    user3.setUser_id(1L);
+    user3.setUserId(1L);
     user3.setUser_name("User name");
 
     GroundStation groundStation4 = new GroundStation();
@@ -375,10 +375,10 @@ class GroundStationServiceTest {
     user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user4.setEmail("jane.doe@example.org");
     user4.setGroundStation(groundStation4);
-    user4.setId(1L);
+    user4.setUserId(1L);
     user4.setPassword("iloveyou");
     user4.setStatus(UserStatus.ACTIVE);
-    user4.setUser_id(1L);
+    user4.setUserId(1L);
     user4.setUser_name("User name");
 
     GroundStation groundStation5 = new GroundStation();
@@ -397,10 +397,10 @@ class GroundStationServiceTest {
     user5.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user5.setEmail("jane.doe@example.org");
     user5.setGroundStation(new GroundStation());
-    user5.setId(1L);
+    user5.setUserId(1L);
     user5.setPassword("iloveyou");
     user5.setStatus(UserStatus.ACTIVE);
-    user5.setUser_id(1L);
+    user5.setUserId(1L);
     user5.setUser_name("User name");
 
     GroundStation groundStation6 = new GroundStation();
@@ -417,10 +417,10 @@ class GroundStationServiceTest {
     user6.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user6.setEmail("jane.doe@example.org");
     user6.setGroundStation(groundStation6);
-    user6.setId(1L);
+    user6.setUserId(1L);
     user6.setPassword("iloveyou");
     user6.setStatus(UserStatus.ACTIVE);
-    user6.setUser_id(1L);
+    user6.setUserId(1L);
     user6.setUser_name("User name");
 
     GroundStation updatedGroundStation = new GroundStation();
@@ -460,10 +460,10 @@ class GroundStationServiceTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(new GroundStation());
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation = new GroundStation();
@@ -480,10 +480,10 @@ class GroundStationServiceTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();
@@ -503,10 +503,10 @@ class GroundStationServiceTest {
     user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user3.setEmail("jane.doe@example.org");
     user3.setGroundStation(new GroundStation());
-    user3.setId(1L);
+    user3.setUserId(1L);
     user3.setPassword("iloveyou");
     user3.setStatus(UserStatus.ACTIVE);
-    user3.setUser_id(1L);
+    user3.setUserId(1L);
     user3.setUser_name("User name");
 
     GroundStation groundStation3 = new GroundStation();
@@ -523,10 +523,10 @@ class GroundStationServiceTest {
     user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user4.setEmail("jane.doe@example.org");
     user4.setGroundStation(groundStation3);
-    user4.setId(1L);
+    user4.setUserId(1L);
     user4.setPassword("iloveyou");
     user4.setStatus(UserStatus.ACTIVE);
-    user4.setUser_id(1L);
+    user4.setUserId(1L);
     user4.setUser_name("User name");
 
     GroundStation updatedGroundStation = new GroundStation();
@@ -604,10 +604,10 @@ class GroundStationServiceTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(new GroundStation());
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation = new GroundStation();
@@ -624,10 +624,10 @@ class GroundStationServiceTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();
@@ -687,10 +687,10 @@ class GroundStationServiceTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(new GroundStation());
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation = new GroundStation();
@@ -707,10 +707,10 @@ class GroundStationServiceTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();

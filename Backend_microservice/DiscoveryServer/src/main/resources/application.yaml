@@ -5,3 +5,16 @@ spring:
     import: optional:configserver:http://localhost:8888
   application:
     name: DISCOVERY
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true

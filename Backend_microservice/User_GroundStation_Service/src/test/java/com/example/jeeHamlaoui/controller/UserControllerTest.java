@@ -114,10 +114,10 @@ class UserControllerTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(groundStation);
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();
@@ -134,10 +134,10 @@ class UserControllerTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation2);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
 
     // Act
@@ -170,10 +170,10 @@ class UserControllerTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(new GroundStation());
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation = new GroundStation();
@@ -190,10 +190,10 @@ class UserControllerTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();
@@ -210,10 +210,10 @@ class UserControllerTest {
     user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user3.setEmail("jane.doe@example.org");
     user3.setGroundStation(groundStation2);
-    user3.setId(1L);
+    user3.setUserId(1L);
     user3.setPassword("iloveyou");
     user3.setStatus(UserStatus.ACTIVE);
-    user3.setUser_id(1L);
+    user3.setUserId(1L);
     user3.setUser_name("User name");
     UserRepository userRepository = mock(UserRepository.class);
     when(userRepository.save(Mockito.<User>any())).thenReturn(user3);
@@ -233,10 +233,10 @@ class UserControllerTest {
     user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user4.setEmail("jane.doe@example.org");
     user4.setGroundStation(groundStation3);
-    user4.setId(1L);
+    user4.setUserId(1L);
     user4.setPassword("iloveyou");
     user4.setStatus(UserStatus.ACTIVE);
-    user4.setUser_id(1L);
+    user4.setUserId(1L);
     user4.setUser_name("User name");
 
     GroundStation groundStation4 = new GroundStation();
@@ -253,10 +253,10 @@ class UserControllerTest {
     user5.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user5.setEmail("jane.doe@example.org");
     user5.setGroundStation(groundStation4);
-    user5.setId(1L);
+    user5.setUserId(1L);
     user5.setPassword("iloveyou");
     user5.setStatus(UserStatus.ACTIVE);
-    user5.setUser_id(1L);
+    user5.setUserId(1L);
     user5.setUser_name("User name");
 
     // Act
@@ -270,7 +270,7 @@ class UserControllerTest {
     Instant created_at = body.getCreated_at();
     assertEquals(0, created_at.getNano());
     assertEquals(0L, created_at.getEpochSecond());
-    assertEquals(1L, body.getUser_id().longValue());
+    assertEquals(1L, body.getUserId().longValue());
     assertEquals(UserStatus.ACTIVE, body.getStatus());
     assertSame(groundStation2, body.getGroundStation());
   }
@@ -307,10 +307,10 @@ class UserControllerTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(groundStation);
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();
@@ -327,10 +327,10 @@ class UserControllerTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation2);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
     Optional<User> ofResult = Optional.of(user2);
     UserRepository userRepository = mock(UserRepository.class);
@@ -352,10 +352,10 @@ class UserControllerTest {
     user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user3.setEmail("jane.doe@example.org");
     user3.setGroundStation(groundStation3);
-    user3.setId(1L);
+    user3.setUserId(1L);
     user3.setPassword("iloveyou");
     user3.setStatus(UserStatus.ACTIVE);
-    user3.setUser_id(1L);
+    user3.setUserId(1L);
     user3.setUser_name("User name");
 
     GroundStation groundStation4 = new GroundStation();
@@ -372,10 +372,10 @@ class UserControllerTest {
     user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user4.setEmail("jane.doe@example.org");
     user4.setGroundStation(groundStation4);
-    user4.setId(1L);
+    user4.setUserId(1L);
     user4.setPassword("iloveyou");
     user4.setStatus(UserStatus.ACTIVE);
-    user4.setUser_id(1L);
+    user4.setUserId(1L);
     user4.setUser_name("User name");
 
     // Act
@@ -424,10 +424,10 @@ class UserControllerTest {
     user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user.setEmail("jane.doe@example.org");
     user.setGroundStation(groundStation);
-    user.setId(1L);
+    user.setUserId(1L);
     user.setPassword("iloveyou");
     user.setStatus(UserStatus.ACTIVE);
-    user.setUser_id(1L);
+    user.setUserId(1L);
     user.setUser_name("User name");
 
     GroundStation groundStation2 = new GroundStation();
@@ -444,10 +444,10 @@ class UserControllerTest {
     user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user2.setEmail("jane.doe@example.org");
     user2.setGroundStation(groundStation2);
-    user2.setId(1L);
+    user2.setUserId(1L);
     user2.setPassword("iloveyou");
     user2.setStatus(UserStatus.ACTIVE);
-    user2.setUser_id(1L);
+    user2.setUserId(1L);
     user2.setUser_name("User name");
     Optional<User> ofResult = Optional.of(user2);
 
@@ -455,10 +455,10 @@ class UserControllerTest {
     user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user3.setEmail("jane.doe@example.org");
     user3.setGroundStation(new GroundStation());
-    user3.setId(1L);
+    user3.setUserId(1L);
     user3.setPassword("iloveyou");
     user3.setStatus(UserStatus.ACTIVE);
-    user3.setUser_id(1L);
+    user3.setUserId(1L);
     user3.setUser_name("User name");
 
     GroundStation groundStation3 = new GroundStation();
@@ -475,10 +475,10 @@ class UserControllerTest {
     user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user4.setEmail("jane.doe@example.org");
     user4.setGroundStation(groundStation3);
-    user4.setId(1L);
+    user4.setUserId(1L);
     user4.setPassword("iloveyou");
     user4.setStatus(UserStatus.ACTIVE);
-    user4.setUser_id(1L);
+    user4.setUserId(1L);
     user4.setUser_name("User name");
 
     GroundStation groundStation4 = new GroundStation();
@@ -495,10 +495,10 @@ class UserControllerTest {
     user5.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user5.setEmail("jane.doe@example.org");
     user5.setGroundStation(groundStation4);
-    user5.setId(1L);
+    user5.setUserId(1L);
     user5.setPassword("iloveyou");
     user5.setStatus(UserStatus.ACTIVE);
-    user5.setUser_id(1L);
+    user5.setUserId(1L);
     user5.setUser_name("User name");
     UserRepository userRepository = mock(UserRepository.class);
     when(userRepository.save(Mockito.<User>any())).thenReturn(user5);
@@ -519,10 +519,10 @@ class UserControllerTest {
     user6.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user6.setEmail("jane.doe@example.org");
     user6.setGroundStation(groundStation5);
-    user6.setId(1L);
+    user6.setUserId(1L);
     user6.setPassword("iloveyou");
     user6.setStatus(UserStatus.ACTIVE);
-    user6.setUser_id(1L);
+    user6.setUserId(1L);
     user6.setUser_name("User name");
 
     GroundStation groundStation6 = new GroundStation();
@@ -539,10 +539,10 @@ class UserControllerTest {
     user7.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
     user7.setEmail("jane.doe@example.org");
     user7.setGroundStation(groundStation6);
-    user7.setId(1L);
+    user7.setUserId(1L);
     user7.setPassword("iloveyou");
     user7.setStatus(UserStatus.ACTIVE);
-    user7.setUser_id(1L);
+    user7.setUserId(1L);
     user7.setUser_name("User name");
 
     // Act
@@ -556,7 +556,7 @@ class UserControllerTest {
     UserDto body = actualUpdateUserResult.getBody();
     assertEquals("User name", body.getUser_name());
     assertEquals("jane.doe@example.org", body.getEmail());
-    assertEquals(1L, body.getUser_id().longValue());
+    assertEquals(1L, body.getUserId().longValue());
     assertEquals(200, actualUpdateUserResult.getStatusCodeValue());
     assertEquals(UserStatus.ACTIVE, body.getStatus());
     assertEquals(HttpStatus.OK, statusCode);

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-groundstation-service
+  labels:
+    app: user-groundstation-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-groundstation-service
+  template:
+    metadata:
+      labels:
+        app: user-groundstation-service
+    spec:
+      containers:
+        - name: user-groundstation-service
+          image: keplereum/user-groundstation-service
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-groundstation-service-svc
+spec:
+  ports:
+    - targetPort: 8090
+      port: 80
+  selector:
+    app: user-groundstation-service

@@ -1,9 +1,12 @@
 eureka:
+  instance:
+    preferIpAddress: true
+    hostname: eureka-0
   client:
-    register-with-eureka: false
-    fetch-registry: true
-    service-url:
-      defaultzone: http://keplereum-discovery-server:8761/eureka
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://eureka-0.eureka.default.svc.cluster.local:8761/eureka
 
 spring:
   cloud:
@@ -11,10 +14,6 @@ spring:
       discovery:
         locator:
           enabled: true
-
-    config:
-      uri: http://keplereum-config-server:8888
-      fail-fast: true
 
       routes:
         - id: user-route

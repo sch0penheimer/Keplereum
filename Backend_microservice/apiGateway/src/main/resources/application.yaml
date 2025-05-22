@@ -1,9 +1,7 @@
-
 spring:
   application:
     name: GATEWAY
-
   config:
-    import: optional:configserver:http://config-server-0.config-server:8888
+    import: configserver:${CONFIG_SERVER_URL}
 
 

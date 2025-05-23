@@ -1,4 +1,4 @@
 scrape_configs:
   - job_name: 'geth'
     static_configs:
-      - targets: ['geth-exporter:6061']     
+      - targets: ['geth-exporter:6061']

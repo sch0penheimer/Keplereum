@@ -44,3 +44,4 @@ scrape_configs:
       - targets: ['keplereum-zipkin:9411']
     scrape_interval: 30s
     metrics_path: '/prometheus'
+

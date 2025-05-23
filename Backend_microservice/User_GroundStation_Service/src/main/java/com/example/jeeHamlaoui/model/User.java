@@ -38,7 +38,6 @@ public class User {
 
     @CreationTimestamp
     @Column(updatable = false)
-
     private Instant created_at;
 
     public User(Long userId, String user_name, String password, String email, UserStatus status, GroundStation groundStation, Instant created_at) {
@@ -54,31 +53,11 @@ public class User {
     public User() {
     }
 
-    public GroundStation getGroundStation() {
-        return groundStation;
-    }
-
-    public void setGroundStation(GroundStation groundStation) {
-        this.groundStation = groundStation;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User user)) return false;
-        return Objects.equals(userId, user.userId) && Objects.equals(user_name, user.user_name) && Objects.equals(password, user.password) && Objects.equals(email, user.email) && status == user.status && Objects.equals(created_at, user.created_at);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(userId, user_name, password, email, status, created_at);
-    }
-
-    public Long getUser_id() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUser_id(Long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -114,19 +93,19 @@ public class User {
         this.status = status;
     }
 
+    public GroundStation getGroundStation() {
+        return groundStation;
+    }
+
+    public void setGroundStation(GroundStation groundStation) {
+        this.groundStation = groundStation;
+    }
+
     public Instant getCreated_at() {
         return created_at;
     }
 
     public void setCreated_at(Instant created_at) {
         this.created_at = created_at;
-    }
-
-    public void setId(Long id) {
-        this.userId = id;
-    }
-
-    public Long getId() {
-        return userId;
     }
 }

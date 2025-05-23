@@ -2,11 +2,20 @@ spring:
   application:
     name: USER-SERVICE
   config:
-    import: configserver:http://keplereum-config-server:8888
-  cloud:
-    config:
-      override-none: true  # Blocks all local overrides
-  zipkin:
-    base-url: http://keplereum-zipkin:9411
-    endpoint: http://keplereum-zipkin:9411/api/v2/spans
+
+    import: configserver:${CONFIG_SERVER_URL}
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
 

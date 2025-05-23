@@ -16,6 +16,12 @@ server:
 spring:
   application:
     name: BLOCKCHAIN-SERVICE
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://keplereum-blockchain-db:5434/blockchain
+    username: username
+    password: password
   jpa:
     hibernate:
       ddl-auto: update

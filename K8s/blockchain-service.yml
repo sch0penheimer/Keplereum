@@ -1,3 +1,63 @@
+## Blockchain Service DB StatefulSet / Service Deployement ##
+#############################################################
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: blockchain-db
+  labels:
+    app: blockchain-db
+spec:
+  serviceName: "blockchain-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blockchain-db
+  template:
+    metadata:
+      labels:
+        app: blockchain-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: blockchain_user
+            - name: POSTGRES_PASSWORD
+              value: blockchain_password
+            - name: POSTGRES_DB
+              value: blockchain
+          volumeMounts:
+            - name: blockchain-db-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: blockchain-db-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockchain-db-svc
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: blockchain-db
+
+---
+
+## Blockchain Service Deployement / K8s Service ##
+############## Blockchain Service ################
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,7 +83,12 @@ spec:
           env:
             - name: CONFIG_SERVER_URL
               value: http://config-server:8888
-
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://blockchain-db-svc:5432/blockchain
+            - name: SPRING_DATASOURCE_USERNAME
+              value: blockchain_user
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: blockchain_password
 ---
 apiVersion: v1
 kind: Service

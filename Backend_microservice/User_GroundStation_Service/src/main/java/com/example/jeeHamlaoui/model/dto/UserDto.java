@@ -2,14 +2,9 @@ package com.example.jeeHamlaoui.model.dto;
 
 import com.example.jeeHamlaoui.model.GroundStation;
 import com.example.jeeHamlaoui.model.enums.UserStatus;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.Instant;
 
 public class UserDto {
-
     private Long userId;
     private String user_name;
     private String email;
@@ -29,28 +24,20 @@ public class UserDto {
         this.user_name = user_name;
     }
 
-    public Long getUser_id() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUser_id(Long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public GroundStation getGroundStation() {
-        return groundStation;
+    public String getUser_name() {
+        return user_name;
     }
 
-    public void setGroundStation(GroundStation groundStation) {
-        this.groundStation = groundStation;
-    }
-
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
     }
 
     public String getEmail() {
@@ -61,12 +48,20 @@ public class UserDto {
         this.email = email;
     }
 
-    public String getUser_name() {
-        return user_name;
+    public UserStatus getStatus() {
+        return status;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    public GroundStation getGroundStation() {
+        return groundStation;
+    }
+
+    public void setGroundStation(GroundStation groundStation) {
+        this.groundStation = groundStation;
     }
 
     public Instant getCreated_at() {

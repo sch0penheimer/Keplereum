@@ -21,6 +21,9 @@ spec:
           imagePullPolicy: Always
           ports:
           - containerPort: 8888
+          env:
+            - name: EUREKA_DEFAULT_ZONE
+              value: http://eureka-service.default.svc.cluster.local:8761/eureka
 ---
 
 apiVersion: v1

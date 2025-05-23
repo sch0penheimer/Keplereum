@@ -33,6 +33,31 @@ spring:
       probability: 1.0
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
+      sla:
+        http.server.requests: 10ms, 100ms
+    tags:
+      application: ${spring.application.name}
   tracing:
     sampling:
       probability: 1.0
@@ -41,5 +66,6 @@ management:
   zipkin:
     tracing:
       endpoint: http://keplereum-zipkin:9411/api/v2/spans
+
 
 

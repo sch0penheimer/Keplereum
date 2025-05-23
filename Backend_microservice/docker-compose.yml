@@ -1,5 +1,6 @@
 services:
 
+
   ##-------------------------------------------##
   ##--------- Infrastructure Services ---------##
   ##-------------------------------------------##
@@ -49,9 +50,11 @@ services:
     networks:
       - keplereum-microservices-net
 
+
   ##---------------------------------------##
   ##--------- Main Micro-Services ---------##
   ##---------------------------------------##
+
 
   keplereum-user-groundstation-service:
     build: ./User_GroundStation_Service
@@ -101,6 +104,7 @@ services:
   ##------------------------------------##
 
   keplereum-user-db:
+
     image: postgres
     container_name: keplereum-user-db
     environment:
@@ -113,6 +117,7 @@ services:
       - keplereum-user-data:/var/lib/postgresql/data
     networks:
       - keplereum-microservices-net
+
 
   keplereum-satellite-db:
     image: postgres

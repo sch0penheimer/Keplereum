@@ -1,7 +1,20 @@
-
-
 spring:
   application:
     name: BLOCKCHAIN-SERVICE
   config:
-    import: optional:configserver:http://keplereum-config-server:8888
+
+    import: configserver:${CONFIG_SERVER_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+

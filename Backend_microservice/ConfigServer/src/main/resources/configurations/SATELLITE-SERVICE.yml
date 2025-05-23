@@ -1,9 +1,13 @@
 eureka:
+  instance:
+    preferIpAddress: true
+    hostname: eureka-0
   client:
-    serviceUrl:
-      defaultZone: http://keplereum-discovery-server:8761/eureka
     registerWithEureka: true
     fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://eureka-0.eureka.default.svc.cluster.local:8761/eureka
+
 
 server:
   port: 8070
@@ -11,35 +15,16 @@ server:
 spring:
   application:
     name: SATELLITE-SERVICE
-
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://keplereum-satellite-db:5432/satellite
-    username: username
-    password: password
   jpa:
     hibernate:
       ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-    
-  zipkin:
-    base-url: http://keplereum-zipkin:9411
-    enabled: true
-
-  sleuth:
-    sampler:
-      probability: 1.0
 
 management:
   tracing:
     sampling:
       probability: 1.0
-    zipkin:
-      endpoint: http://keplereum-zipkin:9411/api/v2/spans
-  zipkin:
-    tracing:
-      endpoint: http://keplereum-zipkin:9411/api/v2/spans
 
 

@@ -12,40 +12,39 @@ This project aims to design and implement a decentralized satellite communicatio
 #### **Blockchain and Backend**
 - **Blockchain Platform**: Ethereum (for a public blockchain).
 - **Smart Contracts**: Solidity (for Ethereum).
-- **Backend**: Node.js / Spring Boot for microservices.
-- **Database**: MongoDB or PostgreSQL for storing non-blockchain data.
+- **Backend**: Spring Boot & Go for microservices.
+- **Database**: PostgreSQL
 
 #### **Microservices and DevOps**
 - **Containerization**: Docker for packaging microservices.
 - **Orchestration**: Kubernetes for managing containers.
-- **CI/CD Pipeline**: Jenkins or GitLab CI for automated testing and deployment.
-- **Monitoring**: Prometheus and Grafana for system health monitoring.
+- **CI/CD Pipeline**: Jenkins for automated testing and deployment.
+- **Monitoring**: Prometheus and Grafana for system health monitoring, and Zipkin for distributed tracing.
 - **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana) for centralized logging.
 
 #### **Frontend**
-- **Framework**: React.js or Angular for building the monitoring dashboard.
+- **Framework**: React.js for building the monitoring and blockchain dashboard.
 - **Visualization**: D3.js or Chart.js for real-time data visualization.
 - **WebSockets**: For real-time updates on the frontend.
 
 #### **Simulation and Testing**
-- **Network Simulation**: Cesium or Three.JS for simulating satellite groups.
-- **Testing**: Jest / JUnit or Mockito for unit and integration testing.
+- **Network Simulation**: Three.JS for simulating satellite groups.
+- **Testing**: JUnit and Mockito for unit and integration testing.
 
----
 
 ### **Microservices and DevOps Infrastructure**
 
 #### **Microservices Architecture**
 1. **Satellite Communication Service**:
    - Handles communication between satellites and ground stations.
-   - Validates and encrypts messages before sending them to the blockchain.
+
 
 2. **Blockchain Service**:
    - Manages smart contracts for message validation and logging.
    - Interacts with the blockchain network (Ethereum).
 
-3. **Authentication Service**:
-   - Ensures only authorized satellites and ground stations can access the network.
+3. **User and groundstation Service**:
+   - Ensures only authorized users can access the network.
    - Uses JWT (JSON Web Tokens) or OAuth2 for secure authentication.
 
 4. **Monitoring Service**:

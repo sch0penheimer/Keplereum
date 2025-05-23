@@ -1,6 +1,5 @@
 services:
 
-
   ##-------------------------------------------##
   ##--------- Infrastructure Services ---------##
   ##-------------------------------------------##
@@ -10,8 +9,6 @@ services:
     container_name: keplereum-config-server
     ports:
       - "8888:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: native
     networks:
       - keplereum-microservices-net
     healthcheck:
@@ -24,7 +21,6 @@ services:
     ports:
       - "8761:8761"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
     depends_on:
       keplereum-config-server:
@@ -41,7 +37,6 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: docker
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
     depends_on:
@@ -50,48 +45,74 @@ services:
     networks:
       - keplereum-microservices-net
 
-
   ##---------------------------------------##
   ##--------- Main Micro-Services ---------##
   ##---------------------------------------##
 
-
-
+  
   keplereum-user-service:
     links:
       - keplereum-zipkin
     build: ./User_GroundStation_Service
     container_name: keplereum-user-groundstation-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      JAVA_TOOL_OPTIONS: >-
+        -Dspring.zipkin.base-url=http://keplereum-zipkin:9411
+        -Dspring.zipkin.sender.type=web
+        -Dmanagement.tracing.enabled=true
+      SPRING_ZIPKIN_BASE_URL: http://keplereum-zipkin:9411
+      SPRING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      MANAGEMENT_ZIPKIN_BASE_URL: http://keplereum-zipkin:9411
+      MANAGEMENT_TRACING_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      SPRING_CLOUD_CONFIG_OVERRIDESYSTEMPROPERTIES: "false"
+      SPRING_ZIPKIN_ENABLED: "true"
+      SPRING_SLEUTH_SAMPLER_PROBABILITY: "1.0"
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
     depends_on:
       - keplereum-config-server
       - keplereum-discovery-server
       - keplereum-user-db
+      - keplereum-zipkin
     networks:
       - keplereum-microservices-net
 
   keplereum-blockchain-service:
+    links:
+      - keplereum-zipkin
     build: ./Blockchain_Service
     container_name: keplereum-blockchain-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      JAVA_TOOL_OPTIONS: >-
+        -Dspring.zipkin.base-url=http://keplereum-zipkin:9411
+        -Dspring.zipkin.sender.type=web
+        -Dmanagement.tracing.enabled=true
+      SPRING_ZIPKIN_BASE_URL: http://keplereum-zipkin:9411
+      SPRING_ZIPKIN_ENABLED: "true"
+      SPRING_SLEUTH_SAMPLER_PROBABILITY: "1.0"
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
     depends_on:
       - keplereum-config-server
       - keplereum-discovery-server
       - keplereum-blockchain-db
+      - keplereum-zipkin
     networks:
       - keplereum-microservices-net
 
   keplereum-satellites-service:
+    links:
+      - keplereum-zipkin
     build: ./Satellites_Service
     container_name: keplereum-satellites-service
     environment:
-      SPRING_PROFILES_ACTIVE: docker
+      JAVA_TOOL_OPTIONS: >-
+        -Dspring.zipkin.base-url=http://keplereum-zipkin:9411
+        -Dspring.zipkin.sender.type=web
+        -Dmanagement.tracing.enabled=true
+      SPRING_ZIPKIN_BASE_URL: http://keplereum-zipkin:9411
+      SPRING_ZIPKIN_ENABLED: "true"
+      SPRING_SLEUTH_SAMPLER_PROBABILITY: "1.0"
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
 
@@ -99,6 +120,7 @@ services:
       - keplereum-config-server
       - keplereum-discovery-server
       - keplereum-satellite-db
+      - keplereum-zipkin
     networks:
       - keplereum-microservices-net
 
@@ -107,7 +129,6 @@ services:
   ##------------------------------------##
 
   keplereum-user-db:
-
     image: postgres
     container_name: keplereum-user-db
     environment:
@@ -120,7 +141,6 @@ services:
       - keplereum-user-data:/var/lib/postgresql/data
     networks:
       - keplereum-microservices-net
-
 
   keplereum-satellite-db:
     image: postgres
@@ -158,7 +178,8 @@ services:
     image: openzipkin/zipkin
     ports:
       - "9411:9411"
-
+    networks:
+      - keplereum-microservices-net
 
   keplereum-prometheus:
     container_name: keplereum-prometheus
@@ -201,7 +222,6 @@ services:
       - keplereum-prometheus
 
 
-
 volumes:
   keplereum-user-data:
   keplereum-satellite-data:
@@ -211,4 +231,5 @@ volumes:
 
 networks:
   keplereum-microservices-net:
+    name: keplereum-microservices-net 
     driver: bridge

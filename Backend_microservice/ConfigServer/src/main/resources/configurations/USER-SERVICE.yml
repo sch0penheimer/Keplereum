@@ -15,17 +15,12 @@ server:
 spring:
   application:
     name: USER-SERVICE
-
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://keplereum-user-db:5432/user
-    username: username
-    password: password
   jpa:
     hibernate:
       ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
 
 management:
   tracing:

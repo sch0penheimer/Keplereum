@@ -15,12 +15,6 @@ server:
 spring:
   application:
     name: SATELLITE-SERVICE
-
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://keplereum-satellite-db:5433/satellite
-    username: username
-    password: password
   jpa:
     hibernate:
       ddl-auto: update

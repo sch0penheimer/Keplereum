@@ -2,7 +2,9 @@ spring:
   application:
     name: USER-SERVICE
   config:
-    import: configserver:http://localhost:8888
+
+    import: configserver:${CONFIG_SERVER_URL}
+
 
 management:
   endpoints:
@@ -16,3 +18,4 @@ management:
     export:
       prometheus:
         enabled: true
+

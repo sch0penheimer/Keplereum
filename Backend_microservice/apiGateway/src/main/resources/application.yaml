@@ -2,7 +2,7 @@ spring:
   application:
     name: GATEWAY
   config:
-    import: optional:configserver:http://localhost:8888
+    import: configserver:${CONFIG_SERVER_URL}
 
 management:
   endpoints:

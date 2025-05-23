@@ -181,7 +181,6 @@ services:
     networks:
       - keplereum-microservices-net
 
-
   keplereum-prometheus:
     container_name: keplereum-prometheus
     image: prom/prometheus:latest

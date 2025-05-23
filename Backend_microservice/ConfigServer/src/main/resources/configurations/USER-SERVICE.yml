@@ -1,7 +1,7 @@
 eureka:
   client:
-    service-url:
-      defaultzone: http://keplereum-discovery-server:8761/eureka
+    serviceUrl:
+      defaultZone: http://keplereum-discovery-server:8761/eureka
     registerWithEureka: true
     fetchRegistry: true
 
@@ -10,7 +10,7 @@ server:
 
 spring:
   application:
-    name: USER-SERVICE
+    name: keplereum-user-service
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -23,7 +23,20 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+  zipkin:
+    base-url: http://keplereum-zipkin:9411
+    enabled: true
+
+  sleuth:
+    sampler:
+      probability: 1.0
+
 management:
   tracing:
     sampling:
       probability: 1.0
+    zipkin:
+      endpoint: http://keplereum-zipkin:9411/api/v2/spans
+  zipkin:
+    tracing:
+      endpoint: http://keplereum-zipkin:9411/api/v2/spans

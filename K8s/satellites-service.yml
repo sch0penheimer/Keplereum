@@ -20,6 +20,9 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8070
+          env:
+            - name: CONFIG_SERVER_URL
+              value: http://config-server:8888
 
 ---
 apiVersion: v1

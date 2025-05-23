@@ -160,7 +160,6 @@ services:
       - "9411:9411"
 
 
-
   keplereum-prometheus:
     container_name: keplereum-prometheus
     image: prom/prometheus:latest
@@ -198,6 +197,9 @@ services:
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     networks:
       - keplereum-microservices-net
+    depends_on:
+      - keplereum-prometheus
+
 
 
 volumes:

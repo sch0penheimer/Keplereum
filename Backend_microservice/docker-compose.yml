@@ -56,7 +56,10 @@ services:
   ##---------------------------------------##
 
 
-  keplereum-user-groundstation-service:
+
+  keplereum-user-service:
+    links:
+      - keplereum-zipkin
     build: ./User_GroundStation_Service
     container_name: keplereum-user-groundstation-service
     environment:
@@ -196,6 +199,7 @@ services:
       - keplereum-microservices-net
     depends_on:
       - keplereum-prometheus
+
 
 
 volumes:

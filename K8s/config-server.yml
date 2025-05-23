@@ -20,8 +20,7 @@ spec:
           image: keplereum/config-server
           imagePullPolicy: Always
           ports:
-            - containerPort: 8888
-
+          - containerPort: 8888
 ---
 
 apiVersion: v1

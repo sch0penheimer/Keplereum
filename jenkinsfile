@@ -5,7 +5,7 @@ pipeline {
     }
     agent any
     triggers{
-        PoolSCM '*/2 * * * *' 
+        PoolSCM 'H * * * *' 
     }
     stages {
         stage('Clone Source') {

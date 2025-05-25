@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/groundstations")
-@CrossOrigin(origins = "*")
 public class GroundStationController {
 
     private final GroundStationService groundStationService;

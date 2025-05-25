@@ -5,7 +5,7 @@ pipeline {
     }
     agent any
     triggers{
-         pollSCM '*/2 * * * *' 
+         pollSCM '* * * * *' 
     }
     stages {
         stage('Clone Source') {

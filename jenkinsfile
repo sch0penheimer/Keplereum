@@ -5,7 +5,7 @@ pipeline {
     }
     agent any
     triggers{
-        cron('*/2 * * * *') //daily at 03:30 AM
+        cron('*/2 * * * *')
     }
     stages {
         stage('Clone Source') {

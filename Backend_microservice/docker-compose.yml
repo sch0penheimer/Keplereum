@@ -21,7 +21,9 @@ services:
     ports:
       - "8761:8761"
     environment:
+      CONFIG_SERVER_URL: http://keplereum-config-server:8888
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
+      EUREKA_SERVER_ADDRESS: http://keplereum-discovery-server:8761/eureka
     depends_on:
       keplereum-config-server:
         condition: service_healthy
@@ -35,10 +37,13 @@ services:
     build: ./apiGateway
     container_name: keplereum-api-gateway
     ports:
-      - "8080:8080"
+      - "8222:8222"
     environment:
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
+      CONFIG_SERVER_URL: http://keplereum-config-server:8888
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
+      EUREKA_DEFAULT_ZONE: http://keplereum-discovery-server:8761/eureka
+      ZIPKIN_DEFAULT: http://keplereum-zipkin:9411/api/v2/spans
     depends_on:
       keplereum-discovery-server:
         condition: service_healthy
@@ -66,9 +71,18 @@ services:
       MANAGEMENT_TRACING_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
       SPRING_CLOUD_CONFIG_OVERRIDESYSTEMPROPERTIES: "false"
       SPRING_ZIPKIN_ENABLED: "true"
+      MANAGEMENT_TRACING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      SPRING_ZIPKIN_TRACING_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
       SPRING_SLEUTH_SAMPLER_PROBABILITY: "1.0"
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
+      CONFIG_SERVER_URL: http://keplereum-config-server:8888
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
+      EUREKA_DEFAULT_ZONE: http://keplereum-discovery-server:8761/eureka
+      ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      SPRING_DATASOURCE_URL: jdbc:postgresql://keplereum-user-db:5432/user
+      SPRING_DATASOURCE_USERNAME: username
+      SPRING_DATASOURCE_PASSWORD: password
+      ZIPKIN_DEFAULT: http://keplereum-zipkin:9411/api/v2/spans
     depends_on:
       - keplereum-config-server
       - keplereum-discovery-server
@@ -89,9 +103,19 @@ services:
         -Dmanagement.tracing.enabled=true
       SPRING_ZIPKIN_BASE_URL: http://keplereum-zipkin:9411
       SPRING_ZIPKIN_ENABLED: "true"
+      SPRING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      MANAGEMENT_TRACING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      SPRING_ZIPKIN_TRACING_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
       SPRING_SLEUTH_SAMPLER_PROBABILITY: "1.0"
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
+      CONFIG_SERVER_URL: http://keplereum-config-server:8888
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
+      EUREKA_DEFAULT_ZONE: http://keplereum-discovery-server:8761/eureka
+      ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      SPRING_DATASOURCE_URL: jdbc:postgresql://keplereum-blockchain-db:5432/blockchain
+      SPRING_DATASOURCE_USERNAME: username
+      SPRING_DATASOURCE_PASSWORD: password
+      ZIPKIN_DEFAULT: http://keplereum-zipkin:9411/api/v2/spans
     depends_on:
       - keplereum-config-server
       - keplereum-discovery-server
@@ -114,8 +138,16 @@ services:
       SPRING_ZIPKIN_ENABLED: "true"
       SPRING_SLEUTH_SAMPLER_PROBABILITY: "1.0"
       SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
+      CONFIG_SERVER_URL: http://keplereum-config-server:8888
       EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
-
+      EUREKA_DEFAULT_ZONE: http://keplereum-discovery-server:8761/eureka
+      ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      SPRING_DATASOURCE_URL: jdbc:postgresql://keplereum-satellite-db:5432/satellite
+      SPRING_DATASOURCE_USERNAME: username
+      SPRING_DATASOURCE_PASSWORD: password
+      MANAGEMENT_TRACING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      SPRING_ZIPKIN_TRACING_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
+      ZIPKIN_DEFAULT: http://keplereum-zipkin:9411/api/v2/spans
     depends_on:
       - keplereum-config-server
       - keplereum-discovery-server

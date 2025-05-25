@@ -1,6 +1,6 @@
 pipeline {
     environment {
-        DOCKER_HUB_REPO = 'mharfe'
+        DOCKER_HUB_REPO = 'keplereum'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
     }
     agent any

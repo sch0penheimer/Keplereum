@@ -72,6 +72,10 @@ spec:
     metadata:
       labels:
         app: user-groundstation-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8090"
     spec:
       containers:
         - name: user-groundstation-service

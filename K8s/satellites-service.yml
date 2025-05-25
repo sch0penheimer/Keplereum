@@ -73,6 +73,10 @@ spec:
     metadata:
       labels:
         app: satellites-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8070"
     spec:
       containers:
         - name: satellites-service

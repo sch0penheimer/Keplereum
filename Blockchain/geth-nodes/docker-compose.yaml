@@ -105,7 +105,7 @@ services:
       --txpool.globalslots=1024
       --txpool.globalqueue=1024
       --txpool.pricelimit=0
-
+      --http.vhosts=*
   geth-node4:
     image: ethereum/client-go:v1.13.5
     container_name: geth-node4
@@ -140,7 +140,7 @@ services:
       --txpool.globalslots=1024
       --txpool.globalqueue=1024
       --txpool.pricelimit=0
-
+      --http.vhosts=*
   geth-node5:
     image: ethereum/client-go:v1.13.5
     container_name: geth-node5
@@ -175,7 +175,7 @@ services:
       --txpool.globalslots=1024
       --txpool.globalqueue=1024
       --txpool.pricelimit=0
-
+      --http.vhosts=*
   nginx-lb:
     image: nginx:latest
     container_name: nginx-lb
@@ -230,7 +230,7 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "9091:9090"
     networks:
       - geth-net
 
@@ -238,7 +238,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - "3000:3000"
+      - "3002:3000"
     volumes:
       - grafana-storage:/var/lib/grafana
     networks:

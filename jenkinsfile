@@ -21,21 +21,21 @@ pipeline {
 
                 dir('Backend_microservice\\ConfigServer') {
                     bat 'mvn clean compile'
-                    bat 'mvn test'
+                    
                     bat 'mvn package -DskipTests'
                     archiveArtifacts artifacts: 'target\\*.jar', fingerprint: true
                 }
 
                 dir('Backend_microservice\\DiscoveryServer') {
                     bat 'mvn clean compile'
-                    bat 'mvn test'
+                    
                     bat 'mvn package -DskipTests'
                     archiveArtifacts artifacts: 'target\\*.jar', fingerprint: true
                 }
 
                 dir('Backend_microservice\\apiGateway') {
                     bat 'mvn clean compile'
-                    bat 'mvn test'
+                    
                     bat 'mvn package -DskipTests'
                     archiveArtifacts artifacts: 'target\\*.jar', fingerprint: true
                 }

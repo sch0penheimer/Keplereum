@@ -39,7 +39,7 @@ class SatelliteTrajectoryServiceTest {
    */
   @Test
   @DisplayName("Test calculateOrbitalTrajectory(double, double, double, double, double, double, double); when '1.0E-6'; then return CartesianValues size is '2004'")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({
       "OrbitalTrajectoryResponse SatelliteTrajectoryService.calculateOrbitalTrajectory(double, double, double, double, double, double, double)"})
   void testCalculateOrbitalTrajectory_when10e6_thenReturnCartesianValuesSizeIs2004() {

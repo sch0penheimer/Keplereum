@@ -38,6 +38,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import com.example.jeeHamlaoui.Blockchain_Service.service.BlockService;
 
 @ContextConfiguration(classes = {BlockController.class})
 @ExtendWith(SpringExtension.class)

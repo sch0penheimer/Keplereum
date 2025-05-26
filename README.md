@@ -52,6 +52,7 @@ Manages user accounts, authentication, and ground station information. This serv
 -   Ground station management
 -   Authorization of satellite operations
 
+
 #### Satellite Service
 
 Handles satellite operations, tracking, and sensor data. This service is responsible for:
@@ -181,6 +182,49 @@ The blockchain infrastructure includes comprehensive monitoring tools:
     -   Enables alerts based on performance thresholds
 
 This monitoring setup ensures the operations team can maintain visibility into the blockchain's performance and health.
+
+## Authentication and Security Flow
+Authentication is implemented using JWT (JSON Web Tokens) with the API Gateway acting as the security filter.
+|![Authentication and Security Flow](./assets/Authentification_flow.png)|
+|:-----------------------------------------------------:|
+| Authentication and Security Flow|
+
+## Jenkins CI/CD Pipeline
+
+This project includes a fully automated **Jenkins pipeline** for continuous integration and delivery of all backend microservices.
+
+
+### Key Features
+
+- **SCM Polling**: Jenkins polls the `main` branch every hour (`H * * * *`) for changes.
+- **Source Cloning**: Automatically clones the GitHub repository.
+- **Multi-Stage Build Process**:
+  - **Infrastructure Services**: Compiles and packages core services:
+    - `Config Server`
+    - `Discovery Server`
+    - `API Gateway`
+  - **Main Business Microservices**: Compiles and packages:
+    - `User Service`
+    - `Blockchain Service`
+    - `Satellites Service`
+- **Dockerization**:
+  - Builds Docker images for each service.
+  - Authenticates to Docker Hub using secured Jenkins credentials.
+  - Pushes images to [Docker Hub](https://hub.docker.com/u/keplereum) under the `keplereum` repository.
+
+    |![Docker Hub Repository](./assets/DockerHub_CD_Images.png)|
+    |:-----------------------------------------------------:|
+    | Docker Hub Repository|
+    
+    
+- **Post-Build Actions**:
+  - Cleans up the Jenkins workspace.
+  - Displays status messages for both successful and failed builds.
+
+This pipeline ensures a reliable and repeatable process for compiling, packaging, and deploying microservices as Docker containers.
+
+
+
 ## Demo Links
 [Main Demo](https://drive.google.com/file/d/1QgRBYGIXICE6yn_chJQLGIOGzcgb3YVO/view?usp=drive_link "Main KEPLEREUM Demo")
 

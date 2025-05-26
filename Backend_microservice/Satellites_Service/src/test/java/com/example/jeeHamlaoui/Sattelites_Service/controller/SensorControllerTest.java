@@ -50,7 +50,7 @@ class SensorControllerTest {
    */
   @Test
   @DisplayName("Test createSensor(SensorRequest)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"org.springframework.http.ResponseEntity SensorController.createSensor(SensorRequest)"})
   void testCreateSensor() throws Exception {
     // Arrange
@@ -85,7 +85,7 @@ class SensorControllerTest {
    */
   @Test
   @DisplayName("Test getAllSensors()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"org.springframework.http.ResponseEntity SensorController.getAllSensors()"})
   void testGetAllSensors() throws Exception {
     // Arrange
@@ -108,7 +108,7 @@ class SensorControllerTest {
    */
   @Test
   @DisplayName("Test getSensorById(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"org.springframework.http.ResponseEntity SensorController.getSensorById(Long)"})
   void testGetSensorById() throws Exception {
     // Arrange
@@ -163,7 +163,7 @@ class SensorControllerTest {
    */
   @Test
   @DisplayName("Test updateSensor(Long, Sensor)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"org.springframework.http.ResponseEntity SensorController.updateSensor(Long, Sensor)"})
   void testUpdateSensor() throws Exception {
     // Arrange
@@ -251,7 +251,7 @@ class SensorControllerTest {
    */
   @Test
   @DisplayName("Test deleteSensor(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"org.springframework.http.ResponseEntity SensorController.deleteSensor(Long)"})
   void testDeleteSensor() throws Exception {
     // Arrange

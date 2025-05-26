@@ -1,270 +1,331 @@
 package com.example.jeeHamlaoui.model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import com.diffblue.cover.annotations.MethodsUnderTest;
+import static org.junit.jupiter.api.Assertions.*;
 import com.example.jeeHamlaoui.model.enums.UserStatus;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import java.time.Instant;
 
 class GroundStationTest {
-  /**
-   * Test getters and setters.
-   * <p>
-   * Methods under test:
-   * <ul>
-   *   <li>{@link GroundStation#GroundStation()}
-   *   <li>{@link GroundStation#setGroundStation_AccesLevel(Integer)}
-   *   <li>{@link GroundStation#setGroundStation_Description(String)}
-   *   <li>{@link GroundStation#setGroundStation_Email(String)}
-   *   <li>{@link GroundStation#setGroundStation_Latitude(Double)}
-   *   <li>{@link GroundStation#setGroundStation_Longitude(Double)}
-   *   <li>{@link GroundStation#setGroundStation_Name(String)}
-   *   <li>{@link GroundStation#setGroundStation_id(Long)}
-   *   <li>{@link GroundStation#setUser(User)}
-   *   <li>{@link GroundStation#getGroundStation_AccesLevel()}
-   *   <li>{@link GroundStation#getGroundStation_Description()}
-   *   <li>{@link GroundStation#getGroundStation_Email()}
-   *   <li>{@link GroundStation#getGroundStation_Latitude()}
-   *   <li>{@link GroundStation#getGroundStation_Longitude()}
-   *   <li>{@link GroundStation#getGroundStation_Name()}
-   *   <li>{@link GroundStation#getGroundStation_id()}
-   *   <li>{@link GroundStation#getUser()}
-   * </ul>
-   */
-  @Test
-  @DisplayName("Test getters and setters")
-  @Tag("MaintainedByDiffblue")
-  @MethodsUnderTest({"void GroundStation.<init>()",
-      "void GroundStation.<init>(Long, String, String, Integer, Double, Double, String, User)",
-      "Integer GroundStation.getGroundStation_AccesLevel()", "String GroundStation.getGroundStation_Description()",
-      "String GroundStation.getGroundStation_Email()", "Double GroundStation.getGroundStation_Latitude()",
-      "Double GroundStation.getGroundStation_Longitude()", "String GroundStation.getGroundStation_Name()",
-      "Long GroundStation.getGroundStation_id()", "User GroundStation.getUser()",
-      "void GroundStation.setGroundStation_AccesLevel(Integer)",
-      "void GroundStation.setGroundStation_Description(String)", "void GroundStation.setGroundStation_Email(String)",
-      "void GroundStation.setGroundStation_Latitude(Double)", "void GroundStation.setGroundStation_Longitude(Double)",
-      "void GroundStation.setGroundStation_Name(String)", "void GroundStation.setGroundStation_id(Long)",
-      "void GroundStation.setUser(User)"})
-  void testGettersAndSetters() {
-    // Arrange and Act
-    GroundStation actualGroundStation = new GroundStation();
-    actualGroundStation.setGroundStation_AccesLevel(1);
-    actualGroundStation.setGroundStation_Description("Ground Station Description");
-    actualGroundStation.setGroundStation_Email("jane.doe@example.org");
-    actualGroundStation.setGroundStation_Latitude(10.0d);
-    actualGroundStation.setGroundStation_Longitude(10.0d);
-    actualGroundStation.setGroundStation_Name("Ground Station Name");
-    actualGroundStation.setGroundStation_id(1L);
-    GroundStation groundStation = new GroundStation();
-    groundStation.setGroundStation_AccesLevel(1);
-    groundStation.setGroundStation_Description("Ground Station Description");
-    groundStation.setGroundStation_Email("jane.doe@example.org");
-    groundStation.setGroundStation_Latitude(10.0d);
-    groundStation.setGroundStation_Longitude(10.0d);
-    groundStation.setGroundStation_Name("Ground Station Name");
-    groundStation.setGroundStation_id(1L);
-    groundStation.setUser(new User());
-    User user = new User();
-    user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user.setEmail("jane.doe@example.org");
-    user.setGroundStation(groundStation);
-    user.setUserId(1L);
-    user.setPassword("iloveyou");
-    user.setStatus(UserStatus.ACTIVE);
-    user.setUserId(1L);
-    user.setUser_name("User name");
-    GroundStation groundStation2 = new GroundStation();
-    groundStation2.setGroundStation_AccesLevel(1);
-    groundStation2.setGroundStation_Description("Ground Station Description");
-    groundStation2.setGroundStation_Email("jane.doe@example.org");
-    groundStation2.setGroundStation_Latitude(10.0d);
-    groundStation2.setGroundStation_Longitude(10.0d);
-    groundStation2.setGroundStation_Name("Ground Station Name");
-    groundStation2.setGroundStation_id(1L);
-    groundStation2.setUser(user);
-    User user2 = new User();
-    user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user2.setEmail("jane.doe@example.org");
-    user2.setGroundStation(groundStation2);
-    user2.setUserId(1L);
-    user2.setPassword("iloveyou");
-    user2.setStatus(UserStatus.ACTIVE);
-    user2.setUserId(1L);
-    user2.setUser_name("User name");
-    actualGroundStation.setUser(user2);
-    Integer actualGroundStation_AccesLevel = actualGroundStation.getGroundStation_AccesLevel();
-    String actualGroundStation_Description = actualGroundStation.getGroundStation_Description();
-    String actualGroundStation_Email = actualGroundStation.getGroundStation_Email();
-    Double actualGroundStation_Latitude = actualGroundStation.getGroundStation_Latitude();
-    Double actualGroundStation_Longitude = actualGroundStation.getGroundStation_Longitude();
-    String actualGroundStation_Name = actualGroundStation.getGroundStation_Name();
-    Long actualGroundStation_id = actualGroundStation.getGroundStation_id();
-    User actualUser = actualGroundStation.getUser();
 
-    // Assert
-    assertEquals("Ground Station Description", actualGroundStation_Description);
-    assertEquals("Ground Station Name", actualGroundStation_Name);
-    assertEquals("jane.doe@example.org", actualGroundStation_Email);
-    assertEquals(1, actualGroundStation_AccesLevel.intValue());
-    assertEquals(10.0d, actualGroundStation_Latitude.doubleValue());
-    assertEquals(10.0d, actualGroundStation_Longitude.doubleValue());
-    assertEquals(1L, actualGroundStation_id.longValue());
-    assertSame(user2, actualUser);
+  private GroundStation groundStation;
+  private User testUser;
+
+  @BeforeEach
+  void setUp() {
+    groundStation = new GroundStation();
+    testUser = new User();
+    testUser.setUserId(1L);
+    testUser.setUser_name("Test User");
+    testUser.setEmail("test@example.com");
+    testUser.setStatus(UserStatus.ACTIVE);
   }
 
-  /**
-   * Test getters and setters.
-   * <ul>
-   *   <li>Given {@link GroundStation#GroundStation()} GroundStation_AccesLevel is one.</li>
-   *   <li>When one.</li>
-   * </ul>
-   * <p>
-   * Methods under test:
-   * <ul>
-   *   <li>{@link GroundStation#GroundStation(Long, String, String, Integer, Double, Double, String, User)}
-   *   <li>{@link GroundStation#GroundStation()}
-   *   <li>{@link GroundStation#setGroundStation_AccesLevel(Integer)}
-   *   <li>{@link GroundStation#setGroundStation_Description(String)}
-   *   <li>{@link GroundStation#setGroundStation_Email(String)}
-   *   <li>{@link GroundStation#setGroundStation_Latitude(Double)}
-   *   <li>{@link GroundStation#setGroundStation_Longitude(Double)}
-   *   <li>{@link GroundStation#setGroundStation_Name(String)}
-   *   <li>{@link GroundStation#setGroundStation_id(Long)}
-   *   <li>{@link GroundStation#setUser(User)}
-   *   <li>{@link GroundStation#getGroundStation_AccesLevel()}
-   *   <li>{@link GroundStation#getGroundStation_Description()}
-   *   <li>{@link GroundStation#getGroundStation_Email()}
-   *   <li>{@link GroundStation#getGroundStation_Latitude()}
-   *   <li>{@link GroundStation#getGroundStation_Longitude()}
-   *   <li>{@link GroundStation#getGroundStation_Name()}
-   *   <li>{@link GroundStation#getGroundStation_id()}
-   *   <li>{@link GroundStation#getUser()}
-   * </ul>
-   */
-  @Test
-  @DisplayName("Test getters and setters; given GroundStation() GroundStation_AccesLevel is one; when one")
-  @Tag("MaintainedByDiffblue")
-  @MethodsUnderTest({"void GroundStation.<init>()",
-      "void GroundStation.<init>(Long, String, String, Integer, Double, Double, String, User)",
-      "Integer GroundStation.getGroundStation_AccesLevel()", "String GroundStation.getGroundStation_Description()",
-      "String GroundStation.getGroundStation_Email()", "Double GroundStation.getGroundStation_Latitude()",
-      "Double GroundStation.getGroundStation_Longitude()", "String GroundStation.getGroundStation_Name()",
-      "Long GroundStation.getGroundStation_id()", "User GroundStation.getUser()",
-      "void GroundStation.setGroundStation_AccesLevel(Integer)",
-      "void GroundStation.setGroundStation_Description(String)", "void GroundStation.setGroundStation_Email(String)",
-      "void GroundStation.setGroundStation_Latitude(Double)", "void GroundStation.setGroundStation_Longitude(Double)",
-      "void GroundStation.setGroundStation_Name(String)", "void GroundStation.setGroundStation_id(Long)",
-      "void GroundStation.setUser(User)"})
-  void testGettersAndSetters_givenGroundStationGroundStation_AccesLevelIsOne_whenOne() {
-    // Arrange
-    GroundStation groundStation = new GroundStation();
-    groundStation.setGroundStation_AccesLevel(1);
-    groundStation.setGroundStation_Description("Ground Station Description");
-    groundStation.setGroundStation_Email("jane.doe@example.org");
-    groundStation.setGroundStation_Latitude(10.0d);
-    groundStation.setGroundStation_Longitude(10.0d);
-    groundStation.setGroundStation_Name("Ground Station Name");
-    groundStation.setGroundStation_id(1L);
-    groundStation.setUser(new User());
+  @Nested
+  @DisplayName("Constructor Tests")
+  class ConstructorTests {
 
-    User user = new User();
-    user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user.setEmail("jane.doe@example.org");
-    user.setGroundStation(groundStation);
-    user.setUserId(1L);
-    user.setPassword("iloveyou");
-    user.setStatus(UserStatus.ACTIVE);
-    user.setUserId(1L);
-    user.setUser_name("User name");
+    @Test
+    @DisplayName("Default constructor should create GroundStation with business fields as null")
+    void testDefaultConstructor() {
+      GroundStation station = new GroundStation();
 
-    GroundStation groundStation2 = new GroundStation();
-    groundStation2.setGroundStation_AccesLevel(1);
-    groundStation2.setGroundStation_Description("Ground Station Description");
-    groundStation2.setGroundStation_Email("jane.doe@example.org");
-    groundStation2.setGroundStation_Latitude(10.0d);
-    groundStation2.setGroundStation_Longitude(10.0d);
-    groundStation2.setGroundStation_Name("Ground Station Name");
-    groundStation2.setGroundStation_id(1L);
-    groundStation2.setUser(user);
+      // Don't test auto-generated ID - it's meaningless in unit tests
+      // Focus on business fields that matter
+      assertNull(station.getGroundStation_Name());
+      assertNull(station.getGroundStation_Email());
+      assertNull(station.getGroundStation_AccesLevel());
+      assertNull(station.getGroundStation_Latitude());
+      assertNull(station.getGroundStation_Longitude());
+      assertNull(station.getGroundStation_Description());
+      assertNull(station.getUser());
+    }
 
-    User user2 = new User();
-    user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user2.setEmail("jane.doe@example.org");
-    user2.setGroundStation(groundStation2);
-    user2.setUserId(1L);
-    user2.setPassword("iloveyou");
-    user2.setStatus(UserStatus.ACTIVE);
-    user2.setUserId(1L);
-    user2.setUser_name("User name");
+    @Test
+    @DisplayName("Parameterized constructor should set all fields")
+    void testParameterizedConstructor() {
+      GroundStation station = new GroundStation(
+              1L,
+              "Test Station",
+              "station@test.com",
+              5,
+              40.7128,
+              -74.0060,
+              "Test Description",
+              testUser
+      );
 
-    // Act
-    GroundStation actualGroundStation = new GroundStation(1L, "Ground Station Name", "jane.doe@example.org", 1, 10.0d,
-        10.0d, "Ground Station Description", user2);
-    actualGroundStation.setGroundStation_AccesLevel(1);
-    actualGroundStation.setGroundStation_Description("Ground Station Description");
-    actualGroundStation.setGroundStation_Email("jane.doe@example.org");
-    actualGroundStation.setGroundStation_Latitude(10.0d);
-    actualGroundStation.setGroundStation_Longitude(10.0d);
-    actualGroundStation.setGroundStation_Name("Ground Station Name");
-    actualGroundStation.setGroundStation_id(1L);
-    GroundStation groundStation3 = new GroundStation();
-    groundStation3.setGroundStation_AccesLevel(1);
-    groundStation3.setGroundStation_Description("Ground Station Description");
-    groundStation3.setGroundStation_Email("jane.doe@example.org");
-    groundStation3.setGroundStation_Latitude(10.0d);
-    groundStation3.setGroundStation_Longitude(10.0d);
-    groundStation3.setGroundStation_Name("Ground Station Name");
-    groundStation3.setGroundStation_id(1L);
-    groundStation3.setUser(new User());
-    User user3 = new User();
-    user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user3.setEmail("jane.doe@example.org");
-    user3.setGroundStation(groundStation3);
-    user3.setUserId(1L);
-    user3.setPassword("iloveyou");
-    user3.setStatus(UserStatus.ACTIVE);
-    user3.setUserId(1L);
-    user3.setUser_name("User name");
-    GroundStation groundStation4 = new GroundStation();
-    groundStation4.setGroundStation_AccesLevel(1);
-    groundStation4.setGroundStation_Description("Ground Station Description");
-    groundStation4.setGroundStation_Email("jane.doe@example.org");
-    groundStation4.setGroundStation_Latitude(10.0d);
-    groundStation4.setGroundStation_Longitude(10.0d);
-    groundStation4.setGroundStation_Name("Ground Station Name");
-    groundStation4.setGroundStation_id(1L);
-    groundStation4.setUser(user3);
-    User user4 = new User();
-    user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user4.setEmail("jane.doe@example.org");
-    user4.setGroundStation(groundStation4);
-    user4.setUserId(1L);
-    user4.setPassword("iloveyou");
-    user4.setStatus(UserStatus.ACTIVE);
-    user4.setUserId(1L);
-    user4.setUser_name("User name");
-    actualGroundStation.setUser(user4);
-    Integer actualGroundStation_AccesLevel = actualGroundStation.getGroundStation_AccesLevel();
-    String actualGroundStation_Description = actualGroundStation.getGroundStation_Description();
-    String actualGroundStation_Email = actualGroundStation.getGroundStation_Email();
-    Double actualGroundStation_Latitude = actualGroundStation.getGroundStation_Latitude();
-    Double actualGroundStation_Longitude = actualGroundStation.getGroundStation_Longitude();
-    String actualGroundStation_Name = actualGroundStation.getGroundStation_Name();
-    Long actualGroundStation_id = actualGroundStation.getGroundStation_id();
-    User actualUser = actualGroundStation.getUser();
+      assertEquals(1L, station.getGroundStation_id());
+      assertEquals("Test Station", station.getGroundStation_Name());
+      assertEquals("station@test.com", station.getGroundStation_Email());
+      assertEquals(5, station.getGroundStation_AccesLevel());
+      assertEquals(40.7128, station.getGroundStation_Latitude());
+      assertEquals(-74.0060, station.getGroundStation_Longitude());
+      assertEquals("Test Description", station.getGroundStation_Description());
+      assertEquals(testUser, station.getUser());
+    }
+  }
 
-    // Assert
-    assertEquals("Ground Station Description", actualGroundStation_Description);
-    assertEquals("Ground Station Name", actualGroundStation_Name);
-    assertEquals("jane.doe@example.org", actualGroundStation_Email);
-    assertEquals(1, actualGroundStation_AccesLevel.intValue());
-    assertEquals(10.0d, actualGroundStation_Latitude.doubleValue());
-    assertEquals(10.0d, actualGroundStation_Longitude.doubleValue());
-    assertEquals(1L, actualGroundStation_id.longValue());
-    assertSame(user4, actualUser);
+  @Nested
+  @DisplayName("Getter and Setter Tests")
+  class GetterSetterTests {
+
+    @Test
+    @DisplayName("Should set and get ID correctly (for testing purposes)")
+    void testIdGetterSetter() {
+      // Note: In real applications, you typically don't set auto-generated IDs manually
+      // This test is mainly for completeness of getter/setter coverage
+      Long expectedId = 123L;
+      groundStation.setGroundStation_id(expectedId);
+      assertEquals(expectedId, groundStation.getGroundStation_id());
+    }
+
+    @Test
+    @DisplayName("Should set and get name correctly")
+    void testNameGetterSetter() {
+      String expectedName = "Ground Station Alpha";
+      groundStation.setGroundStation_Name(expectedName);
+      assertEquals(expectedName, groundStation.getGroundStation_Name());
+    }
+
+    @Test
+    @DisplayName("Should set and get email correctly")
+    void testEmailGetterSetter() {
+      String expectedEmail = "alpha@groundstation.com";
+      groundStation.setGroundStation_Email(expectedEmail);
+      assertEquals(expectedEmail, groundStation.getGroundStation_Email());
+    }
+
+    @Test
+    @DisplayName("Should set and get access level correctly")
+    void testAccessLevelGetterSetter() {
+      Integer expectedLevel = 3;
+      groundStation.setGroundStation_AccesLevel(expectedLevel);
+      assertEquals(expectedLevel, groundStation.getGroundStation_AccesLevel());
+    }
+
+    @Test
+    @DisplayName("Should set and get latitude correctly")
+    void testLatitudeGetterSetter() {
+      Double expectedLat = 51.5074;
+      groundStation.setGroundStation_Latitude(expectedLat);
+      assertEquals(expectedLat, groundStation.getGroundStation_Latitude());
+    }
+
+    @Test
+    @DisplayName("Should set and get longitude correctly")
+    void testLongitudeGetterSetter() {
+      Double expectedLon = -0.1278;
+      groundStation.setGroundStation_Longitude(expectedLon);
+      assertEquals(expectedLon, groundStation.getGroundStation_Longitude());
+    }
+
+    @Test
+    @DisplayName("Should set and get description correctly")
+    void testDescriptionGetterSetter() {
+      String expectedDesc = "Primary ground station for satellite communication";
+      groundStation.setGroundStation_Description(expectedDesc);
+      assertEquals(expectedDesc, groundStation.getGroundStation_Description());
+    }
+
+    @Test
+    @DisplayName("Should set and get user correctly")
+    void testUserGetterSetter() {
+      groundStation.setUser(testUser);
+      assertEquals(testUser, groundStation.getUser());
+    }
+  }
+
+  @Nested
+  @DisplayName("Null Value Tests")
+  class NullValueTests {
+
+    @Test
+    @DisplayName("Should handle null name")
+    void testNullName() {
+      groundStation.setGroundStation_Name(null);
+      assertNull(groundStation.getGroundStation_Name());
+    }
+
+    @Test
+    @DisplayName("Should handle null email")
+    void testNullEmail() {
+      groundStation.setGroundStation_Email(null);
+      assertNull(groundStation.getGroundStation_Email());
+    }
+
+    @Test
+    @DisplayName("Should handle null access level")
+    void testNullAccessLevel() {
+      groundStation.setGroundStation_AccesLevel(null);
+      assertNull(groundStation.getGroundStation_AccesLevel());
+    }
+
+    @Test
+    @DisplayName("Should handle null coordinates")
+    void testNullCoordinates() {
+      groundStation.setGroundStation_Latitude(null);
+      groundStation.setGroundStation_Longitude(null);
+      assertNull(groundStation.getGroundStation_Latitude());
+      assertNull(groundStation.getGroundStation_Longitude());
+    }
+
+    @Test
+    @DisplayName("Should handle null user")
+    void testNullUser() {
+      groundStation.setUser(null);
+      assertNull(groundStation.getUser());
+    }
+  }
+
+  @Nested
+  @DisplayName("Edge Case Tests")
+  class EdgeCaseTests {
+
+    @Test
+    @DisplayName("Should handle empty strings")
+    void testEmptyStrings() {
+      groundStation.setGroundStation_Name("");
+      groundStation.setGroundStation_Email("");
+      groundStation.setGroundStation_Description("");
+
+      assertEquals("", groundStation.getGroundStation_Name());
+      assertEquals("", groundStation.getGroundStation_Email());
+      assertEquals("", groundStation.getGroundStation_Description());
+    }
+
+    @Test
+    @DisplayName("Should handle very long strings")
+    void testVeryLongStrings() {
+      String longString = "A".repeat(1000);
+      groundStation.setGroundStation_Name(longString);
+      groundStation.setGroundStation_Description(longString);
+
+      assertEquals(longString, groundStation.getGroundStation_Name());
+      assertEquals(longString, groundStation.getGroundStation_Description());
+    }
+
+    @Test
+    @DisplayName("Should handle extreme coordinate values")
+    void testExtremeCoordinates() {
+      // Test valid extreme values
+      groundStation.setGroundStation_Latitude(90.0);
+      groundStation.setGroundStation_Longitude(180.0);
+      assertEquals(90.0, groundStation.getGroundStation_Latitude());
+      assertEquals(180.0, groundStation.getGroundStation_Longitude());
+
+      groundStation.setGroundStation_Latitude(-90.0);
+      groundStation.setGroundStation_Longitude(-180.0);
+      assertEquals(-90.0, groundStation.getGroundStation_Latitude());
+      assertEquals(-180.0, groundStation.getGroundStation_Longitude());
+    }
+
+
+
+    @Test
+    @DisplayName("Should handle special characters in strings")
+    void testSpecialCharacters() {
+      String specialChars = "!@#$%^&*()_+-=[]{}|;':\",./<>?`~";
+      groundStation.setGroundStation_Name(specialChars);
+      groundStation.setGroundStation_Description(specialChars);
+
+      assertEquals(specialChars, groundStation.getGroundStation_Name());
+      assertEquals(specialChars, groundStation.getGroundStation_Description());
+    }
+  }
+
+  @Nested
+  @DisplayName("Business Logic Tests")
+  class BusinessLogicTests {
+
+    @Test
+    @DisplayName("Should maintain bidirectional relationship with User")
+    void testBidirectionalRelationship() {
+      testUser.setGroundStation(groundStation);
+      groundStation.setUser(testUser);
+
+      assertEquals(testUser, groundStation.getUser());
+      assertEquals(groundStation, testUser.getGroundStation());
+    }
+
+    @Test
+    @DisplayName("Should handle coordinate precision")
+    void testCoordinatePrecision() {
+      Double preciseLat = 40.123456789;
+      Double preciseLon = -74.987654321;
+
+      groundStation.setGroundStation_Latitude(preciseLat);
+      groundStation.setGroundStation_Longitude(preciseLon);
+
+      assertEquals(preciseLat, groundStation.getGroundStation_Latitude(), 0.000000001);
+      assertEquals(preciseLon, groundStation.getGroundStation_Longitude(), 0.000000001);
+    }
+
+    @Test
+    @DisplayName("User should always have a GroundStation assigned")
+    void testUserMustHaveGroundStation() {
+      User user = new User();
+      user.setUserId(1L);
+      user.setUser_name("Test User");
+      user.setEmail("test@example.com");
+      user.setStatus(UserStatus.ACTIVE);
+
+      user.setGroundStation(groundStation);
+      assertNotNull(user.getGroundStation());
+
+     }
+
+    @Test
+    @DisplayName("Should establish proper JPA relationship")
+    void testJpaRelationshipMapping() {
+      testUser.setGroundStation(groundStation);
+
+      assertNotNull(testUser.getGroundStation());
+      assertEquals(groundStation.getGroundStation_id(), testUser.getGroundStation().getGroundStation_id());
+    }
+  }
+
+  @Nested
+  @DisplayName("Integration Tests")
+  class IntegrationTests {
+
+    @Test
+    @DisplayName("Should create complete GroundStation with User")
+    void testCompleteGroundStationCreation() {
+      User user = new User();
+      user.setUserId(1L);
+      user.setUser_name("Station Operator");
+      user.setEmail("operator@station.com");
+      user.setStatus(UserStatus.ACTIVE);
+      user.setCreated_at(Instant.now());
+
+      GroundStation station = new GroundStation(
+              1L,
+              "Main Station",
+              "main@station.com",
+              5,
+              35.6762,
+              139.6503,
+              "Primary communication hub",
+              user
+      );
+
+      user.setGroundStation(station);
+
+      // Verify all fields are set correctly
+      assertNotNull(station);
+      assertEquals(1L, station.getGroundStation_id());
+      assertEquals("Main Station", station.getGroundStation_Name());
+      assertEquals("main@station.com", station.getGroundStation_Email());
+      assertEquals(5, station.getGroundStation_AccesLevel());
+      assertEquals(35.6762, station.getGroundStation_Latitude());
+      assertEquals(139.6503, station.getGroundStation_Longitude());
+      assertEquals("Primary communication hub", station.getGroundStation_Description());
+      assertEquals(user, station.getUser());
+
+      assertEquals(station, user.getGroundStation());
+    }
   }
 }

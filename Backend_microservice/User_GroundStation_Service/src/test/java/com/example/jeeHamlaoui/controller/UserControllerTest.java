@@ -1,587 +1,517 @@
 package com.example.jeeHamlaoui.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import com.diffblue.cover.annotations.MethodsUnderTest;
+import static org.mockito.Mockito.*;
+
 import com.example.jeeHamlaoui.model.GroundStation;
 import com.example.jeeHamlaoui.model.User;
 import com.example.jeeHamlaoui.model.dto.UserDto;
-import com.example.jeeHamlaoui.model.dto.UserMapper;
 import com.example.jeeHamlaoui.model.enums.UserStatus;
-import com.example.jeeHamlaoui.repository.UserRepository;
 import com.example.jeeHamlaoui.service.UserService;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.aot.DisabledInAotMode;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@ContextConfiguration(classes = {UserController.class})
-@ExtendWith(SpringExtension.class)
-@DisabledInAotMode
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("UserController Tests")
 class UserControllerTest {
-  @Autowired
-  private UserController userController;
 
-  @MockitoBean
-  private UserService userService;
+    @Mock
+    private UserService userService;
 
-  /**
-   * Test {@link UserController#getAllUsers()}.
-   * <p>
-   * Method under test: {@link UserController#getAllUsers()}
-   */
-  @Test
-  @DisplayName("Test getAllUsers()")
-  @Tag("MaintainedByDiffblue")
-  @MethodsUnderTest({"ResponseEntity UserController.getAllUsers()"})
-  void testGetAllUsers() throws Exception {
-    // Arrange
-    when(userService.getAllUsers()).thenReturn(new ArrayList<>());
-    MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/users");
+    @InjectMocks
+    private UserController userController;
 
-    // Act and Assert
-    MockMvcBuilders.standaloneSetup(userController)
-        .build()
-        .perform(requestBuilder)
-        .andExpect(MockMvcResultMatchers.status().isOk())
-        .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-        .andExpect(MockMvcResultMatchers.content().string("[]"));
-  }
+    private User testUser;
+    private UserDto testUserDto;
+    private GroundStation testGroundStation;
 
-  /**
-   * Test {@link UserController#createUser(User)}.
-   * <ul>
-   *   <li>Given {@link UserService} {@link UserService#saveUser(User)} return {@link UserDto#UserDto()}.</li>
-   *   <li>Then return Body is {@link UserDto#UserDto()}.</li>
-   * </ul>
-   * <p>
-   * Method under test: {@link UserController#createUser(User)}
-   */
-  @Test
-  @DisplayName("Test createUser(User); given UserService saveUser(User) return UserDto(); then return Body is UserDto()")
-  @Tag("MaintainedByDiffblue")
-  @MethodsUnderTest({"ResponseEntity UserController.createUser(User)"})
-  void testCreateUser_givenUserServiceSaveUserReturnUserDto_thenReturnBodyIsUserDto() {
-    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
-    //   Run dcover create --keep-partial-tests to gain insights into why
-    //   a non-Spring test was created.
+    @BeforeEach
+    void setUp() {
+        // Create test ground station
+        testGroundStation = new GroundStation();
+        testGroundStation.setGroundStation_id(1L);
+        testGroundStation.setGroundStation_Name("Test Ground Station");
+        testGroundStation.setGroundStation_Description("Test Description");
+        testGroundStation.setGroundStation_Email("test@groundstation.com");
+        testGroundStation.setGroundStation_Latitude(40.7128);
+        testGroundStation.setGroundStation_Longitude(-74.0060);
+        testGroundStation.setGroundStation_AccesLevel(1);
 
-    // Arrange
-    UserService userService = mock(UserService.class);
-    UserDto userDto = new UserDto();
-    when(userService.saveUser(Mockito.<User>any())).thenReturn(userDto);
-    UserController userController = new UserController(userService);
+        // Create test user
+        testUser = new User();
+        testUser.setUserId(1L);
+        testUser.setUser_name("Test User");
+        testUser.setEmail("test@example.com");
+        testUser.setPassword("testPassword");
+        testUser.setStatus(UserStatus.ACTIVE);
+        testUser.setCreated_at(Instant.now());
+        testUser.setGroundStation(testGroundStation);
 
-    GroundStation groundStation = new GroundStation();
-    groundStation.setGroundStation_AccesLevel(1);
-    groundStation.setGroundStation_Description("Ground Station Description");
-    groundStation.setGroundStation_Email("jane.doe@example.org");
-    groundStation.setGroundStation_Latitude(10.0d);
-    groundStation.setGroundStation_Longitude(10.0d);
-    groundStation.setGroundStation_Name("Ground Station Name");
-    groundStation.setGroundStation_id(1L);
-    groundStation.setUser(new User());
+        // Create test UserDto
+        testUserDto = new UserDto();
+        testUserDto.setUserId(1L);
+        testUserDto.setUser_name("Test User");
+        testUserDto.setEmail("test@example.com");
+        testUserDto.setStatus(UserStatus.ACTIVE);
+        testUserDto.setCreated_at(testUser.getCreated_at());
+        testUserDto.setGroundStation(testGroundStation);
+    }
 
-    User user = new User();
-    user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user.setEmail("jane.doe@example.org");
-    user.setGroundStation(groundStation);
-    user.setUserId(1L);
-    user.setPassword("iloveyou");
-    user.setStatus(UserStatus.ACTIVE);
-    user.setUserId(1L);
-    user.setUser_name("User name");
+    @Nested
+    @DisplayName("Get All Users Tests")
+    class GetAllUsersTests {
 
-    GroundStation groundStation2 = new GroundStation();
-    groundStation2.setGroundStation_AccesLevel(1);
-    groundStation2.setGroundStation_Description("Ground Station Description");
-    groundStation2.setGroundStation_Email("jane.doe@example.org");
-    groundStation2.setGroundStation_Latitude(10.0d);
-    groundStation2.setGroundStation_Longitude(10.0d);
-    groundStation2.setGroundStation_Name("Ground Station Name");
-    groundStation2.setGroundStation_id(1L);
-    groundStation2.setUser(user);
+        @Test
+        @DisplayName("Should return all users when users exist")
+        void shouldReturnAllUsersWhenUsersExist() {
+            // Given
+            List<UserDto> expectedUsers = Arrays.asList(testUserDto);
+            when(userService.getAllUsers()).thenReturn(expectedUsers);
 
-    User user2 = new User();
-    user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user2.setEmail("jane.doe@example.org");
-    user2.setGroundStation(groundStation2);
-    user2.setUserId(1L);
-    user2.setPassword("iloveyou");
-    user2.setStatus(UserStatus.ACTIVE);
-    user2.setUserId(1L);
-    user2.setUser_name("User name");
+            // When
+            ResponseEntity<List<UserDto>> response = userController.getAllUsers();
 
-    // Act
-    ResponseEntity<UserDto> actualCreateUserResult = userController.createUser(user2);
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(expectedUsers, response.getBody());
+            assertEquals(1, response.getBody().size());
+            verify(userService, times(1)).getAllUsers();
+        }
 
-    // Assert
-    verify(userService).saveUser(isA(User.class));
-    assertSame(userDto, actualCreateUserResult.getBody());
-  }
+        @Test
+        @DisplayName("Should return empty list when no users exist")
+        void shouldReturnEmptyListWhenNoUsersExist() {
+            // Given
+            when(userService.getAllUsers()).thenReturn(Arrays.asList());
 
-  /**
-   * Test {@link UserController#createUser(User)}.
-   * <ul>
-   *   <li>Then return Body User_name is {@code User name}.</li>
-   * </ul>
-   * <p>
-   * Method under test: {@link UserController#createUser(User)}
-   */
-  @Test
-  @DisplayName("Test createUser(User); then return Body User_name is 'User name'")
-  @Tag("MaintainedByDiffblue")
-  @MethodsUnderTest({"ResponseEntity UserController.createUser(User)"})
-  void testCreateUser_thenReturnBodyUser_nameIsUserName() {
-    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
-    //   Run dcover create --keep-partial-tests to gain insights into why
-    //   a non-Spring test was created.
+            // When
+            ResponseEntity<List<UserDto>> response = userController.getAllUsers();
 
-    // Arrange
-    User user = new User();
-    user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user.setEmail("jane.doe@example.org");
-    user.setGroundStation(new GroundStation());
-    user.setUserId(1L);
-    user.setPassword("iloveyou");
-    user.setStatus(UserStatus.ACTIVE);
-    user.setUserId(1L);
-    user.setUser_name("User name");
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertTrue(response.getBody().isEmpty());
+            verify(userService, times(1)).getAllUsers();
+        }
+    }
 
-    GroundStation groundStation = new GroundStation();
-    groundStation.setGroundStation_AccesLevel(1);
-    groundStation.setGroundStation_Description("Ground Station Description");
-    groundStation.setGroundStation_Email("jane.doe@example.org");
-    groundStation.setGroundStation_Latitude(10.0d);
-    groundStation.setGroundStation_Longitude(10.0d);
-    groundStation.setGroundStation_Name("Ground Station Name");
-    groundStation.setGroundStation_id(1L);
-    groundStation.setUser(user);
+    @Nested
+    @DisplayName("Get User By ID Tests")
+    class GetUserByIdTests {
 
-    User user2 = new User();
-    user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user2.setEmail("jane.doe@example.org");
-    user2.setGroundStation(groundStation);
-    user2.setUserId(1L);
-    user2.setPassword("iloveyou");
-    user2.setStatus(UserStatus.ACTIVE);
-    user2.setUserId(1L);
-    user2.setUser_name("User name");
+        @Test
+        @DisplayName("Should return user when user exists")
+        void shouldReturnUserWhenUserExists() {
+            // Given
+            Long userId = 1L;
+            when(userService.getUserById(userId)).thenReturn(Optional.of(testUser));
 
-    GroundStation groundStation2 = new GroundStation();
-    groundStation2.setGroundStation_AccesLevel(1);
-    groundStation2.setGroundStation_Description("Ground Station Description");
-    groundStation2.setGroundStation_Email("jane.doe@example.org");
-    groundStation2.setGroundStation_Latitude(10.0d);
-    groundStation2.setGroundStation_Longitude(10.0d);
-    groundStation2.setGroundStation_Name("Ground Station Name");
-    groundStation2.setGroundStation_id(1L);
-    groundStation2.setUser(user2);
+            // When
+            ResponseEntity<User> response = userController.getUserById(userId);
 
-    User user3 = new User();
-    user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user3.setEmail("jane.doe@example.org");
-    user3.setGroundStation(groundStation2);
-    user3.setUserId(1L);
-    user3.setPassword("iloveyou");
-    user3.setStatus(UserStatus.ACTIVE);
-    user3.setUserId(1L);
-    user3.setUser_name("User name");
-    UserRepository userRepository = mock(UserRepository.class);
-    when(userRepository.save(Mockito.<User>any())).thenReturn(user3);
-    UserController userController = new UserController(new UserService(userRepository, UserMapper.INSTANCE));
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(testUser, response.getBody());
+            verify(userService, times(1)).getUserById(userId);
+        }
 
-    GroundStation groundStation3 = new GroundStation();
-    groundStation3.setGroundStation_AccesLevel(1);
-    groundStation3.setGroundStation_Description("Ground Station Description");
-    groundStation3.setGroundStation_Email("jane.doe@example.org");
-    groundStation3.setGroundStation_Latitude(10.0d);
-    groundStation3.setGroundStation_Longitude(10.0d);
-    groundStation3.setGroundStation_Name("Ground Station Name");
-    groundStation3.setGroundStation_id(1L);
-    groundStation3.setUser(new User());
+        @Test
+        @DisplayName("Should return 404 when user does not exist")
+        void shouldReturn404WhenUserDoesNotExist() {
+            // Given
+            Long userId = 999L;
+            when(userService.getUserById(userId)).thenReturn(Optional.empty());
 
-    User user4 = new User();
-    user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user4.setEmail("jane.doe@example.org");
-    user4.setGroundStation(groundStation3);
-    user4.setUserId(1L);
-    user4.setPassword("iloveyou");
-    user4.setStatus(UserStatus.ACTIVE);
-    user4.setUserId(1L);
-    user4.setUser_name("User name");
+            // When
+            ResponseEntity<User> response = userController.getUserById(userId);
 
-    GroundStation groundStation4 = new GroundStation();
-    groundStation4.setGroundStation_AccesLevel(1);
-    groundStation4.setGroundStation_Description("Ground Station Description");
-    groundStation4.setGroundStation_Email("jane.doe@example.org");
-    groundStation4.setGroundStation_Latitude(10.0d);
-    groundStation4.setGroundStation_Longitude(10.0d);
-    groundStation4.setGroundStation_Name("Ground Station Name");
-    groundStation4.setGroundStation_id(1L);
-    groundStation4.setUser(user4);
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertNull(response.getBody());
+            verify(userService, times(1)).getUserById(userId);
+        }
+    }
 
-    User user5 = new User();
-    user5.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user5.setEmail("jane.doe@example.org");
-    user5.setGroundStation(groundStation4);
-    user5.setUserId(1L);
-    user5.setPassword("iloveyou");
-    user5.setStatus(UserStatus.ACTIVE);
-    user5.setUserId(1L);
-    user5.setUser_name("User name");
+    @Nested
+    @DisplayName("Create User Tests")
+    class CreateUserTests {
 
-    // Act
-    ResponseEntity<UserDto> actualCreateUserResult = userController.createUser(user5);
+        @Test
+        @DisplayName("Should create user successfully")
+        void shouldCreateUserSuccessfully() {
+            // Given
+            when(userService.saveUser(any(User.class))).thenReturn(testUserDto);
 
-    // Assert
-    verify(userRepository).save(isA(User.class));
-    UserDto body = actualCreateUserResult.getBody();
-    assertEquals("User name", body.getUser_name());
-    assertEquals("jane.doe@example.org", body.getEmail());
-    Instant created_at = body.getCreated_at();
-    assertEquals(0, created_at.getNano());
-    assertEquals(0L, created_at.getEpochSecond());
-    assertEquals(1L, body.getUserId().longValue());
-    assertEquals(UserStatus.ACTIVE, body.getStatus());
-    assertSame(groundStation2, body.getGroundStation());
-  }
+            // When
+            ResponseEntity<UserDto> response = userController.createUser(testUser);
 
-  /**
-   * Test {@link UserController#updateUser(Long, User)}.
-   * <ul>
-   *   <li>Then return Body is {@code null}.</li>
-   * </ul>
-   * <p>
-   * Method under test: {@link UserController#updateUser(Long, User)}
-   */
-  @Test
-  @DisplayName("Test updateUser(Long, User); then return Body is 'null'")
-  @Tag("MaintainedByDiffblue")
-  @MethodsUnderTest({"ResponseEntity UserController.updateUser(Long, User)"})
-  void testUpdateUser_thenReturnBodyIsNull() {
-    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
-    //   Run dcover create --keep-partial-tests to gain insights into why
-    //   a non-Spring test was created.
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(testUserDto, response.getBody());
+            assertEquals("Test User", response.getBody().getUser_name());
+            assertEquals("test@example.com", response.getBody().getEmail());
+            verify(userService, times(1)).saveUser(any(User.class));
+        }
 
-    // Arrange
-    GroundStation groundStation = new GroundStation();
-    groundStation.setGroundStation_AccesLevel(1);
-    groundStation.setGroundStation_Description("Ground Station Description");
-    groundStation.setGroundStation_Email("jane.doe@example.org");
-    groundStation.setGroundStation_Latitude(10.0d);
-    groundStation.setGroundStation_Longitude(10.0d);
-    groundStation.setGroundStation_Name("Ground Station Name");
-    groundStation.setGroundStation_id(1L);
-    groundStation.setUser(new User());
+        @Test
+        @DisplayName("Should handle service exception during user creation")
+        void shouldHandleServiceExceptionDuringUserCreation() {
+            // Given
+            when(userService.saveUser(any(User.class))).thenThrow(new RuntimeException("Database error"));
 
-    User user = new User();
-    user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user.setEmail("jane.doe@example.org");
-    user.setGroundStation(groundStation);
-    user.setUserId(1L);
-    user.setPassword("iloveyou");
-    user.setStatus(UserStatus.ACTIVE);
-    user.setUserId(1L);
-    user.setUser_name("User name");
+            // When & Then
+            assertThrows(RuntimeException.class, () -> userController.createUser(testUser));
+            verify(userService, times(1)).saveUser(any(User.class));
+        }
+    }
 
-    GroundStation groundStation2 = new GroundStation();
-    groundStation2.setGroundStation_AccesLevel(1);
-    groundStation2.setGroundStation_Description("Ground Station Description");
-    groundStation2.setGroundStation_Email("jane.doe@example.org");
-    groundStation2.setGroundStation_Latitude(10.0d);
-    groundStation2.setGroundStation_Longitude(10.0d);
-    groundStation2.setGroundStation_Name("Ground Station Name");
-    groundStation2.setGroundStation_id(1L);
-    groundStation2.setUser(user);
+    @Nested
+    @DisplayName("Update User Tests")
+    class UpdateUserTests {
 
-    User user2 = new User();
-    user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user2.setEmail("jane.doe@example.org");
-    user2.setGroundStation(groundStation2);
-    user2.setUserId(1L);
-    user2.setPassword("iloveyou");
-    user2.setStatus(UserStatus.ACTIVE);
-    user2.setUserId(1L);
-    user2.setUser_name("User name");
-    Optional<User> ofResult = Optional.of(user2);
-    UserRepository userRepository = mock(UserRepository.class);
-    when(userRepository.save(Mockito.<User>any())).thenThrow(new RuntimeException("User not found"));
-    when(userRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
-    UserController userController = new UserController(new UserService(userRepository, UserMapper.INSTANCE));
+        @Test
+        @DisplayName("Should update user successfully")
+        void shouldUpdateUserSuccessfully() {
+            // Given
+            Long userId = 1L;
+            User updatedUser = new User();
+            updatedUser.setUser_name("Updated User");
+            
+            when(userService.updateUser(eq(userId), any(User.class))).thenReturn(testUser);
+            when(userService.saveUser(any(User.class))).thenReturn(testUserDto);
 
-    GroundStation groundStation3 = new GroundStation();
-    groundStation3.setGroundStation_AccesLevel(1);
-    groundStation3.setGroundStation_Description("Ground Station Description");
-    groundStation3.setGroundStation_Email("jane.doe@example.org");
-    groundStation3.setGroundStation_Latitude(10.0d);
-    groundStation3.setGroundStation_Longitude(10.0d);
-    groundStation3.setGroundStation_Name("Ground Station Name");
-    groundStation3.setGroundStation_id(1L);
-    groundStation3.setUser(new User());
+            // When
+            ResponseEntity<UserDto> response = userController.updateUser(userId, updatedUser);
 
-    User user3 = new User();
-    user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user3.setEmail("jane.doe@example.org");
-    user3.setGroundStation(groundStation3);
-    user3.setUserId(1L);
-    user3.setPassword("iloveyou");
-    user3.setStatus(UserStatus.ACTIVE);
-    user3.setUserId(1L);
-    user3.setUser_name("User name");
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(testUserDto, response.getBody());
+            verify(userService, times(1)).updateUser(eq(userId), any(User.class));
+            verify(userService, times(1)).saveUser(any(User.class));
+        }
 
-    GroundStation groundStation4 = new GroundStation();
-    groundStation4.setGroundStation_AccesLevel(1);
-    groundStation4.setGroundStation_Description("Ground Station Description");
-    groundStation4.setGroundStation_Email("jane.doe@example.org");
-    groundStation4.setGroundStation_Latitude(10.0d);
-    groundStation4.setGroundStation_Longitude(10.0d);
-    groundStation4.setGroundStation_Name("Ground Station Name");
-    groundStation4.setGroundStation_id(1L);
-    groundStation4.setUser(user3);
+        @Test
+        @DisplayName("Should return 404 when user to update does not exist")
+        void shouldReturn404WhenUserToUpdateDoesNotExist() {
+            // Given
+            Long userId = 999L;
+            when(userService.updateUser(eq(userId), any(User.class)))
+                .thenThrow(new RuntimeException("User not found"));
 
-    User user4 = new User();
-    user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user4.setEmail("jane.doe@example.org");
-    user4.setGroundStation(groundStation4);
-    user4.setUserId(1L);
-    user4.setPassword("iloveyou");
-    user4.setStatus(UserStatus.ACTIVE);
-    user4.setUserId(1L);
-    user4.setUser_name("User name");
+            // When
+            ResponseEntity<UserDto> response = userController.updateUser(userId, testUser);
 
-    // Act
-    ResponseEntity<UserDto> actualUpdateUserResult = userController.updateUser(1L, user4);
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertNull(response.getBody());
+            verify(userService, times(1)).updateUser(eq(userId), any(User.class));
+            verify(userService, never()).saveUser(any(User.class));
+        }
+    }
 
-    // Assert
-    verify(userRepository).findById(eq(1L));
-    verify(userRepository).save(isA(User.class));
-    HttpStatusCode statusCode = actualUpdateUserResult.getStatusCode();
-    assertTrue(statusCode instanceof HttpStatus);
-    assertNull(actualUpdateUserResult.getBody());
-    assertEquals(404, actualUpdateUserResult.getStatusCodeValue());
-    assertEquals(HttpStatus.NOT_FOUND, statusCode);
-    assertFalse(actualUpdateUserResult.hasBody());
-  }
+    @Nested
+    @DisplayName("Delete User Tests")
+    class DeleteUserTests {
 
-  /**
-   * Test {@link UserController#updateUser(Long, User)}.
-   * <ul>
-   *   <li>Then return Body User_name is {@code User name}.</li>
-   * </ul>
-   * <p>
-   * Method under test: {@link UserController#updateUser(Long, User)}
-   */
-  @Test
-  @DisplayName("Test updateUser(Long, User); then return Body User_name is 'User name'")
-  @Tag("MaintainedByDiffblue")
-  @MethodsUnderTest({"ResponseEntity UserController.updateUser(Long, User)"})
-  void testUpdateUser_thenReturnBodyUser_nameIsUserName() {
-    //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
-    //   Run dcover create --keep-partial-tests to gain insights into why
-    //   a non-Spring test was created.
+        @Test
+        @DisplayName("Should delete user successfully")
+        void shouldDeleteUserSuccessfully() {
+            // Given
+            Long userId = 1L;
+            doNothing().when(userService).deleteUser(userId);
 
-    // Arrange
-    GroundStation groundStation = new GroundStation();
-    groundStation.setGroundStation_AccesLevel(1);
-    groundStation.setGroundStation_Description("Ground Station Description");
-    groundStation.setGroundStation_Email("jane.doe@example.org");
-    groundStation.setGroundStation_Latitude(10.0d);
-    groundStation.setGroundStation_Longitude(10.0d);
-    groundStation.setGroundStation_Name("Ground Station Name");
-    groundStation.setGroundStation_id(1L);
-    groundStation.setUser(new User());
+            // When
+            ResponseEntity<Void> response = userController.deleteUser(userId);
 
-    User user = new User();
-    user.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user.setEmail("jane.doe@example.org");
-    user.setGroundStation(groundStation);
-    user.setUserId(1L);
-    user.setPassword("iloveyou");
-    user.setStatus(UserStatus.ACTIVE);
-    user.setUserId(1L);
-    user.setUser_name("User name");
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+            assertNull(response.getBody());
+            verify(userService, times(1)).deleteUser(userId);
+        }
 
-    GroundStation groundStation2 = new GroundStation();
-    groundStation2.setGroundStation_AccesLevel(1);
-    groundStation2.setGroundStation_Description("Ground Station Description");
-    groundStation2.setGroundStation_Email("jane.doe@example.org");
-    groundStation2.setGroundStation_Latitude(10.0d);
-    groundStation2.setGroundStation_Longitude(10.0d);
-    groundStation2.setGroundStation_Name("Ground Station Name");
-    groundStation2.setGroundStation_id(1L);
-    groundStation2.setUser(user);
+        @Test
+        @DisplayName("Should handle service exception during user deletion")
+        void shouldHandleServiceExceptionDuringUserDeletion() {
+            // Given
+            Long userId = 1L;
+            doThrow(new RuntimeException("Database error")).when(userService).deleteUser(userId);
 
-    User user2 = new User();
-    user2.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user2.setEmail("jane.doe@example.org");
-    user2.setGroundStation(groundStation2);
-    user2.setUserId(1L);
-    user2.setPassword("iloveyou");
-    user2.setStatus(UserStatus.ACTIVE);
-    user2.setUserId(1L);
-    user2.setUser_name("User name");
-    Optional<User> ofResult = Optional.of(user2);
+            // When & Then
+            assertThrows(RuntimeException.class, () -> userController.deleteUser(userId));
+            verify(userService, times(1)).deleteUser(userId);
+        }
+    }
 
-    User user3 = new User();
-    user3.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user3.setEmail("jane.doe@example.org");
-    user3.setGroundStation(new GroundStation());
-    user3.setUserId(1L);
-    user3.setPassword("iloveyou");
-    user3.setStatus(UserStatus.ACTIVE);
-    user3.setUserId(1L);
-    user3.setUser_name("User name");
+    @Nested
+    @DisplayName("Edge Cases and Validation Tests")
+    class EdgeCasesTests {
 
-    GroundStation groundStation3 = new GroundStation();
-    groundStation3.setGroundStation_AccesLevel(1);
-    groundStation3.setGroundStation_Description("Ground Station Description");
-    groundStation3.setGroundStation_Email("jane.doe@example.org");
-    groundStation3.setGroundStation_Latitude(10.0d);
-    groundStation3.setGroundStation_Longitude(10.0d);
-    groundStation3.setGroundStation_Name("Ground Station Name");
-    groundStation3.setGroundStation_id(1L);
-    groundStation3.setUser(user3);
+        @Test
+        @DisplayName("Should handle null user input gracefully")
+        void shouldHandleNullUserInputGracefully() {
+            // Given
+            when(userService.saveUser(null)).thenThrow(new IllegalArgumentException("User cannot be null"));
 
-    User user4 = new User();
-    user4.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user4.setEmail("jane.doe@example.org");
-    user4.setGroundStation(groundStation3);
-    user4.setUserId(1L);
-    user4.setPassword("iloveyou");
-    user4.setStatus(UserStatus.ACTIVE);
-    user4.setUserId(1L);
-    user4.setUser_name("User name");
+            // When & Then
+            assertThrows(IllegalArgumentException.class, () -> userController.createUser(null));
+            verify(userService, times(1)).saveUser(null);
+        }
 
-    GroundStation groundStation4 = new GroundStation();
-    groundStation4.setGroundStation_AccesLevel(1);
-    groundStation4.setGroundStation_Description("Ground Station Description");
-    groundStation4.setGroundStation_Email("jane.doe@example.org");
-    groundStation4.setGroundStation_Latitude(10.0d);
-    groundStation4.setGroundStation_Longitude(10.0d);
-    groundStation4.setGroundStation_Name("Ground Station Name");
-    groundStation4.setGroundStation_id(1L);
-    groundStation4.setUser(user4);
+        @Test
+        @DisplayName("Should handle user with minimal required fields")
+        void shouldHandleUserWithMinimalRequiredFields() {
+            // Given
+            User minimalUser = new User();
+            minimalUser.setUser_name("Minimal User");
+            minimalUser.setEmail("minimal@example.com");
 
-    User user5 = new User();
-    user5.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user5.setEmail("jane.doe@example.org");
-    user5.setGroundStation(groundStation4);
-    user5.setUserId(1L);
-    user5.setPassword("iloveyou");
-    user5.setStatus(UserStatus.ACTIVE);
-    user5.setUserId(1L);
-    user5.setUser_name("User name");
-    UserRepository userRepository = mock(UserRepository.class);
-    when(userRepository.save(Mockito.<User>any())).thenReturn(user5);
-    when(userRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
-    UserController userController = new UserController(new UserService(userRepository, UserMapper.INSTANCE));
+            UserDto minimalDto = new UserDto();
+            minimalDto.setUser_name("Minimal User");
+            minimalDto.setEmail("minimal@example.com");
 
-    GroundStation groundStation5 = new GroundStation();
-    groundStation5.setGroundStation_AccesLevel(1);
-    groundStation5.setGroundStation_Description("Ground Station Description");
-    groundStation5.setGroundStation_Email("jane.doe@example.org");
-    groundStation5.setGroundStation_Latitude(10.0d);
-    groundStation5.setGroundStation_Longitude(10.0d);
-    groundStation5.setGroundStation_Name("Ground Station Name");
-    groundStation5.setGroundStation_id(1L);
-    groundStation5.setUser(new User());
+            when(userService.saveUser(any(User.class))).thenReturn(minimalDto);
 
-    User user6 = new User();
-    user6.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user6.setEmail("jane.doe@example.org");
-    user6.setGroundStation(groundStation5);
-    user6.setUserId(1L);
-    user6.setPassword("iloveyou");
-    user6.setStatus(UserStatus.ACTIVE);
-    user6.setUserId(1L);
-    user6.setUser_name("User name");
+            // When
+            ResponseEntity<UserDto> response = userController.createUser(minimalUser);
 
-    GroundStation groundStation6 = new GroundStation();
-    groundStation6.setGroundStation_AccesLevel(1);
-    groundStation6.setGroundStation_Description("Ground Station Description");
-    groundStation6.setGroundStation_Email("jane.doe@example.org");
-    groundStation6.setGroundStation_Latitude(10.0d);
-    groundStation6.setGroundStation_Longitude(10.0d);
-    groundStation6.setGroundStation_Name("Ground Station Name");
-    groundStation6.setGroundStation_id(1L);
-    groundStation6.setUser(user6);
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals("Minimal User", response.getBody().getUser_name());
+            assertEquals("minimal@example.com", response.getBody().getEmail());
+        }
 
-    User user7 = new User();
-    user7.setCreated_at(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-    user7.setEmail("jane.doe@example.org");
-    user7.setGroundStation(groundStation6);
-    user7.setUserId(1L);
-    user7.setPassword("iloveyou");
-    user7.setStatus(UserStatus.ACTIVE);
-    user7.setUserId(1L);
-    user7.setUser_name("User name");
+        @Test
+        @DisplayName("Should handle invalid email format")
+        void shouldHandleInvalidEmailFormat() {
+            // Given
+            User userWithInvalidEmail = new User();
+            userWithInvalidEmail.setUser_name("Test User");
+            userWithInvalidEmail.setEmail("invalid-email-format");
+            userWithInvalidEmail.setPassword("password");
+            
+            when(userService.saveUser(any(User.class)))
+                .thenThrow(new IllegalArgumentException("Invalid email format"));
 
-    // Act
-    ResponseEntity<UserDto> actualUpdateUserResult = userController.updateUser(1L, user7);
+            // When & Then
+            assertThrows(IllegalArgumentException.class, () -> userController.createUser(userWithInvalidEmail));
+            verify(userService, times(1)).saveUser(any(User.class));
+        }
 
-    // Assert
-    verify(userRepository).findById(eq(1L));
-    verify(userRepository, atLeast(1)).save(isA(User.class));
-    HttpStatusCode statusCode = actualUpdateUserResult.getStatusCode();
-    assertTrue(statusCode instanceof HttpStatus);
-    UserDto body = actualUpdateUserResult.getBody();
-    assertEquals("User name", body.getUser_name());
-    assertEquals("jane.doe@example.org", body.getEmail());
-    assertEquals(1L, body.getUserId().longValue());
-    assertEquals(200, actualUpdateUserResult.getStatusCodeValue());
-    assertEquals(UserStatus.ACTIVE, body.getStatus());
-    assertEquals(HttpStatus.OK, statusCode);
-    assertTrue(actualUpdateUserResult.hasBody());
-    assertSame(groundStation4, body.getGroundStation());
-  }
+        @Test
+        @DisplayName("Should handle user update with null required fields")
+        void shouldHandleUserUpdateWithNullFields() {
+            // Given
+            Long userId = 1L;
+            User userWithNullFields = new User();
+            userWithNullFields.setUser_name(null); // Required field is null
+            userWithNullFields.setEmail(null);     // Required field is null
+            
+            when(userService.updateUser(eq(userId), any(User.class)))
+                .thenThrow(new IllegalArgumentException("Required fields cannot be null"));
 
-  /**
-   * Test {@link UserController#deleteUser(Long)}.
-   * <p>
-   * Method under test: {@link UserController#deleteUser(Long)}
-   */
-  @Test
-  @DisplayName("Test deleteUser(Long)")
-  @Tag("MaintainedByDiffblue")
-  @MethodsUnderTest({"ResponseEntity UserController.deleteUser(Long)"})
-  void testDeleteUser() throws Exception {
-    // Arrange
-    doNothing().when(userService).deleteUser(Mockito.<Long>any());
-    MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/v1/users/{id}", 1L);
+            // When
+            ResponseEntity<UserDto> response = userController.updateUser(userId, userWithNullFields);
 
-    // Act and Assert
-    MockMvcBuilders.standaloneSetup(userController)
-        .build()
-        .perform(requestBuilder)
-        .andExpect(MockMvcResultMatchers.status().isNoContent());
-  }
+            // Then
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertNull(response.getBody());
+            verify(userService, times(1)).updateUser(eq(userId), any(User.class));
+        }
+
+        @Test
+        @DisplayName("Should handle user update with invalid ground station")
+        void shouldHandleUserUpdateWithInvalidGroundStation() {
+            // Given
+            Long userId = 1L;
+            GroundStation invalidGroundStation = new GroundStation();
+            invalidGroundStation.setGroundStation_id(999L); // Non-existent ground station
+            invalidGroundStation.setGroundStation_Name("Invalid Station");
+            
+            User userWithInvalidGroundStation = new User();
+            userWithInvalidGroundStation.setUser_name("Test User");
+            userWithInvalidGroundStation.setEmail("test@example.com");
+            userWithInvalidGroundStation.setGroundStation(invalidGroundStation);
+            
+            when(userService.updateUser(eq(userId), any(User.class)))
+                .thenThrow(new IllegalArgumentException("Ground station does not exist"));
+
+            // When
+            ResponseEntity<UserDto> response = userController.updateUser(userId, userWithInvalidGroundStation);
+
+            // Then
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertNull(response.getBody());
+            verify(userService, times(1)).updateUser(eq(userId), any(User.class));
+        }
+
+        @Test
+        @DisplayName("Should handle user deletion with associated ground station")
+        void shouldHandleUserDeletionWithAssociatedGroundStation() {
+            // Given
+            Long userId = 1L;
+            
+            // Simulate that user has associated ground station that needs cleanup
+            doThrow(new RuntimeException("Cannot delete user: associated ground station must be handled"))
+                .when(userService).deleteUser(userId);
+
+            // When & Then
+            assertThrows(RuntimeException.class, () -> userController.deleteUser(userId));
+            verify(userService, times(1)).deleteUser(userId);
+        }
+    }
+
+    @Nested
+    @DisplayName("State Transition Tests")
+    class StateTransitionTests {
+
+        @Test
+        @DisplayName("Should handle user status transitions from ACTIVE to INACTIVE")
+        void shouldHandleUserStatusTransitions() {
+            // Given
+            Long userId = 1L;
+            User userToUpdate = new User();
+            userToUpdate.setUserId(userId);
+            userToUpdate.setUser_name("Test User");
+            userToUpdate.setEmail("test@example.com");
+            userToUpdate.setStatus(UserStatus.INACTIVE); // Changing from ACTIVE to INACTIVE
+            
+            User updatedUser = new User();
+            updatedUser.setUserId(userId);
+            updatedUser.setUser_name("Test User");
+            updatedUser.setEmail("test@example.com");
+            updatedUser.setStatus(UserStatus.INACTIVE);
+            
+            UserDto updatedUserDto = new UserDto();
+            updatedUserDto.setUserId(userId);
+            updatedUserDto.setUser_name("Test User");
+            updatedUserDto.setEmail("test@example.com");
+            updatedUserDto.setStatus(UserStatus.INACTIVE);
+            
+            when(userService.updateUser(eq(userId), any(User.class))).thenReturn(updatedUser);
+            when(userService.saveUser(any(User.class))).thenReturn(updatedUserDto);
+
+            // When
+            ResponseEntity<UserDto> response = userController.updateUser(userId, userToUpdate);
+
+            // Then
+            assertNotNull(response);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertEquals(UserStatus.INACTIVE, response.getBody().getStatus());
+            verify(userService, times(1)).updateUser(eq(userId), any(User.class));
+            verify(userService, times(1)).saveUser(any(User.class));
+        }
+
+        @Test
+        @DisplayName("Should handle invalid status transition")
+        void shouldHandleInvalidStatusTransition() {
+            // Given
+            Long userId = 1L;
+            User userWithInvalidStatus = new User();
+            userWithInvalidStatus.setUserId(userId);
+            userWithInvalidStatus.setUser_name("Test User");
+            userWithInvalidStatus.setEmail("test@example.com");
+            userWithInvalidStatus.setStatus(null); // Invalid status
+            
+            when(userService.updateUser(eq(userId), any(User.class)))
+                .thenThrow(new IllegalArgumentException("Invalid user status"));
+
+            // When
+            ResponseEntity<UserDto> response = userController.updateUser(userId, userWithInvalidStatus);
+
+            // Then
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertNull(response.getBody());
+            verify(userService, times(1)).updateUser(eq(userId), any(User.class));
+        }
+
+        @Test
+        @DisplayName("Should handle status transition with business rule validation")
+        void shouldHandleStatusTransitionWithBusinessRuleValidation() {
+            // Given
+            Long userId = 1L;
+            User userToDeactivate = new User();
+            userToDeactivate.setUserId(userId);
+            userToDeactivate.setUser_name("Test User");
+            userToDeactivate.setEmail("test@example.com");
+            userToDeactivate.setStatus(UserStatus.INACTIVE);
+            
+            // Simulate business rule: cannot deactivate user with active ground station operations
+            when(userService.updateUser(eq(userId), any(User.class)))
+                .thenThrow(new RuntimeException("Cannot deactivate user with active ground station operations"));
+
+            // When
+            ResponseEntity<UserDto> response = userController.updateUser(userId, userToDeactivate);
+
+            // Then
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertNull(response.getBody());
+            verify(userService, times(1)).updateUser(eq(userId), any(User.class));
+        }
+    }
+
+    @Nested
+    @DisplayName("Concurrent Access and Performance Tests")
+    class ConcurrencyTests {
+
+        @Test
+        @DisplayName("Should handle concurrent user updates")
+        void shouldHandleConcurrentUserUpdates() {
+            // Given
+            Long userId = 1L;
+            User userUpdate1 = new User();
+            userUpdate1.setUser_name("Update 1");
+            userUpdate1.setEmail("update1@example.com");
+            
+            // Simulate optimistic locking exception
+            when(userService.updateUser(eq(userId), any(User.class)))
+                .thenThrow(new RuntimeException("Optimistic locking failure - user was modified by another transaction"));
+
+            // When
+            ResponseEntity<UserDto> response = userController.updateUser(userId, userUpdate1);
+
+            // Then
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertNull(response.getBody());
+            verify(userService, times(1)).updateUser(eq(userId), any(User.class));
+        }
+
+        @Test
+        @DisplayName("Should handle database timeout during user creation")
+        void shouldHandleDatabaseTimeoutDuringUserCreation() {
+            // Given
+            User newUser = new User();
+            newUser.setUser_name("New User");
+            newUser.setEmail("new@example.com");
+            
+            when(userService.saveUser(any(User.class)))
+                .thenThrow(new RuntimeException("Database connection timeout"));
+
+            // When & Then
+            assertThrows(RuntimeException.class, () -> userController.createUser(newUser));
+            verify(userService, times(1)).saveUser(any(User.class));
+        }
+    }
 }

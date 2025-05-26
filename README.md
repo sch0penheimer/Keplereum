@@ -117,6 +117,7 @@ The genesis block defines the initial state of the blockchain and includes confi
 
 ### Geth Nodes Configuration
 The infrastructure consists of five Ethereum nodes running go-ethereum (geth) client. Each node has a specific role in the network:
+
     |![node_archi](./assets/node_archi.png)|
     |:----------------------------------:|
     | The Go-Ethereum Nodes Architecture |
@@ -184,6 +185,7 @@ This monitoring setup ensures the operations team can maintain visibility into t
 
 ## Authentication and Security Flow
 Authentication is implemented using JWT (JSON Web Tokens) with the API Gateway acting as the security filter.
+
     |![Authentication and Security Flow](./assets/Authentification_flow.png)|
     |:-----------------------------------------------------:|
     | Authentication and Security Flow|
@@ -191,6 +193,7 @@ Authentication is implemented using JWT (JSON Web Tokens) with the API Gateway a
 ## Jenkins CI/CD Pipeline
 
 This project includes a fully automated **Jenkins pipeline** for continuous integration and delivery of all backend microservices.
+
     |![Pipeline Overview](./assets/jenkins_Pipeline.png)|
     |:-----------------------------------------------------:|
     | Pipeline Overview |

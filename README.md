@@ -100,9 +100,9 @@ Keplereum uses a private Ethereum blockchain network with multiple Geth nodes fo
 ## Blockchain Infrastructure
 The Keplereum blockchain infrastructure is designed as a private Ethereum network with multiple nodes for redundancy, fault tolerance, and distributed consensus. This infrastructure provides the immutable ledger for recording critical satellite events, alerts, confirmations, and actions.
 
-|![Blockchain_Overview](./assets/blockchain_overview.png)|
-|:---------------------------------------------------:|
-| The PoA Ethereum Blockchain Infrastructure Overview |
+   |![Blockchain_Overview](./assets/blockchain_overview.png)|
+   |:---------------------------------------------------:|
+   | The PoA Ethereum Blockchain Infrastructure Overview |
 
 ### Private Ethereum Network
 The Keplereum blockchain is implemented as a private Ethereum network with the following characteristics:
@@ -118,9 +118,9 @@ The genesis block defines the initial state of the blockchain and includes confi
 ### Geth Nodes Configuration
 The infrastructure consists of five Ethereum nodes running go-ethereum (geth) client. Each node has a specific role in the network:
 
-    |![node_archi](./assets/node_archi.png)|
-    |:----------------------------------:|
-    | The Go-Ethereum Nodes Architecture |
+   |![node_archi](./assets/node_archi.png)|
+   |:----------------------------------:|
+   | The Go-Ethereum Nodes Architecture |
 
 All nodes have the following configuration:
 
@@ -186,17 +186,17 @@ This monitoring setup ensures the operations team can maintain visibility into t
 ## Authentication and Security Flow
 Authentication is implemented using JWT (JSON Web Tokens) with the API Gateway acting as the security filter.
 
-    |![Authentication and Security Flow](./assets/Authentification_flow.png)|
-    |:-----------------------------------------------------:|
-    | Authentication and Security Flow|
+|![Authentication and Security Flow](./assets/Authentification_flow.png)|
+|:-----------------------------------------------------:|
+| Authentication and Security Flow|
 
 ## Jenkins CI/CD Pipeline
 
 This project includes a fully automated **Jenkins pipeline** for continuous integration and delivery of all backend microservices.
 
-    |![Pipeline Overview](./assets/jenkins_Pipeline.png)|
-    |:-----------------------------------------------------:|
-    | Pipeline Overview |
+|![Pipeline Overview](./assets/jenkins_Pipeline.png)|
+|:-----------------------------------------------------:|
+| Pipeline Overview |
 
 
 ### Key Features
@@ -216,7 +216,7 @@ This project includes a fully automated **Jenkins pipeline** for continuous inte
   - Builds Docker images for each service.
   - Authenticates to Docker Hub using secured Jenkins credentials.
   - Pushes images to [Docker Hub](https://hub.docker.com/u/keplereum) under the `keplereum` repository.
-
+    
     |![Docker Hub Repository](./assets/DockerHub_CD_Images.png)|
     |:-----------------------------------------------------:|
     | Docker Hub Repository|

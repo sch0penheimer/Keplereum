@@ -13,4 +13,5 @@ class UserMapperImplTest {
     @Test
     void toEntity() {
     }
+
 }

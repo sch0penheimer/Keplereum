@@ -18,15 +18,23 @@ Keplereum serves as a comprehensive platform for:
 ## High-Level Architecture
 
 Keplereum follows a microservices architecture with a clear separation of concerns:
-![Architecture](./assets/Keplereum_Architecture_PNG_final.png)
+
+|![Architecture](./assets/Keplereum_Architecture_PNG_final.png)|
+|:------------------------------------:|
+| The High Level Architecture of Keplereum |
+
 
 ## Monolith & Microservices Class Diagram
 
-![Class_Diagram](./assets/Class_Diagram.png)
+|![Class_Diagram](./assets/Class_Diagram.png)|
+|:-----------------------------------------:|
+| The Monolithic class diagram of Keplereum |
 
 ---
 
-![Microservice_Class_Diagram](./assets/Microservice_Class_Diagram.png)
+|![Microservice_Class_Diagram](./assets/Microservice_Class_Diagram.png)|
+|:-----------------------------------------------------:|
+| The Microservices (Actual) class diagram of Keplereum |
 
 ## Core Components
 
@@ -43,6 +51,7 @@ Manages user accounts, authentication, and ground station information. This serv
 -   JWT token generation
 -   Ground station management
 -   Authorization of satellite operations
+
 
 #### Satellite Service
 
@@ -62,7 +71,9 @@ Integrates with the private Ethereum blockchain to record and verify critical ev
 -   Network node validation
 -   Alert system integration
 
-![Blockchain_Service](./assets/blockchain_service.png)
+|![Blockchain_Service](./assets/blockchain_service.png)|
+|:----------------------------------:|
+| The Blockchain "Base" Microservice |
 
 ### 3. Blockchain Infrastructure
 Keplereum uses a private Ethereum blockchain network with multiple Geth nodes for transaction validation and smart contract execution. The blockchain is configured as:
@@ -88,7 +99,10 @@ Keplereum uses a private Ethereum blockchain network with multiple Geth nodes fo
 
 ## Blockchain Infrastructure
 The Keplereum blockchain infrastructure is designed as a private Ethereum network with multiple nodes for redundancy, fault tolerance, and distributed consensus. This infrastructure provides the immutable ledger for recording critical satellite events, alerts, confirmations, and actions.
-![Blockchain_Overview](./assets/blockchain_overview.png)
+
+|![Blockchain_Overview](./assets/blockchain_overview.png)|
+|:---------------------------------------------------:|
+| The PoA Ethereum Blockchain Infrastructure Overview |
 
 ### Private Ethereum Network
 The Keplereum blockchain is implemented as a private Ethereum network with the following characteristics:
@@ -104,7 +118,9 @@ The genesis block defines the initial state of the blockchain and includes confi
 ### Geth Nodes Configuration
 The infrastructure consists of five Ethereum nodes running go-ethereum (geth) client. Each node has a specific role in the network:
 
-![node_archi](./assets/node_archi.png)
+|![node_archi](./assets/node_archi.png)|
+|:----------------------------------:|
+| The Go-Ethereum Nodes Architecture |
 
 All nodes have the following configuration:
 
@@ -141,7 +157,9 @@ The Keplereum blockchain utilizes the  `SatelliteSystem`  smart contract to mana
     -   Operations related to network validators
     -   Management of consensus participants
 
-![smart_contract_overview](./assets/smart_contract_overview.png)
+|![smart_contract_overview](./assets/smart_contract_overview.png)|
+|:-----------------------:|
+| Smart Contract Overview |
 
 ## Monitoring Infrastructure
 
@@ -164,6 +182,61 @@ The blockchain infrastructure includes comprehensive monitoring tools:
     -   Enables alerts based on performance thresholds
 
 This monitoring setup ensures the operations team can maintain visibility into the blockchain's performance and health.
+
+## Authentication and Security Flow
+Authentication is implemented using JWT (JSON Web Tokens) with the API Gateway acting as the security filter.
+|![Authentication and Security Flow](./assets/Authentification_flow.png)|
+|:-----------------------------------------------------:|
+| Authentication and Security Flow|
+
+## Jenkins CI/CD Pipeline
+
+This project includes a fully automated **Jenkins pipeline** for continuous integration and delivery of all backend microservices.
+
+
+### Key Features
+
+- **SCM Polling**: Jenkins polls the `main` branch every hour (`H * * * *`) for changes.
+- **Source Cloning**: Automatically clones the GitHub repository.
+- **Multi-Stage Build Process**:
+  - **Infrastructure Services**: Compiles and packages core services:
+    - `Config Server`
+    - `Discovery Server`
+    - `API Gateway`
+  - **Main Business Microservices**: Compiles and packages:
+    - `User Service`
+    - `Blockchain Service`
+    - `Satellites Service`
+- **Dockerization**:
+  - Builds Docker images for each service.
+  - Authenticates to Docker Hub using secured Jenkins credentials.
+  - Pushes images to [Docker Hub](https://hub.docker.com/u/keplereum) under the `keplereum` repository.
+
+    |![Docker Hub Repository](./assets/DockerHub_CD_Images.png)|
+    |:-----------------------------------------------------:|
+    | Docker Hub Repository|
+    
+    
+- **Post-Build Actions**:
+  - Cleans up the Jenkins workspace.
+  - Displays status messages for both successful and failed builds.
+
+This pipeline ensures a reliable and repeatable process for compiling, packaging, and deploying microservices as Docker containers.
+
+
+
+## Demo Links
+[Main Demo](https://drive.google.com/file/d/1QgRBYGIXICE6yn_chJQLGIOGzcgb3YVO/view?usp=drive_link "Main KEPLEREUM Demo")
+
+---
+
+[Actual Blockchain Monitoring](https://drive.google.com/file/d/1B5NoJdRDYW0m8flSNJyRVDDiNAY0juZf/view?usp=drive_link "Custom Blockchain Monitoring")
+
+## Documentation  
+  
+For detailed technical documentation, check our wiki:  
+- [Keplereum's WIKI](https://deepwiki.com/m-elhamlaoui/Keplereum)
+
 
 ## Conclusion
 

@@ -11,7 +11,6 @@ import { BlockchainProvider } from "./contexts/BlockchainContext";
 import Header from "./components/Header";
 import { AuthProvider } from './contexts/AuthContext';
 import { LoginPage } from './pages/Login';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
@@ -31,20 +30,11 @@ const App = () => {
                   <div className="flex-1 overflow-hidden">
                     <Routes>
                       <Route path="/login" element={<LoginPage />} />
-                      <Route
-                        path="/*"
-                        element={
-                          <ProtectedRoute>
-                            <Routes>
-                              <Route path="/" element={<Index />} />
-                              <Route path="/blockchain" element={<BlockchainDashboard />} />
-                              <Route path="/blockchain/block/:blockNumber" element={<BlockDetails />} />
-                              <Route path="/blockchain/transaction/:transactionId" element={<TransactionDetails />} />
-                              <Route path="*" element={<Navigate to="/" replace />} />
-                            </Routes>
-                          </ProtectedRoute>
-                        }
-                      />
+                      <Route path="/" element={<Index />} />
+                      <Route path="/blockchain" element={<BlockchainDashboard />} />
+                      <Route path="/blockchain/block/:blockNumber" element={<BlockDetails />} />
+                      <Route path="/blockchain/transaction/:transactionId" element={<TransactionDetails />} />
+                      <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                   </div>
                 </div>

@@ -31,6 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @DisabledInAotMode
 class SatelliteModelServiceTest {
+
   @MockitoBean
   private SatelliteModelRepository satelliteModelRepository;
 
@@ -47,7 +48,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test saveSatelliteModel(SatelliteModel); then return SatelliteModel()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"SatelliteModel SatelliteModelService.saveSatelliteModel(SatelliteModel)"})
   void testSaveSatelliteModel_thenReturnSatelliteModel() {
     // Arrange
@@ -92,7 +93,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test saveSatelliteModel(SatelliteModel); then throw RuntimeException")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"SatelliteModel SatelliteModelService.saveSatelliteModel(SatelliteModel)"})
   void testSaveSatelliteModel_thenThrowRuntimeException() {
     // Arrange
@@ -124,7 +125,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test getAllSatellitesModel(); then return Empty")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"List SatelliteModelService.getAllSatellitesModel()"})
   void testGetAllSatellitesModel_thenReturnEmpty() {
     // Arrange
@@ -148,7 +149,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test getAllSatellitesModel(); then throw RuntimeException")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"List SatelliteModelService.getAllSatellitesModel()"})
   void testGetAllSatellitesModel_thenThrowRuntimeException() {
     // Arrange
@@ -169,7 +170,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test getSatelliteModelById(Long); then return Optional with SatelliteModel()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"Optional SatelliteModelService.getSatelliteModelById(Long)"})
   void testGetSatelliteModelById_thenReturnOptionalWithSatelliteModel() {
     // Arrange
@@ -204,7 +205,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test getSatelliteModelById(Long); then throw RuntimeException")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"Optional SatelliteModelService.getSatelliteModelById(Long)"})
   void testGetSatelliteModelById_thenThrowRuntimeException() {
     // Arrange
@@ -222,7 +223,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test updateSatelliteModel(Long, SatelliteModel)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"SatelliteModel SatelliteModelService.updateSatelliteModel(Long, SatelliteModel)"})
   void testUpdateSatelliteModel() {
     // Arrange
@@ -267,7 +268,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test updateSatelliteModel(Long, SatelliteModel); given SatelliteModelRepository findById(Object) return empty")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"SatelliteModel SatelliteModelService.updateSatelliteModel(Long, SatelliteModel)"})
   void testUpdateSatelliteModel_givenSatelliteModelRepositoryFindByIdReturnEmpty() {
     // Arrange
@@ -300,7 +301,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test updateSatelliteModel(Long, SatelliteModel); then return SatelliteModel()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"SatelliteModel SatelliteModelService.updateSatelliteModel(Long, SatelliteModel)"})
   void testUpdateSatelliteModel_thenReturnSatelliteModel() {
     // Arrange
@@ -359,7 +360,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test deleteSatelliteModel(Long); given SatelliteModelRepository deleteById(Object) does nothing")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"void SatelliteModelService.deleteSatelliteModel(Long)"})
   void testDeleteSatelliteModel_givenSatelliteModelRepositoryDeleteByIdDoesNothing() {
     // Arrange
@@ -382,7 +383,7 @@ class SatelliteModelServiceTest {
    */
   @Test
   @DisplayName("Test deleteSatelliteModel(Long); then throw RuntimeException")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"void SatelliteModelService.deleteSatelliteModel(Long)"})
   void testDeleteSatelliteModel_thenThrowRuntimeException() {
     // Arrange

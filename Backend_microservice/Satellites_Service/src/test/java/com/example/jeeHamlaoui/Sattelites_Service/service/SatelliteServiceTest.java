@@ -48,7 +48,7 @@ class SatelliteServiceTest {
    */
   @Test
   @DisplayName("Test save(Satellite)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"Satellite SatelliteService.save(Satellite)"})
   void testSave() {
     // Arrange
@@ -114,7 +114,6 @@ class SatelliteServiceTest {
    */
   @Test
   @DisplayName("Test findById(Long)")
-  @Tag("MaintainedByDiffblue")
   @MethodsUnderTest({"Optional SatelliteService.findById(Long)"})
   void testFindById() {
     // Arrange
@@ -158,7 +157,7 @@ class SatelliteServiceTest {
    */
   @Test
   @DisplayName("Test findAll()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"List SatelliteService.findAll()"})
   void testFindAll() {
     // Arrange
@@ -179,7 +178,7 @@ class SatelliteServiceTest {
    */
   @Test
   @DisplayName("Test deleteById(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"void SatelliteService.deleteById(Long)"})
   void testDeleteById() {
     // Arrange
@@ -203,7 +202,7 @@ class SatelliteServiceTest {
    */
   @Test
   @DisplayName("Test existsById(Long); given SatelliteRepository existsById(Object) return 'false'; then return 'false'")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"boolean SatelliteService.existsById(Long)"})
   void testExistsById_givenSatelliteRepositoryExistsByIdReturnFalse_thenReturnFalse() {
     // Arrange
@@ -228,7 +227,7 @@ class SatelliteServiceTest {
    */
   @Test
   @DisplayName("Test existsById(Long); given SatelliteRepository existsById(Object) return 'true'; then return 'true'")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"boolean SatelliteService.existsById(Long)"})
   void testExistsById_givenSatelliteRepositoryExistsByIdReturnTrue_thenReturnTrue() {
     // Arrange
@@ -249,7 +248,7 @@ class SatelliteServiceTest {
    */
   @Test
   @DisplayName("Test findByName(String)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"Optional SatelliteService.findByName(String)"})
   void testFindByName() {
     // Arrange
@@ -293,7 +292,7 @@ class SatelliteServiceTest {
    */
   @Test
   @DisplayName("Test findAllByGroundStationId(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"List SatelliteService.findAllByGroundStationId(Long)"})
   void testFindAllByGroundStationId() {
     // Arrange

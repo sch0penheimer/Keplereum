@@ -71,7 +71,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test createTrajectory(SatelliteTrajectoryRequest); then StatusCode return HttpStatus")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteTrajectoryController.createTrajectory(SatelliteTrajectoryRequest)"})
   void testCreateTrajectory_thenStatusCodeReturnHttpStatus() {
     //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
@@ -219,7 +219,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test getAllTrajectoriesById(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteTrajectoryController.getAllTrajectoriesById(Long)"})
   void testGetAllTrajectoriesById() throws Exception {
     // Arrange
@@ -243,7 +243,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test getCurrentTrajectoryById(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteTrajectoryController.getCurrentTrajectoryById(Long)"})
   void testGetCurrentTrajectoryById() throws Exception {
     // Arrange
@@ -306,7 +306,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test updateTrajectory(Long, SatelliteTrajectory)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteTrajectoryController.updateTrajectory(Long, SatelliteTrajectory)"})
   void testUpdateTrajectory() {
     //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
@@ -454,7 +454,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test updateTrajectory(Long, SatelliteTrajectory)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteTrajectoryController.updateTrajectory(Long, SatelliteTrajectory)"})
   void testUpdateTrajectory2() {
     //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
@@ -565,7 +565,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test updateTrajectory(Long, SatelliteTrajectory)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteTrajectoryController.updateTrajectory(Long, SatelliteTrajectory)"})
   void testUpdateTrajectory3() {
     //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
@@ -635,7 +635,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test updateTrajectory(Long, SatelliteTrajectory); given SatelliteTrajectoryRepository findById(Object) return empty")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteTrajectoryController.updateTrajectory(Long, SatelliteTrajectory)"})
   void testUpdateTrajectory_givenSatelliteTrajectoryRepositoryFindByIdReturnEmpty() {
     //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
@@ -711,7 +711,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test updateTrajectory(Long, SatelliteTrajectory); then calls updateTrajectory(Long, SatelliteTrajectory)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteTrajectoryController.updateTrajectory(Long, SatelliteTrajectory)"})
   void testUpdateTrajectory_thenCallsUpdateTrajectory() {
     //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
@@ -819,7 +819,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test deleteTrajectory(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteTrajectoryController.deleteTrajectory(Long)"})
   void testDeleteTrajectory() throws Exception {
     // Arrange
@@ -840,7 +840,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test calculateOrbitalTrajectory(Long, double, double) with 'id', 'earthRadius', 'scaleFactor'")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({
       "OrbitalTrajectoryResponse SatelliteTrajectoryController.calculateOrbitalTrajectory(Long, double, double)"})
   void testCalculateOrbitalTrajectoryWithIdEarthRadiusScaleFactor() throws Exception {
@@ -870,7 +870,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test calculateOrbitalTrajectory(Long, double, double) with 'id', 'earthRadius', 'scaleFactor'")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({
       "OrbitalTrajectoryResponse SatelliteTrajectoryController.calculateOrbitalTrajectory(Long, double, double)"})
   void testCalculateOrbitalTrajectoryWithIdEarthRadiusScaleFactor2() throws Exception {
@@ -901,7 +901,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test calculateOrbitalTrajectory(double, double, double, double, double, double, double) with 'perigeeAltitude', 'eccentricity', 'inclination', 'longitudeOfAscendingNode', 'argumentOfPeriapsis', 'earthRadius', 'scaleFactor'")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({
       "OrbitalTrajectoryResponse SatelliteTrajectoryController.calculateOrbitalTrajectory(double, double, double, double, double, double, double)"})
   void testCalculateOrbitalTrajectoryWithPerigeeAltitudeEccentricityInclinationLongitudeOfAscendingNodeArgumentOfPeriapsisEarthRadiusScaleFactor()
@@ -937,7 +937,7 @@ class SatelliteTrajectoryControllerTest {
    */
   @Test
   @DisplayName("Test calculateOrbitalTrajectory(double, double, double, double, double, double, double) with 'perigeeAltitude', 'eccentricity', 'inclination', 'longitudeOfAscendingNode', 'argumentOfPeriapsis', 'earthRadius', 'scaleFactor'")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({
       "OrbitalTrajectoryResponse SatelliteTrajectoryController.calculateOrbitalTrajectory(double, double, double, double, double, double, double)"})
   void testCalculateOrbitalTrajectoryWithPerigeeAltitudeEccentricityInclinationLongitudeOfAscendingNodeArgumentOfPeriapsisEarthRadiusScaleFactor2()

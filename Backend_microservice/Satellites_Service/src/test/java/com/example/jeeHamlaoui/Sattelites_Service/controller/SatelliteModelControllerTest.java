@@ -42,7 +42,7 @@ class SatelliteModelControllerTest {
    */
   @Test
   @DisplayName("Test createModel(SatelliteModel)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"org.springframework.http.ResponseEntity SatelliteModelController.createModel(SatelliteModel)"})
   void testCreateModel() throws Exception {
     // Arrange
@@ -93,7 +93,7 @@ class SatelliteModelControllerTest {
    */
   @Test
   @DisplayName("Test getAllModels()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"org.springframework.http.ResponseEntity SatelliteModelController.getAllModels()"})
   void testGetAllModels() throws Exception {
     // Arrange
@@ -116,7 +116,7 @@ class SatelliteModelControllerTest {
    */
   @Test
   @DisplayName("Test getModelById(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"org.springframework.http.ResponseEntity SatelliteModelController.getModelById(Long)"})
   void testGetModelById() throws Exception {
     // Arrange
@@ -157,7 +157,7 @@ class SatelliteModelControllerTest {
    */
   @Test
   @DisplayName("Test updateModel(Long, SatelliteModel); then status isNotFound()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({
       "org.springframework.http.ResponseEntity SatelliteModelController.updateModel(Long, SatelliteModel)"})
   void testUpdateModel_thenStatusIsNotFound() throws Exception {
@@ -197,7 +197,7 @@ class SatelliteModelControllerTest {
    */
   @Test
   @DisplayName("Test updateModel(Long, SatelliteModel); then status isOk()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({
       "org.springframework.http.ResponseEntity SatelliteModelController.updateModel(Long, SatelliteModel)"})
   void testUpdateModel_thenStatusIsOk() throws Exception {
@@ -250,7 +250,7 @@ class SatelliteModelControllerTest {
    */
   @Test
   @DisplayName("Test deleteModel(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"org.springframework.http.ResponseEntity SatelliteModelController.deleteModel(Long)"})
   void testDeleteModel() throws Exception {
     // Arrange

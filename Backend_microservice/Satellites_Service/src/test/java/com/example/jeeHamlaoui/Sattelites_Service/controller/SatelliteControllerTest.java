@@ -59,7 +59,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test createOrUpdateSatellite(Satellite); then calls save(Object)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.createOrUpdateSatellite(Satellite)"})
   void testCreateOrUpdateSatellite_thenCallsSave() {
     //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
@@ -141,7 +141,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test createOrUpdateSatellite(Satellite); then calls save(Satellite)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.createOrUpdateSatellite(Satellite)"})
   void testCreateOrUpdateSatellite_thenCallsSave2() {
     //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
@@ -223,7 +223,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test getSatelliteById(Long); then status isNotFound()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.getSatelliteById(Long)"})
   void testGetSatelliteById_thenStatusIsNotFound() throws Exception {
     // Arrange
@@ -248,7 +248,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test getSatelliteById(Long); then status isOk()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.getSatelliteById(Long)"})
   void testGetSatelliteById_thenStatusIsOk() throws Exception {
     // Arrange
@@ -299,7 +299,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test getAllSatellites()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.getAllSatellites()"})
   void testGetAllSatellites() throws Exception {
     // Arrange
@@ -325,7 +325,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test deleteSatellite(Long); then status isNoContent()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.deleteSatellite(Long)"})
   void testDeleteSatellite_thenStatusIsNoContent() throws Exception {
     // Arrange
@@ -350,7 +350,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test deleteSatellite(Long); then status isNotFound()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.deleteSatellite(Long)"})
   void testDeleteSatellite_thenStatusIsNotFound() throws Exception {
     // Arrange
@@ -375,7 +375,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test getSatelliteByName(String); then status isNotFound()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.getSatelliteByName(String)"})
   void testGetSatelliteByName_thenStatusIsNotFound() throws Exception {
     // Arrange
@@ -400,7 +400,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test getSatelliteByName(String); then status isOk()")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.getSatelliteByName(String)"})
   void testGetSatelliteByName_thenStatusIsOk() throws Exception {
     // Arrange
@@ -451,7 +451,7 @@ class SatelliteControllerTest {
    */
   @Test
   @DisplayName("Test findAllByUserId(Long)")
-  @Tag("MaintainedByDiffblue")
+  
   @MethodsUnderTest({"ResponseEntity SatelliteController.findAllByUserId(Long)"})
   void testFindAllByUserId() throws Exception {
     // Arrange

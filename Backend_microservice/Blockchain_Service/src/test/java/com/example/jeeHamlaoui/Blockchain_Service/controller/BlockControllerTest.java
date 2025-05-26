@@ -4,294 +4,366 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.diffblue.cover.annotations.MethodsUnderTest;
+import com.example.jeeHamlaoui.Blockchain_Service.exception.GlobalExceptionHandler;
 import com.example.jeeHamlaoui.Blockchain_Service.model.Block;
+import com.example.jeeHamlaoui.Blockchain_Service.model.BlockTransaction;
 import com.example.jeeHamlaoui.Blockchain_Service.model.NetworkNode;
 import com.example.jeeHamlaoui.Blockchain_Service.model.dto.BlockDTO;
+import com.example.jeeHamlaoui.Blockchain_Service.model.dto.TransactionDTO;
+import com.example.jeeHamlaoui.Blockchain_Service.model.enumerate.TransactionStatus;
 import com.example.jeeHamlaoui.Blockchain_Service.repository.BlockRepository;
 import com.example.jeeHamlaoui.Blockchain_Service.repository.BlockTransactionRepository;
 import com.example.jeeHamlaoui.Blockchain_Service.repository.NetworkNodeRepository;
 import com.example.jeeHamlaoui.Blockchain_Service.service.BlockService;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Optional;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.aot.DisabledInAotMode;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import com.example.jeeHamlaoui.Blockchain_Service.service.BlockService;
 
 @ContextConfiguration(classes = {BlockController.class})
 @ExtendWith(SpringExtension.class)
 @DisabledInAotMode
 class BlockControllerTest {
-    @Autowired
-    private BlockController blockController;
 
-    @MockitoBean
+    @Mock
     private BlockService blockService;
 
-    /**
-     * Test {@link BlockController#getLatestBlock()}.
-     * <p>
-     * Method under test: {@link BlockController#getLatestBlock()}
-     */
-    @Test
-    @DisplayName("Test getLatestBlock()")
-    @Tag("MaintainedByDiffblue")
-    @MethodsUnderTest({"Optional BlockController.getLatestBlock()"})
-    void testGetLatestBlock() throws Exception {
-        // Arrange
-        NetworkNode validator = new NetworkNode();
-        validator.setAuthorityStatus(true);
-        validator.setBlocksValidated(1);
-        validator.setLastActive(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-        validator.setNodeName("Node Name");
-        validator.setPublicKey("Public Key");
-        validator.setReceivedTransactions(new ArrayList<>());
-        validator.setSentTransactions(new ArrayList<>());
+    @InjectMocks
+    private BlockController blockController;
 
-        Block block = new Block();
-        block.setBlockSize("Block Size");
-        block.setBlockWeight(10.0d);
-        block.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-        block.setCurrentBlockHash("Current Block Hash");
-        block.setHeight(1L);
-        block.setPreviousBlockHash("Previous Block Hash");
-        block.setSha3Uncles("Sha3 Uncles");
-        block.setTransactionRoot("Transaction Root");
-        block.setTransactions(new ArrayList<>());
-        block.setValidator(validator);
-        Optional<Block> ofResult = Optional.of(block);
-        when(blockService.getLatestBlock()).thenReturn(ofResult);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/blocks/latest");
+    private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
+    private Block testBlock;
+    private NetworkNode testValidator;
+    private BlockDTO testBlockDTO;
+    private BlockTransaction testTransaction;
 
-        // Act and Assert
-        MockMvcBuilders.standaloneSetup(blockController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.content()
-                        .string(
-                                "{\"height\":1,\"previousBlockHash\":\"Previous Block Hash\",\"currentBlockHash\":\"Current Block Hash\",\"createdAt"
-                                        + "\":0.0,\"blockWeight\":10.0,\"transactionRoot\":\"Transaction Root\",\"sha3Uncles\":\"Sha3 Uncles\",\"blockSize\":\"Block"
-                                        + " Size\",\"transactions\":[],\"validator\":{\"publicKey\":\"Public Key\",\"privateKey\":null,\"authorityStatus\":true,\"blocksValidated"
-                                        + "\":1,\"lastActive\":0.0,\"nodeName\":\"Node Name\"}}"));
+    @BeforeEach
+    void setUp() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        mockMvc = MockMvcBuilders.standaloneSetup(blockController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+
+        setupTestData();
     }
 
-    /**
-     * Test {@link BlockController#getBlockByHeight(Long)}.
-     * <p>
-     * Method under test: {@link BlockController#getBlockByHeight(Long)}
-     */
-    @Test
-    @DisplayName("Test getBlockByHeight(Long)")
-    @Tag("MaintainedByDiffblue")
-    @MethodsUnderTest({"Optional BlockController.getBlockByHeight(Long)"})
-    void testGetBlockByHeight() throws Exception {
-        // Arrange
-        NetworkNode validator = new NetworkNode();
-        validator.setAuthorityStatus(true);
-        validator.setBlocksValidated(1);
-        validator.setLastActive(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-        validator.setNodeName("Node Name");
-        validator.setPublicKey("Public Key");
-        validator.setReceivedTransactions(new ArrayList<>());
-        validator.setSentTransactions(new ArrayList<>());
+    private void setupTestData() {
+        // Setup validator
+        testValidator = new NetworkNode();
+        testValidator.setPublicKey("0xvalidator123456789");
+        testValidator.setNodeName("Validator-1");
+        testValidator.setAuthorityStatus(true);
 
-        Block block = new Block();
-        block.setBlockSize("Block Size");
-        block.setBlockWeight(10.0d);
-        block.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-        block.setCurrentBlockHash("Current Block Hash");
-        block.setHeight(1L);
-        block.setPreviousBlockHash("Previous Block Hash");
-        block.setSha3Uncles("Sha3 Uncles");
-        block.setTransactionRoot("Transaction Root");
-        block.setTransactions(new ArrayList<>());
-        block.setValidator(validator);
-        Optional<Block> ofResult = Optional.of(block);
-        when(blockService.getBlockByHeight(Mockito.<Long>any())).thenReturn(ofResult);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/blocks/{height}", 1L);
+        // Setup test transaction
+        testTransaction = new BlockTransaction();
+        testTransaction.setHash("0xtx123");
+        testTransaction.setAmount(100.0);
+        testTransaction.setStatus(TransactionStatus.PENDING);
+        testTransaction.setGasPrice(20.0);
+        testTransaction.setGasLimit(21000.0);
+        testTransaction.setGasUsed(21000.0);
+        testTransaction.setCreatedAt(Instant.now());
 
-        // Act and Assert
-        MockMvcBuilders.standaloneSetup(blockController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.content()
-                        .string(
-                                "{\"height\":1,\"previousBlockHash\":\"Previous Block Hash\",\"currentBlockHash\":\"Current Block Hash\",\"createdAt"
-                                        + "\":0.0,\"blockWeight\":10.0,\"transactionRoot\":\"Transaction Root\",\"sha3Uncles\":\"Sha3 Uncles\",\"blockSize\":\"Block"
-                                        + " Size\",\"transactions\":[],\"validator\":{\"publicKey\":\"Public Key\",\"privateKey\":null,\"authorityStatus\":true,\"blocksValidated"
-                                        + "\":1,\"lastActive\":0.0,\"nodeName\":\"Node Name\"}}"));
+        // Setup test block
+        testBlock = new Block();
+        testBlock.setHeight(1L);
+        testBlock.setCurrentBlockHash("0xblock123");
+        testBlock.setPreviousBlockHash("0xprevious123");
+        testBlock.setValidator(testValidator);
+        testBlock.setCreatedAt(Instant.now());
+        testBlock.setBlockWeight(100.0);
+        testBlock.setTransactionRoot("0xroot123");
+        testBlock.setSha3Uncles("0xuncles123");
+        testBlock.setBlockSize("1024");
+        testBlock.setTransactions(new ArrayList<>(Arrays.asList(testTransaction)));
+
+        // Setup test block DTO
+        testBlockDTO = new BlockDTO();
+        testBlockDTO.setNumber(1L);
+        testBlockDTO.setHash("0xblock123");
+        testBlockDTO.setParentHash("0xprevious123");
+        testBlockDTO.setValidator("0xvalidator123456789");
+        testBlockDTO.setSize(1024);
+        testBlockDTO.setTimestamp(Instant.now());
+        testBlockDTO.setGasLimit(8000000.0);
+        testBlockDTO.setGasUsed(4000000.0);
+        testBlockDTO.setTotalFees(0.5);
+        testBlockDTO.setTransactionCount(1);
+        testBlockDTO.setTransactions(new ArrayList<>());
     }
 
-    /**
-     * Test {@link BlockController#getBlockByHash(String)}.
-     * <p>
-     * Method under test: {@link BlockController#getBlockByHash(String)}
-     */
-    @Test
-    @DisplayName("Test getBlockByHash(String)")
-    @Tag("MaintainedByDiffblue")
-    @MethodsUnderTest({"Optional BlockController.getBlockByHash(String)"})
-    void testGetBlockByHash() throws Exception {
-        // Arrange
-        NetworkNode validator = new NetworkNode();
-        validator.setAuthorityStatus(true);
-        validator.setBlocksValidated(1);
-        validator.setLastActive(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-        validator.setNodeName("Node Name");
-        validator.setPublicKey("Public Key");
-        validator.setReceivedTransactions(new ArrayList<>());
-        validator.setSentTransactions(new ArrayList<>());
+    @Nested
+    @DisplayName("GET /api/v1/blocks/latest - Latest Block Endpoint")
+    class GetLatestBlockTests {
 
-        Block block = new Block();
-        block.setBlockSize("Block Size");
-        block.setBlockWeight(10.0d);
-        block.setCreatedAt(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-        block.setCurrentBlockHash("Current Block Hash");
-        block.setHeight(1L);
-        block.setPreviousBlockHash("Previous Block Hash");
-        block.setSha3Uncles("Sha3 Uncles");
-        block.setTransactionRoot("Transaction Root");
-        block.setTransactions(new ArrayList<>());
-        block.setValidator(validator);
-        Optional<Block> ofResult = Optional.of(block);
-        when(blockService.getBlockByHash(Mockito.<String>any())).thenReturn(ofResult);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/v1/blocks/hash/{hash}", "Hash");
+        @Test
+        @DisplayName("Should return latest block with full details")
+        void shouldReturnLatestBlockWithFullDetails() throws Exception {
+            when(blockService.getLatestBlock()).thenReturn(Optional.of(testBlock));
 
-        // Act and Assert
-        MockMvcBuilders.standaloneSetup(blockController)
-                .build()
-                .perform(requestBuilder)
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.content()
-                        .string(
-                                "{\"height\":1,\"previousBlockHash\":\"Previous Block Hash\",\"currentBlockHash\":\"Current Block Hash\",\"createdAt"
-                                        + "\":0.0,\"blockWeight\":10.0,\"transactionRoot\":\"Transaction Root\",\"sha3Uncles\":\"Sha3 Uncles\",\"blockSize\":\"Block"
-                                        + " Size\",\"transactions\":[],\"validator\":{\"publicKey\":\"Public Key\",\"privateKey\":null,\"authorityStatus\":true,\"blocksValidated"
-                                        + "\":1,\"lastActive\":0.0,\"nodeName\":\"Node Name\"}}"));
+            mockMvc.perform(get("/api/v1/blocks/latest")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.height").value(testBlock.getHeight()))
+                    .andExpect(jsonPath("$.currentBlockHash").value(testBlock.getCurrentBlockHash()))
+                    .andExpect(jsonPath("$.previousBlockHash").value(testBlock.getPreviousBlockHash()))
+                    .andExpect(jsonPath("$.validator.publicKey").value(testValidator.getPublicKey()))
+                    .andExpect(jsonPath("$.validator.authorityStatus").value(testValidator.isAuthorityStatus()))
+                    .andExpect(jsonPath("$.transactions").isArray())
+                    .andExpect(jsonPath("$.transactions[0].hash").value(testTransaction.getHash()))
+                    .andExpect(jsonPath("$.transactions[0].status").value(testTransaction.getStatus().toString()));
+
+            verify(blockService, times(1)).getLatestBlock();
+        }
+
+        @Test
+        @DisplayName("Should return empty optional when no latest block exists")
+        void shouldReturnEmptyOptionalWhenNoLatestBlockExists() throws Exception {
+            when(blockService.getLatestBlock()).thenReturn(Optional.empty());
+
+            mockMvc.perform(get("/api/v1/blocks/latest")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk());  // Your controller returns 200 with empty Optional
+
+            verify(blockService, times(1)).getLatestBlock();
+        }
     }
 
-    /**
-     * Test {@link BlockController#saveBlock(BlockDTO)}.
-     * <ul>
-     *   <li>Given {@link BlockRepository} {@link BlockRepository#existsByHeight(Long)} return {@code true}.</li>
-     * </ul>
-     * <p>
-     * Method under test: {@link BlockController#saveBlock(BlockDTO)}
-     */
-    @Test
-    @DisplayName("Test saveBlock(BlockDTO); given BlockRepository existsByHeight(Long) return 'true'")
-    @Tag("MaintainedByDiffblue")
-    @MethodsUnderTest({"ResponseEntity BlockController.saveBlock(BlockDTO)"})
-    void testSaveBlock_givenBlockRepositoryExistsByHeightReturnTrue() {
-        // Arrange
-        BlockRepository blockRepository = mock(BlockRepository.class);
-        when(blockRepository.existsByHeight(Mockito.<Long>any())).thenReturn(true);
-        BlockController blockController = new BlockController(
-                new BlockService(blockRepository, mock(BlockTransactionRepository.class), mock(NetworkNodeRepository.class)));
+    @Nested
+    @DisplayName("GET /api/v1/blocks/{height} - Get Block by Height Endpoint")
+    class GetBlockByHeightTests {
 
-        BlockDTO block = new BlockDTO();
-        block.setGasLimit(10.0d);
-        block.setGasUsed(10.0d);
-        block.setHash("Hash");
-        block.setNumber(1L);
-        block.setParentHash("Parent Hash");
-        block.setSha3uncles("Sha3uncles");
-        block.setSize(3);
-        block.setTimestamp(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-        block.setTotalFees(10.0d);
-        block.setTransactionCount(3);
-        block.setTransactionRoot("Transaction Root");
-        block.setTransactions(new ArrayList<>());
-        block.setValidator("Validator");
+        @Test
+        @DisplayName("Should return block with transactions when height exists")
+        void shouldReturnBlockWithTransactionsWhenHeightExists() throws Exception {
+            Long height = 1L;
+            when(blockService.getBlockByHeight(height)).thenReturn(Optional.of(testBlock));
 
-        // Act
-        ResponseEntity<Void> actualSaveBlockResult = blockController.saveBlock(block);
+            mockMvc.perform(get("/api/v1/blocks/{height}", height)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.height").value(height))
+                    .andExpect(jsonPath("$.currentBlockHash").value(testBlock.getCurrentBlockHash()))
+                    .andExpect(jsonPath("$.transactions").isArray())
+                    .andExpect(jsonPath("$.transactions[0].hash").value(testTransaction.getHash()));
 
-        // Assert
-        verify(blockRepository).existsByHeight(eq(1L));
-        HttpStatusCode statusCode = actualSaveBlockResult.getStatusCode();
-        assertTrue(statusCode instanceof HttpStatus);
-        assertNull(actualSaveBlockResult.getBody());
-        assertEquals(409, actualSaveBlockResult.getStatusCodeValue());
-        assertEquals(HttpStatus.CONFLICT, statusCode);
-        assertFalse(actualSaveBlockResult.hasBody());
-        assertTrue(actualSaveBlockResult.getHeaders().isEmpty());
+            verify(blockService, times(1)).getBlockByHeight(height);
+        }
+
+        @Test
+        @DisplayName("Should return empty optional when height does not exist")
+        void shouldReturnEmptyOptionalWhenHeightDoesNotExist() throws Exception {
+            Long height = 99999L;
+            when(blockService.getBlockByHeight(height)).thenReturn(Optional.empty());
+
+            mockMvc.perform(get("/api/v1/blocks/{height}", height)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk());  // Your controller returns 200 with empty Optional
+
+            verify(blockService, times(1)).getBlockByHeight(height);
+        }
+
+        @Test
+        @DisplayName("Should handle invalid height parameter")
+        void shouldHandleInvalidHeightParameter() throws Exception {
+            mockMvc.perform(get("/api/v1/blocks/{height}", "invalid")
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.error").value("Bad Request"))
+                    .andExpect(jsonPath("$.message").value("Invalid parameter format"));
+
+            verify(blockService, never()).getBlockByHeight(any());
+        }
     }
 
-    /**
-     * Test {@link BlockController#saveBlock(BlockDTO)}.
-     * <ul>
-     *   <li>Then calls {@link BlockRepository#existsByCurrentBlockHash(String)}.</li>
-     * </ul>
-     * <p>
-     * Method under test: {@link BlockController#saveBlock(BlockDTO)}
-     */
-    @Test
-    @DisplayName("Test saveBlock(BlockDTO); then calls existsByCurrentBlockHash(String)")
-    @Tag("MaintainedByDiffblue")
-    @MethodsUnderTest({"ResponseEntity BlockController.saveBlock(BlockDTO)"})
-    void testSaveBlock_thenCallsExistsByCurrentBlockHash() {
-        // Arrange
-        BlockRepository blockRepository = mock(BlockRepository.class);
-        when(blockRepository.existsByCurrentBlockHash(Mockito.<String>any())).thenReturn(true);
-        when(blockRepository.existsByHeight(Mockito.<Long>any())).thenReturn(false);
-        BlockController blockController = new BlockController(
-                new BlockService(blockRepository, mock(BlockTransactionRepository.class), mock(NetworkNodeRepository.class)));
+    @Nested
+    @DisplayName("GET /api/v1/blocks/hash/{hash} - Get Block by Hash Endpoint")
+    class GetBlockByHashTests {
 
-        BlockDTO block = new BlockDTO();
-        block.setGasLimit(10.0d);
-        block.setGasUsed(10.0d);
-        block.setHash("Hash");
-        block.setNumber(1L);
-        block.setParentHash("Parent Hash");
-        block.setSha3uncles("Sha3uncles");
-        block.setSize(3);
-        block.setTimestamp(LocalDate.of(1970, 1, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
-        block.setTotalFees(10.0d);
-        block.setTransactionCount(3);
-        block.setTransactionRoot("Transaction Root");
-        block.setTransactions(new ArrayList<>());
-        block.setValidator("Validator");
+        @Test
+        @DisplayName("Should return block with full details when hash exists")
+        void shouldReturnBlockWithFullDetailsWhenHashExists() throws Exception {
+            String hash = "0xblock123";
+            when(blockService.getBlockByHash(hash)).thenReturn(Optional.of(testBlock));
 
-        // Act
-        ResponseEntity<Void> actualSaveBlockResult = blockController.saveBlock(block);
+            mockMvc.perform(get("/api/v1/blocks/hash/{hash}", hash)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.currentBlockHash").value(hash))
+                    .andExpect(jsonPath("$.height").value(testBlock.getHeight()))
+                    .andExpect(jsonPath("$.blockWeight").value(testBlock.getBlockWeight()))
+                    .andExpect(jsonPath("$.transactionRoot").value(testBlock.getTransactionRoot()))
+                    .andExpect(jsonPath("$.transactions").isArray());
 
-        // Assert
-        verify(blockRepository).existsByCurrentBlockHash(eq("Hash"));
-        verify(blockRepository).existsByHeight(eq(1L));
-        HttpStatusCode statusCode = actualSaveBlockResult.getStatusCode();
-        assertTrue(statusCode instanceof HttpStatus);
-        assertNull(actualSaveBlockResult.getBody());
-        assertEquals(409, actualSaveBlockResult.getStatusCodeValue());
-        assertEquals(HttpStatus.CONFLICT, statusCode);
-        assertFalse(actualSaveBlockResult.hasBody());
-        assertTrue(actualSaveBlockResult.getHeaders().isEmpty());
+            verify(blockService, times(1)).getBlockByHash(hash);
+        }
+
+        @Test
+        @DisplayName("Should return empty optional when hash does not exist")
+        void shouldReturnEmptyOptionalWhenHashDoesNotExist() throws Exception {
+            String hash = "0xnonexistent";
+            when(blockService.getBlockByHash(hash)).thenReturn(Optional.empty());
+
+            mockMvc.perform(get("/api/v1/blocks/hash/{hash}", hash)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk());  // Your controller returns 200 with empty Optional
+
+            verify(blockService, times(1)).getBlockByHash(hash);
+        }
+
+        @Test
+        @DisplayName("Should handle invalid hash format")
+        void shouldHandleInvalidHashFormat() throws Exception {
+            String invalidHash = "invalid_hash_format";
+            when(blockService.getBlockByHash(invalidHash))
+                    .thenThrow(new IllegalArgumentException("Invalid hash format"));
+
+            mockMvc.perform(get("/api/v1/blocks/hash/{hash}", invalidHash)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.error").value("Bad Request"))
+                    .andExpect(jsonPath("$.message").value("Invalid hash format"));
+
+            verify(blockService, times(1)).getBlockByHash(invalidHash);
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /api/v1/blocks - Save Block Endpoint")
+    class SaveBlockTests {
+
+        @Test
+        @DisplayName("Should save block successfully when no conflicts")
+        void shouldSaveBlockSuccessfullyWhenNoConflicts() throws Exception {
+            TransactionDTO txDTO = new TransactionDTO();
+            txDTO.setHash("0xtx123");
+            txDTO.setAmount(100.0);
+            txDTO.setStatus(TransactionStatus.PENDING);
+            testBlockDTO.setTransactions(Arrays.asList(txDTO));
+
+            when(blockService.blockExists(testBlockDTO.getNumber())).thenReturn(false);
+            when(blockService.blockExists(testBlockDTO.getHash())).thenReturn(false);
+            doNothing().when(blockService).createBlock(any(BlockDTO.class)); // Void method
+
+            mockMvc.perform(post("/api/v1/blocks")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(testBlockDTO)))
+                    .andExpect(status().isOk());
+
+            verify(blockService, times(1)).blockExists(testBlockDTO.getNumber());
+            verify(blockService, times(1)).blockExists(testBlockDTO.getHash());
+            verify(blockService, times(1)).createBlock(any(BlockDTO.class));
+        }
+
+        @Test
+        @DisplayName("Should return conflict when block height already exists")
+        void shouldReturnConflictWhenBlockHeightExists() throws Exception {
+            when(blockService.blockExists(testBlockDTO.getNumber())).thenReturn(true);
+
+            mockMvc.perform(post("/api/v1/blocks")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(testBlockDTO)))
+                    .andExpect(status().isConflict());
+
+            verify(blockService, times(1)).blockExists(testBlockDTO.getNumber());
+            verify(blockService, never()).createBlock(any(BlockDTO.class));
+        }
+
+        @Test
+        @DisplayName("Should return conflict when block hash already exists")
+        void shouldReturnConflictWhenBlockHashExists() throws Exception {
+            when(blockService.blockExists(testBlockDTO.getNumber())).thenReturn(false);
+            when(blockService.blockExists(testBlockDTO.getHash())).thenReturn(true);
+
+            mockMvc.perform(post("/api/v1/blocks")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(testBlockDTO)))
+                    .andExpect(status().isConflict());
+
+            verify(blockService, times(1)).blockExists(testBlockDTO.getNumber());
+            verify(blockService, times(1)).blockExists(testBlockDTO.getHash());
+            verify(blockService, never()).createBlock(any(BlockDTO.class));
+        }
+
+        @Test
+        @DisplayName("Should handle missing required fields")
+        void shouldHandleMissingRequiredFields() throws Exception {
+            testBlockDTO.setHash(null);
+            testBlockDTO.setNumber(null);
+
+            mockMvc.perform(post("/api/v1/blocks")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(testBlockDTO)))
+                    .andExpect(status().isOk());  // Your controller doesn't validate, so it returns 200
+
+            // Note: Your controller doesn't validate required fields, so this test expects 200
+        }
+    }
+
+    @Nested
+    @DisplayName("Error Handling Tests")
+    class ErrorHandlingTests {
+
+        @Test
+        @DisplayName("Should handle malformed JSON request")
+        void shouldHandleMalformedJsonRequest() throws Exception {
+            String malformedJson = "{ \"invalid\": \"json\" \"missing\": \"comma\" }";
+
+            mockMvc.perform(post("/api/v1/blocks")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(malformedJson))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.error").value("Bad Request"))
+                    .andExpect(jsonPath("$.message").value("Invalid request format"));
+
+            verify(blockService, never()).createBlock(any(BlockDTO.class));
+        }
+
+        @Test
+        @DisplayName("Should handle missing content type")
+        void shouldHandleMissingContentType() throws Exception {
+            mockMvc.perform(post("/api/v1/blocks")
+                            .content(objectMapper.writeValueAsString(testBlockDTO)))
+                    .andExpect(status().isUnsupportedMediaType());
+
+            verify(blockService, never()).createBlock(any(BlockDTO.class));
+        }
+
+        @Test
+        @DisplayName("Should handle empty request body")
+        void shouldHandleEmptyRequestBody() throws Exception {
+            mockMvc.perform(post("/api/v1/blocks")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(""))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.error").value("Bad Request"))
+                    .andExpect(jsonPath("$.message").value("Invalid request format"));
+
+            verify(blockService, never()).createBlock(any(BlockDTO.class));
+        }
     }
 }

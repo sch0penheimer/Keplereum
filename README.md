@@ -38,7 +38,6 @@ This project aims to design and implement a decentralized satellite communicatio
 1. **Satellite Communication Service**:
    - Handles communication between satellites and ground stations.
 
-
 2. **Blockchain Service**:
    - Manages smart contracts for message validation and logging.
    - Interacts with the blockchain network (Ethereum).
@@ -57,15 +56,14 @@ This project aims to design and implement a decentralized satellite communicatio
 #### **DevOps Infrastructure**
 - **Version Control**: Git (GitHub/GitLab) for code management.
 - **CI/CD Pipeline**:
-  - Automate testing, building, and deploying microservices using Jenkins or GitLab CI.
+  - Automate testing, building, and deploying microservices using Jenkins.
   - Use Docker to containerize each microservice.
   - Deploy containers to a Kubernetes cluster for orchestration.
+    
 - **Monitoring and Logging**:
   - Use Prometheus to collect metrics (e.g., CPU usage, latency).
   - Use Grafana to visualize metrics on the frontend dashboard.
   - Use the ELK Stack for centralized logging and log analysis.
-- **Infrastructure as Code (IaC)**:
-  - Use Terraform or Ansible to automate infrastructure setup (e.g., Kubernetes clusters, cloud resources).
 
 ---
 

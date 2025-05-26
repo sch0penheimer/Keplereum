@@ -5,7 +5,7 @@ services:
   ##-------------------------------------------##
 
   keplereum-config-server:
-    build: ./ConfigServer
+    image: keplereum/config-server
     container_name: keplereum-config-server
     ports:
       - "8888:8080"
@@ -16,7 +16,7 @@ services:
       interval: 30s
 
   keplereum-discovery-server:
-    build: ./DiscoveryServer
+    image: keplereum/discovery-server
     container_name: keplereum-discovery-server
     ports:
       - "8761:8761"
@@ -34,7 +34,7 @@ services:
       interval: 30s
 
   keplereum-api-gateway:
-    build: ./apiGateway
+    image: keplereum/api-gateway
     container_name: keplereum-api-gateway
     ports:
       - "8222:8222"
@@ -54,11 +54,11 @@ services:
   ##--------- Main Micro-Services ---------##
   ##---------------------------------------##
 
-  
+
   keplereum-user-service:
     links:
       - keplereum-zipkin
-    build: ./User_GroundStation_Service
+    image: keplereum/user-service
     container_name: keplereum-user-groundstation-service
     environment:
       JAVA_TOOL_OPTIONS: >-
@@ -94,7 +94,7 @@ services:
   keplereum-blockchain-service:
     links:
       - keplereum-zipkin
-    build: ./Blockchain_Service
+    image: keplereum/blockchain-service
     container_name: keplereum-blockchain-service
     environment:
       JAVA_TOOL_OPTIONS: >-
@@ -127,7 +127,7 @@ services:
   keplereum-satellites-service:
     links:
       - keplereum-zipkin
-    build: ./Satellites_Service
+    image: keplereum/satellites-service
     container_name: keplereum-satellites-service
     environment:
       JAVA_TOOL_OPTIONS: >-
@@ -263,5 +263,5 @@ volumes:
 
 networks:
   keplereum-microservices-net:
-    name: keplereum-microservices-net 
+    name: keplereum-microservices-net
     driver: bridge

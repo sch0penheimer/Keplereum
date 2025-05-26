@@ -193,6 +193,10 @@ Authentication is implemented using JWT (JSON Web Tokens) with the API Gateway a
 
 This project includes a fully automated **Jenkins pipeline** for continuous integration and delivery of all backend microservices.
 
+|![Pipeline Overview](./assets/jenkins_Pipeline.png)|
+|:-----------------------------------------------------:|
+| Pipeline Overview |
+
 
 ### Key Features
 

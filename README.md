@@ -18,6 +18,7 @@ Keplereum serves as a comprehensive platform for:
 ## High-Level Architecture
 
 Keplereum follows a microservices architecture with a clear separation of concerns:
+
 ![Architecture](./assets/Keplereum_Architecture_PNG_final.png)
 
 ## Monolith & Microservices Class Diagram
@@ -62,7 +63,9 @@ Integrates with the private Ethereum blockchain to record and verify critical ev
 -   Network node validation
 -   Alert system integration
 
-![Blockchain_Service](./assets/blockchain_service.png)
+|![Blockchain_Service](./assets/blockchain_service.png)|
+|:------------------------------------:|
+| High Level Architecture of Keplereum |
 
 ### 3. Blockchain Infrastructure
 Keplereum uses a private Ethereum blockchain network with multiple Geth nodes for transaction validation and smart contract execution. The blockchain is configured as:
@@ -88,7 +91,10 @@ Keplereum uses a private Ethereum blockchain network with multiple Geth nodes fo
 
 ## Blockchain Infrastructure
 The Keplereum blockchain infrastructure is designed as a private Ethereum network with multiple nodes for redundancy, fault tolerance, and distributed consensus. This infrastructure provides the immutable ledger for recording critical satellite events, alerts, confirmations, and actions.
-![Blockchain_Overview](./assets/blockchain_overview.png)
+
+|![Blockchain_Overview](./assets/blockchain_overview.png)|
+|:---------------------------------------------------:|
+| The PoA Ethereum Blockchain Infrastructure Overview |
 
 ### Private Ethereum Network
 The Keplereum blockchain is implemented as a private Ethereum network with the following characteristics:
@@ -104,7 +110,9 @@ The genesis block defines the initial state of the blockchain and includes confi
 ### Geth Nodes Configuration
 The infrastructure consists of five Ethereum nodes running go-ethereum (geth) client. Each node has a specific role in the network:
 
-![node_archi](./assets/node_archi.png)
+|![node_archi](./assets/node_archi.png)|
+|:----------------------------------:|
+| The Go-Ethereum Nodes Architecture |
 
 All nodes have the following configuration:
 
@@ -141,7 +149,9 @@ The Keplereum blockchain utilizes the  `SatelliteSystem`  smart contract to mana
     -   Operations related to network validators
     -   Management of consensus participants
 
-![smart_contract_overview](./assets/smart_contract_overview.png)
+|![smart_contract_overview](./assets/smart_contract_overview.png)|
+|:-----------------------:|
+| Smart Contract Overview |
 
 ## Monitoring Infrastructure
 
@@ -166,6 +176,9 @@ The blockchain infrastructure includes comprehensive monitoring tools:
 This monitoring setup ensures the operations team can maintain visibility into the blockchain's performance and health.
 ## Demo Links
 [Main Demo](https://drive.google.com/file/d/1QgRBYGIXICE6yn_chJQLGIOGzcgb3YVO/view?usp=drive_link "Main KEPLEREUM Demo")
+
+---
+
 [Actual Blockchain Monitoring](https://drive.google.com/file/d/1B5NoJdRDYW0m8flSNJyRVDDiNAY0juZf/view?usp=drive_link "Custom Blockchain Monitoring")
 
 ## Conclusion

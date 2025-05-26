@@ -71,9 +71,9 @@ Integrates with the private Ethereum blockchain to record and verify critical ev
 -   Network node validation
 -   Alert system integration
 
-|![Blockchain_Service](./assets/blockchain_service.png)|
-|:----------------------------------:|
-| The Blockchain "Base" Microservice |
+    |![Blockchain_Service](./assets/blockchain_service.png)|
+    |:----------------------------------:|
+    | The Blockchain "Base" Microservice |
 
 ### 3. Blockchain Infrastructure
 Keplereum uses a private Ethereum blockchain network with multiple Geth nodes for transaction validation and smart contract execution. The blockchain is configured as:
@@ -117,10 +117,9 @@ The genesis block defines the initial state of the blockchain and includes confi
 
 ### Geth Nodes Configuration
 The infrastructure consists of five Ethereum nodes running go-ethereum (geth) client. Each node has a specific role in the network:
-
-|![node_archi](./assets/node_archi.png)|
-|:----------------------------------:|
-| The Go-Ethereum Nodes Architecture |
+    |![node_archi](./assets/node_archi.png)|
+    |:----------------------------------:|
+    | The Go-Ethereum Nodes Architecture |
 
 All nodes have the following configuration:
 
@@ -157,9 +156,9 @@ The Keplereum blockchain utilizes the  `SatelliteSystem`  smart contract to mana
     -   Operations related to network validators
     -   Management of consensus participants
 
-|![smart_contract_overview](./assets/smart_contract_overview.png)|
-|:-----------------------:|
-| Smart Contract Overview |
+    |![smart_contract_overview](./assets/smart_contract_overview.png)|
+    |:-----------------------:|
+    | Smart Contract Overview |
 
 ## Monitoring Infrastructure
 
@@ -185,17 +184,16 @@ This monitoring setup ensures the operations team can maintain visibility into t
 
 ## Authentication and Security Flow
 Authentication is implemented using JWT (JSON Web Tokens) with the API Gateway acting as the security filter.
-|![Authentication and Security Flow](./assets/Authentification_flow.png)|
-|:-----------------------------------------------------:|
-| Authentication and Security Flow|
+    |![Authentication and Security Flow](./assets/Authentification_flow.png)|
+    |:-----------------------------------------------------:|
+    | Authentication and Security Flow|
 
 ## Jenkins CI/CD Pipeline
 
 This project includes a fully automated **Jenkins pipeline** for continuous integration and delivery of all backend microservices.
-
-|![Pipeline Overview](./assets/jenkins_Pipeline.png)|
-|:-----------------------------------------------------:|
-| Pipeline Overview |
+    |![Pipeline Overview](./assets/jenkins_Pipeline.png)|
+    |:-----------------------------------------------------:|
+    | Pipeline Overview |
 
 
 ### Key Features

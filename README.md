@@ -19,15 +19,22 @@ Keplereum serves as a comprehensive platform for:
 
 Keplereum follows a microservices architecture with a clear separation of concerns:
 
-![Architecture](./assets/Keplereum_Architecture_PNG_final.png)
+|![Architecture](./assets/Keplereum_Architecture_PNG_final.png)|
+|:------------------------------------:|
+| The High Level Architecture of Keplereum |
+
 
 ## Monolith & Microservices Class Diagram
 
-![Class_Diagram](./assets/Class_Diagram.png)
+|![Class_Diagram](./assets/Class_Diagram.png)|
+|:-----------------------------------------:|
+| The Monolithic class diagram of Keplereum |
 
 ---
 
-![Microservice_Class_Diagram](./assets/Microservice_Class_Diagram.png)
+|![Microservice_Class_Diagram](./assets/Microservice_Class_Diagram.png)|
+|:-----------------------------------------------------:|
+| The Microservices (Actual) class diagram of Keplereum |
 
 ## Core Components
 
@@ -64,8 +71,8 @@ Integrates with the private Ethereum blockchain to record and verify critical ev
 -   Alert system integration
 
 |![Blockchain_Service](./assets/blockchain_service.png)|
-|:------------------------------------:|
-| High Level Architecture of Keplereum |
+|:----------------------------------:|
+| The Blockchain "Base" Microservice |
 
 ### 3. Blockchain Infrastructure
 Keplereum uses a private Ethereum blockchain network with multiple Geth nodes for transaction validation and smart contract execution. The blockchain is configured as:
@@ -180,6 +187,12 @@ This monitoring setup ensures the operations team can maintain visibility into t
 ---
 
 [Actual Blockchain Monitoring](https://drive.google.com/file/d/1B5NoJdRDYW0m8flSNJyRVDDiNAY0juZf/view?usp=drive_link "Custom Blockchain Monitoring")
+
+## Documentation  
+  
+For detailed technical documentation, check our wiki:  
+- [Keplereum's WIKI](https://deepwiki.com/m-elhamlaoui/Keplereum)
+
 
 ## Conclusion
 

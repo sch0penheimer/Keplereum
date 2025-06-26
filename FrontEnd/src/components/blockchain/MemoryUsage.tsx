@@ -8,7 +8,18 @@ const MemoryUsage = () => {
   // Generate mock data for incoming transactions chart
   const generateChartData = () => {
     const data = [];
-    const timestamps = ["21:45", "22:00", "22:15", "22:30", "22:45", "23:00", "23:15", "23:30"];
+    // Generate timestamps dynamically for the past 2 hours, every 15 minutes, ending at current time (rounded to nearest 15 min)
+    const timestamps = [];
+    const now = new Date();
+    now.setSeconds(0, 0);
+    now.setMinutes(Math.floor(now.getMinutes() / 15) * 15);
+
+    for (let i = 7; i >= 0; i--) {
+      const t = new Date(now.getTime() - i * 15 * 60 * 1000);
+      const hh = t.getHours().toString().padStart(2, '0');
+      const mm = t.getMinutes().toString().padStart(2, '0');
+      timestamps.push(`${hh}:${mm}`);
+    }
     
     for (let i = 0; i < timestamps.length; i++) {
       const baseValue = 1000 + Math.random() * 1000;

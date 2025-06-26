@@ -108,4 +108,35 @@
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: rgba(86, 88, 105, 0.2);
   }
+  
+  /* Leaflet map styling for natural Earth colors */
+  .leaflet-container {
+    height: 100%;
+    width: 100%;
+    background: #1a202c;
+  }
+
+  .leaflet-control-container {
+    font-family: inherit;
+  }
+
+  .leaflet-popup-content-wrapper {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 4px;
+  }
+
+  .leaflet-popup-tip {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  /* Ensure map tiles load properly */
+  .leaflet-tile-container {
+    filter: none !important;
+  }
+
+  .leaflet-tile {
+    filter: none !important;
+  }
+
 }

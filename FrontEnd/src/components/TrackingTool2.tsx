@@ -21,7 +21,7 @@ const SensorStatusContent = () => {
   const [filterType, setFilterType] = useState("all");
 
   const filteredSatellites = satellites.filter(satellite => {
-    const isActive = ["sat-1", "sat-3"].includes(satellite.id);
+    const isActive = ["sat-1", "sat-3", "sat-4"].includes(satellite.id);
     
     if (filterType === "all") return true;
     if (filterType === "active") return isActive;
@@ -30,7 +30,7 @@ const SensorStatusContent = () => {
   });
 
   const getSensorStatus = (satelliteId) => {
-    return ["sat-1", "sat-3"].includes(satelliteId);
+    return ["sat-1", "sat-3", "sat-4"].includes(satelliteId);
   };
 
   const getCoverageArea = (satellite) => {

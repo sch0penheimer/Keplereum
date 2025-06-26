@@ -259,7 +259,11 @@ export default function SatelliteViewer() {
     scene.current.add(ambientLight);
     createEarth();
     createStars();
+    /* Initail Simulated Tornados */
     createTornado(33.984376, -6.867138);
+    createTornado(39.7392, -104.9903);
+    createTornado(32.7767, -96.7970);
+    createTornado(41.8781, -87.6298);
     animate();
   };
 
@@ -285,6 +289,7 @@ export default function SatelliteViewer() {
   
     earth.current = new THREE.Mesh(earthGeometry, earthMaterial);
     earth.current.receiveShadow = true;
+    earth.current.rotation.y = Math.PI; // <-- To face the correct direction
     scene.current.add(earth.current);
   
     //* Cloud layer *//

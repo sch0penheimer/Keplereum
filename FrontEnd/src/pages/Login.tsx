@@ -1,12 +1,15 @@
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Satellite } from 'lucide-react';
+import { loginUser } from '../utils/api';
+import { Satellite, Loader2 } from 'lucide-react';
 import * as THREE from 'three';
-import { useEffect, useRef, useState } from 'react';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     email: '',
@@ -81,9 +84,20 @@ export function LoginPage() {
     }));
   };
 
-  const handleLogin = () => {
-    login();
-    navigate('/');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      await loginUser(formData);
+      login();
+      navigate('/');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -103,12 +117,12 @@ export function LoginPage() {
               </div>
               <h1 className="text-3xl font-bold text-white">Keplereum</h1>
               <p className="text-gray-400 text-center">
-                Welcome to your satellite control dashboard
+                Access your satellite control dashboard
               </p>
             </div>
 
             {/* Login form */}
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
@@ -118,6 +132,7 @@ export function LoginPage() {
                     id="email"
                     name="email"
                     type="email"
+                    required
                     className="w-full px-4 py-3 rounded-lg bg-satellite-dark border border-satellite-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-satellite-accent focus:border-transparent transition-all"
                     placeholder="Enter your email"
                     value={formData.email}
@@ -132,6 +147,7 @@ export function LoginPage() {
                     id="password"
                     name="password"
                     type="password"
+                    required
                     className="w-full px-4 py-3 rounded-lg bg-satellite-dark border border-satellite-border text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-satellite-accent focus:border-transparent transition-all"
                     placeholder="Enter your password"
                     value={formData.password}
@@ -140,14 +156,27 @@ export function LoginPage() {
                 </div>
               </div>
 
-              {/* Login button */}
+              {error && (
+                <div className="text-red-400 text-sm text-center bg-red-400/10 py-2 px-4 rounded-lg border border-red-400/20">
+                  {error}
+                </div>
+              )}
+
               <button
-                onClick={handleLogin}
-                className="w-full py-3 px-4 rounded-lg bg-satellite-accent text-white font-medium hover:bg-satellite-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-satellite-accent focus:ring-offset-satellite-dark transition-all"
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 px-4 rounded-lg bg-satellite-accent text-white font-medium hover:bg-satellite-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-satellite-accent focus:ring-offset-satellite-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
-                Enter Dashboard
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <span>Sign in</span>
+                )}
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>

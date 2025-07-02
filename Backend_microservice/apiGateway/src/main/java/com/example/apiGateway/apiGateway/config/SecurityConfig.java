@@ -22,6 +22,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeExchange(auth -> auth
                 .pathMatchers("/api/v1/users/auth/**").permitAll()
+                .pathMatchers("/actuator/prometheus").permitAll()  // allow Prometheus scrape
+                .pathMatchers("/actuator/health").permitAll() 
                 .anyExchange().permitAll()
             )
             .formLogin(form -> form.disable())

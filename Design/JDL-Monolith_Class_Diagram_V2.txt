@@ -127,12 +127,18 @@ entity BlockTransaction {
   type AbstractTransactionType required
 }
 
-entity Block{
+entity Block {
   height Long required unique
-  previousBlockHash String required
+  previousBlockHash String
   currentBlockHash String required unique
   createdAt Instant required
+  blockWeight Double required
+  transactionRoot String required
+  sha3Uncles String required
+  blockSize String required
+  validator NetworkNode required
 }
+
 entity AbstractTransactionType{}
 
 

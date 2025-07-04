@@ -70,7 +70,11 @@ const Header = () => {
   return (
     <header className="bg-satellite-dark-header py-2 px-4 border-b border-satellite-border flex justify-between items-center">
       <div className="flex items-center gap-2">
-        <Satellite className="w-6 h-6 text-satellite-accent" />
+        <img
+          src="/Keplereum_icon_SVG.svg"
+          alt="Keplereum Logo"
+          className="w-12 h-12"
+        />
         <div className="w-1 h-10 bg-satellite-accent rounded-full animate-pulse ml-1"></div>
         <h1 className="text-white text-xl font-bold pl-1">Keplereum</h1>
       </div>

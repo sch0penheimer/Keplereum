@@ -1,3 +1,48 @@
+
+application {
+  config {
+    baseName apiGateway
+    applicationType gateway
+    packageName com.myapp
+    authenticationType jwt
+    clientFramework react
+  }
+  entities None
+}
+
+application {
+  config {
+    baseName User_GroundStation_Service
+    applicationType microservice
+    packageName com.myapp
+    authenticationType jwt
+    prodDatabaseType postgres
+  }
+  entities User, GroundStation
+}
+
+application {
+  config {
+    baseName Sattelites_Service
+    applicationType microservice
+    packageName com.myapp
+    
+    prodDatabaseType postgres
+  }
+  entities Satellite, SatelliteModel, SatelliteTrajectory, Sensor
+}
+
+application {
+  config {
+    baseName Blockchain_Service
+    applicationType microservice
+    packageName com.myapp
+    prodDatabaseType postgres
+  }
+  entities Alert, NetworkNode, Block, Event, BlockTransaction, Confirmation, ValidatorAction
+}
+
+
 enum UserStatus {
   ACTIVE,
   INACTIVE,
@@ -33,8 +78,6 @@ enum TransactionStatus {
   PENDING,
   FAILED
 }
-
-// Entities with Attributes
 entity User {
   username String required unique minlength(3) maxlength(50)
   password String required minlength(8) maxlength(100)
@@ -119,8 +162,8 @@ entity ValidatorAction {
 
 entity BlockTransaction {
   hash String required unique
-  from String required
-  to String required
+  sender String required
+  receiver String required
   amount Double
   fee Double
   status TransactionStatus required
@@ -133,33 +176,31 @@ entity BlockTransaction {
 
 entity Block {
   height Long required unique
-  previousBlockHash String required
+  previousBlockHash String
   currentBlockHash String required unique
   createdAt Instant required
+  blockWeight Double required
+  transactionRoot String required
+  sha3Uncles String required
+  blockSize String required
+  validator NetworkNode required
 }
 
 relationship OneToMany {
   Satellite{sensor} to Sensor{satellite} 
   Satellite{trajectory} to SatelliteTrajectory{satellite}
   Block{transaction} to BlockTransaction{block}
-  NetworkNode{block} to Block{networkNode}
-  Event{confirmation} to Confirmation{event}
-  Event{blockTransaction} to BlockTransaction{event}
-  Alert{confirmation} to Confirmation{alert}
   GroundStation{satellite} to Satellite{groundStation}
-}
-
-relationship ManyToOne {
-  Satellite{model} to SatelliteModel{satellite}
 }
 
 relationship ManyToMany {
   NetworkNode{blockTransaction} to BlockTransaction{networkNode}
 }
 
-relationship OneToOne {
-  NetworkNode{satellite} to Satellite{networkNode}
-  ValidatorAction{event} to Event{validatorAction}
-  ValidatorAction{alert} to Alert{validatorAction}
-  Event{alert} to Alert{event}
+relationship OneToOne{
+NetworkNode{satellite} to Satellite{networkNode}
+ User{groundStation} to GroundStation{user}
+}
+relationship ManyToOne {
+  Satellite{model} to SatelliteModel 
 }

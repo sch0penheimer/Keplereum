@@ -2,6 +2,7 @@ pipeline {
     environment {
         DOCKER_HUB_REPO = 'keplereum'
         DOCKER_HUB_CREDENTIALS = credentials('docker-hub-credentials')
+        KUBE_NAMESPACE = 'production'
     }
     agent any
     triggers {
@@ -151,16 +152,38 @@ pipeline {
                         }
                     }
                 }
+                stage('Create Secrets') {
+                    steps {
+                        script {
+                            withKubeConfig([credentialsId: 'k8s-prod-creds']) {
+                                bat '''
+                                    kubectl create secret generic keplereum-k8s-secrets \
+                                        --from-env-file=.env \
+                                        --dry-run=client -o yaml
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage('Deploy kubernetes Manifests') {
+                    steps {
+                        echo 'Deploying all services to Kubernetes...'
+                        dir('K8s') {
+                            bat 'kubectl apply -f ./'
+                        }
+                    }
+                }
             }
         }
     }
+    
 
     post {
         always {
             cleanWs()
         }
         success {
-            echo 'All services tested, compiled, and Docker images built successfully!'
+            echo 'All services tested, compiled, and Docker images built successfully! And Keplereum is successfully deployed.'
         }
         failure {
             echo 'Build failed. Check logs for compilation or test errors.'

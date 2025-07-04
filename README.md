@@ -1,5 +1,5 @@
 # Keplereum: Ethereum-based Decentralized Satellite Communication System
-> Last Updated: 4st July 2025
+> Last Updated: 4th July 2025
 
 ## Overview
 Keplereum is a decentralized satellite communication system built on Ethereum blockchain technology. It allows ground stations to track and manage their satellites, each through a dedicated private Ethereum Proof-of-Authority (PoA) blockchain. This architecture ensures secure, tamper-proof, and efficient transmission of satellite data.

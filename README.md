@@ -57,7 +57,7 @@ At the core of Keplereum’s functionality is an **alert management system** dev
 
 ## Keplereum's Logo
 <div style="padding-top: 20px; text-align: center;">
-    <img src="./assets/keplereum_logo.svg" alt="Keplereum's Logo" width="400">
+    <img src="./assets/keplereum_logo.svg" alt="Keplereum's Logo" width="600">
 </div>
 
 ## **Table of Contents**

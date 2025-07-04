@@ -17,12 +17,12 @@ At the core of Keplereum’s functionality is an **alert management system** dev
             <br /> <br />
             <a href="https://github.com/sch0penheimer" 
             title="GitHub">
-                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/github.svg" width="20" style="filter: invert(54%) sepia(73%) saturate(393%) hue-rotate(172deg) brightness(97%) contrast(92%);" />
+                    <img src="https://img.shields.io/badge/GitHub-0077B5?style=for-the-badge&logo=github&logoColor=white" height="17" />
             </a>
             &nbsp;
             <a href="https://www.linkedin.com/in/haitam-bidiouane/" 
             title="LinkedIn">
-                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/linkedin.svg" width="20" style="filter: invert(54%) sepia(73%) saturate(393%) hue-rotate(172deg) brightness(97%) contrast(92%);" />
+                    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="17" />
             </a>
         </td>
         <td align="center" width="25%">
@@ -30,27 +30,39 @@ At the core of Keplereum’s functionality is an **alert management system** dev
             <br /><span style="font-family: 'Segoe UI', Arial, sans-serif; font-weight: bold; font-size: 0.9em;">EL MOUDNI <br />Yassine</span><br />
             <span style="font-family: 'Fira Mono', 'Consolas', monospace; font-size: 0.75em; color: #43a2e2;">(<b>@</b> Mdn753)</span>
             <br /> <br />
-            <a href="https://github.com/Mdn753" title="GitHub"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/github.svg" width="20" style="filter: invert(54%) sepia(73%) saturate(393%) hue-rotate(172deg) brightness(97%) contrast(92%);" /></a>
+            <a href="https://github.com/Mdn753" title="GitHub">                    
+                <img src="https://img.shields.io/badge/GitHub-0077B5?style=for-the-badge&logo=github&logoColor=white" height="17" />
+            </a>
             &nbsp;
-            <a href="https://www.linkedin.com/in/el-moudni-yassine-064482333/" title="LinkedIn"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/linkedin.svg" width="20" style="filter: invert(54%) sepia(73%) saturate(393%) hue-rotate(172deg) brightness(97%) contrast(92%);" /></a>
+            <a href="https://www.linkedin.com/in/el-moudni-yassine-064482333/" title="LinkedIn">
+                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="17" />
+            </a>
         </td>
         <td align="center" width="25%">
             <img src="https://media.licdn.com/dms/image/v2/D4D03AQGJaPiVGDsIuA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1713920106747?e=1756339200&v=beta&t=Q125DDNBpOWmCCodpZmvVxQkYSPyc4EuO6r86A5gftE" width="90%" height="100%" alt="FENGIRO Mohammed Arafa" style="border: 4px solid #43a2e2; border-radius: 3%;" />
             <br /><span style="font-family: 'Segoe UI', Arial, sans-serif; font-weight: bold; font-size: 0.9em;">FENGIRO <br /> Mohammed Arafa</span><br />
             <span style="font-family: 'Fira Mono', 'Consolas', monospace; font-size: 0.75em; color: #43a2e2;">(<b>@</b> Mharfe23)</span>
             <br /> <br />
-            <a href="https://github.com/Mharfe23" title="GitHub"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/github.svg" width="20" style="filter: invert(54%) sepia(73%) saturate(393%) hue-rotate(172deg) brightness(97%) contrast(92%);"/></a>
+            <a href="https://github.com/Mharfe23" title="GitHub">
+                <img src="https://img.shields.io/badge/GitHub-0077B5?style=for-the-badge&logo=github&logoColor=white" height="17" />
+            </a>
             &nbsp;
-            <a href="https://www.linkedin.com/in/mohammedfengiro/" title="LinkedIn"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/linkedin.svg" width="20" style="filter: invert(54%) sepia(73%) saturate(393%) hue-rotate(172deg) brightness(97%) contrast(92%);"/></a>
+            <a href="https://www.linkedin.com/in/mohammedfengiro/" title="LinkedIn">
+                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="17" />
+            </a>
         </td>
         <td align="center" width="25%">
             <img src="https://media.licdn.com/dms/image/v2/D4E03AQF-s05oPTVWPQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1729087132467?e=1756339200&v=beta&t=BlfpRdIZZjpIQcTv4leRBIxZ0pkLjXM79LSDVAaJEWE" width="90%" height="100%"  alt="YACOUBI Wail" style="border: 4px solid #43a2e2; border-radius: 3%;" />
             <br /><span style="font-family: 'Segoe UI', Arial, sans-serif; font-weight: bold; font-size: 0.9em;">YACOUBI <br /> Wail</span><br />
             <span style="font-family: 'Fira Mono', 'Consolas', monospace; font-size: 0.75em; color: #43a2e2;">(<b>@</b> WailYacoubi9)</span>
             <br /> <br />
-            <a href="https://github.com/WailYacoubi9" title="GitHub"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/github.svg" width="20" style="filter: invert(54%) sepia(73%) saturate(393%) hue-rotate(172deg) brightness(97%) contrast(92%);" /></a>
+            <a href="https://github.com/WailYacoubi9" title="GitHub">
+                <img src="https://img.shields.io/badge/GitHub-0077B5?style=for-the-badge&logo=github&logoColor=white" height="17" />
+            </a>
             &nbsp;
-            <a href="https://www.linkedin.com/in/wail-yacoubi/" title="LinkedIn"><img src="https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/linkedin.svg" width="20" style="filter: invert(54%) sepia(73%) saturate(393%) hue-rotate(172deg) brightness(97%) contrast(92%);"/></a>
+            <a href="https://www.linkedin.com/in/wail-yacoubi/" title="LinkedIn">
+                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="17" />
+            </a>
         </td>
     </tr>
 </table>

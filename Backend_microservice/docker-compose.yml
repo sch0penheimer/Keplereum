@@ -21,9 +21,9 @@ services:
     ports:
       - "8761:8761"
     environment:
-      CONFIG_SERVER_URL: http://keplereum-config-server:8888
-      SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
-      EUREKA_SERVER_ADDRESS: http://keplereum-discovery-server:8761/eureka
+      CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      SPRING_CLOUD_CONFIG_URI: ${SPRING_CLOUD_CONFIG_URI}
+      EUREKA_SERVER_ADDRESS: ${EUREKA_SERVER_ADDRESS}
     depends_on:
       keplereum-config-server:
         condition: service_healthy
@@ -39,11 +39,11 @@ services:
     ports:
       - "8222:8222"
     environment:
-      SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
-      CONFIG_SERVER_URL: http://keplereum-config-server:8888
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
-      EUREKA_DEFAULT_ZONE: http://keplereum-discovery-server:8761/eureka
-      ZIPKIN_DEFAULT: http://keplereum-zipkin:9411/api/v2/spans
+      SPRING_CLOUD_CONFIG_URI: ${SPRING_CLOUD_CONFIG_URI}
+      CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+      EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
+      ZIPKIN_DEFAULT: ${ZIPKIN_DEFAULT}
     depends_on:
       keplereum-discovery-server:
         condition: service_healthy
@@ -54,35 +54,31 @@ services:
   ##--------- Main Micro-Services ---------##
   ##---------------------------------------##
 
-
   keplereum-user-service:
     links:
       - keplereum-zipkin
     image: keplereum/user-service
     container_name: keplereum-user-groundstation-service
     environment:
-      JAVA_TOOL_OPTIONS: >-
-        -Dspring.zipkin.base-url=http://keplereum-zipkin:9411
-        -Dspring.zipkin.sender.type=web
-        -Dmanagement.tracing.enabled=true
-      SPRING_ZIPKIN_BASE_URL: http://keplereum-zipkin:9411
-      SPRING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      MANAGEMENT_ZIPKIN_BASE_URL: http://keplereum-zipkin:9411
-      MANAGEMENT_TRACING_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      SPRING_CLOUD_CONFIG_OVERRIDESYSTEMPROPERTIES: "false"
-      SPRING_ZIPKIN_ENABLED: "true"
-      MANAGEMENT_TRACING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      SPRING_ZIPKIN_TRACING_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      SPRING_SLEUTH_SAMPLER_PROBABILITY: "1.0"
-      SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
-      CONFIG_SERVER_URL: http://keplereum-config-server:8888
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
-      EUREKA_DEFAULT_ZONE: http://keplereum-discovery-server:8761/eureka
-      ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      SPRING_DATASOURCE_URL: jdbc:postgresql://keplereum-user-db:5432/user
-      SPRING_DATASOURCE_USERNAME: username
-      SPRING_DATASOURCE_PASSWORD: password
-      ZIPKIN_DEFAULT: http://keplereum-zipkin:9411/api/v2/spans
+      JAVA_TOOL_OPTIONS: ${USER_JAVA_TOOL_OPTIONS}
+      SPRING_ZIPKIN_BASE_URL: ${SPRING_ZIPKIN_BASE_URL}
+      SPRING_ZIPKIN_ENDPOINT: ${SPRING_ZIPKIN_ENDPOINT}
+      MANAGEMENT_ZIPKIN_BASE_URL: ${MANAGEMENT_ZIPKIN_BASE_URL}
+      MANAGEMENT_TRACING_ENDPOINT: ${MANAGEMENT_TRACING_ENDPOINT}
+      SPRING_CLOUD_CONFIG_OVERRIDESYSTEMPROPERTIES: ${SPRING_CLOUD_CONFIG_OVERRIDESYSTEMPROPERTIES}
+      SPRING_ZIPKIN_ENABLED: ${SPRING_ZIPKIN_ENABLED}
+      MANAGEMENT_TRACING_ZIPKIN_ENDPOINT: ${MANAGEMENT_TRACING_ZIPKIN_ENDPOINT}
+      SPRING_ZIPKIN_TRACING_ENDPOINT: ${SPRING_ZIPKIN_TRACING_ENDPOINT}
+      SPRING_SLEUTH_SAMPLER_PROBABILITY: ${SPRING_SLEUTH_SAMPLER_PROBABILITY}
+      SPRING_CLOUD_CONFIG_URI: ${SPRING_CLOUD_CONFIG_URI}
+      CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+      EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
+      ZIPKIN_ENDPOINT: ${ZIPKIN_ENDPOINT}
+      SPRING_DATASOURCE_URL: ${USER_SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${USER_SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${USER_SPRING_DATASOURCE_PASSWORD}
+      ZIPKIN_DEFAULT: ${ZIPKIN_DEFAULT}
     depends_on:
       - keplereum-config-server
       - keplereum-discovery-server
@@ -97,25 +93,22 @@ services:
     image: keplereum/blockchain-service
     container_name: keplereum-blockchain-service
     environment:
-      JAVA_TOOL_OPTIONS: >-
-        -Dspring.zipkin.base-url=http://keplereum-zipkin:9411
-        -Dspring.zipkin.sender.type=web
-        -Dmanagement.tracing.enabled=true
-      SPRING_ZIPKIN_BASE_URL: http://keplereum-zipkin:9411
-      SPRING_ZIPKIN_ENABLED: "true"
-      SPRING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      MANAGEMENT_TRACING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      SPRING_ZIPKIN_TRACING_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      SPRING_SLEUTH_SAMPLER_PROBABILITY: "1.0"
-      SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
-      CONFIG_SERVER_URL: http://keplereum-config-server:8888
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
-      EUREKA_DEFAULT_ZONE: http://keplereum-discovery-server:8761/eureka
-      ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      SPRING_DATASOURCE_URL: jdbc:postgresql://keplereum-blockchain-db:5432/blockchain
-      SPRING_DATASOURCE_USERNAME: username
-      SPRING_DATASOURCE_PASSWORD: password
-      ZIPKIN_DEFAULT: http://keplereum-zipkin:9411/api/v2/spans
+      JAVA_TOOL_OPTIONS: ${BLOCKCHAIN_JAVA_TOOL_OPTIONS}
+      SPRING_ZIPKIN_BASE_URL: ${SPRING_ZIPKIN_BASE_URL}
+      SPRING_ZIPKIN_ENABLED: ${SPRING_ZIPKIN_ENABLED}
+      SPRING_ZIPKIN_ENDPOINT: ${SPRING_ZIPKIN_ENDPOINT}
+      MANAGEMENT_TRACING_ZIPKIN_ENDPOINT: ${MANAGEMENT_TRACING_ZIPKIN_ENDPOINT}
+      SPRING_ZIPKIN_TRACING_ENDPOINT: ${SPRING_ZIPKIN_TRACING_ENDPOINT}
+      SPRING_SLEUTH_SAMPLER_PROBABILITY: ${SPRING_SLEUTH_SAMPLER_PROBABILITY}
+      SPRING_CLOUD_CONFIG_URI: ${SPRING_CLOUD_CONFIG_URI}
+      CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+      EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
+      ZIPKIN_ENDPOINT: ${ZIPKIN_ENDPOINT}
+      SPRING_DATASOURCE_URL: ${BLOCKCHAIN_SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${BLOCKCHAIN_SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${BLOCKCHAIN_SPRING_DATASOURCE_PASSWORD}
+      ZIPKIN_DEFAULT: ${ZIPKIN_DEFAULT}
     depends_on:
       - keplereum-config-server
       - keplereum-discovery-server
@@ -130,24 +123,21 @@ services:
     image: keplereum/satellites-service
     container_name: keplereum-satellites-service
     environment:
-      JAVA_TOOL_OPTIONS: >-
-        -Dspring.zipkin.base-url=http://keplereum-zipkin:9411
-        -Dspring.zipkin.sender.type=web
-        -Dmanagement.tracing.enabled=true
-      SPRING_ZIPKIN_BASE_URL: http://keplereum-zipkin:9411
-      SPRING_ZIPKIN_ENABLED: "true"
-      SPRING_SLEUTH_SAMPLER_PROBABILITY: "1.0"
-      SPRING_CLOUD_CONFIG_URI: http://keplereum-config-server:8888
-      CONFIG_SERVER_URL: http://keplereum-config-server:8888
-      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://keplereum-discovery-server:8761/eureka
-      EUREKA_DEFAULT_ZONE: http://keplereum-discovery-server:8761/eureka
-      ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      SPRING_DATASOURCE_URL: jdbc:postgresql://keplereum-satellite-db:5432/satellite
-      SPRING_DATASOURCE_USERNAME: username
-      SPRING_DATASOURCE_PASSWORD: password
-      MANAGEMENT_TRACING_ZIPKIN_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      SPRING_ZIPKIN_TRACING_ENDPOINT: http://keplereum-zipkin:9411/api/v2/spans
-      ZIPKIN_DEFAULT: http://keplereum-zipkin:9411/api/v2/spans
+      JAVA_TOOL_OPTIONS: ${SATELLITES_JAVA_TOOL_OPTIONS}
+      SPRING_ZIPKIN_BASE_URL: ${SPRING_ZIPKIN_BASE_URL}
+      SPRING_ZIPKIN_ENABLED: ${SPRING_ZIPKIN_ENABLED}
+      SPRING_SLEUTH_SAMPLER_PROBABILITY: ${SPRING_SLEUTH_SAMPLER_PROBABILITY}
+      SPRING_CLOUD_CONFIG_URI: ${SPRING_CLOUD_CONFIG_URI}
+      CONFIG_SERVER_URL: ${CONFIG_SERVER_URL}
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE}
+      EUREKA_DEFAULT_ZONE: ${EUREKA_DEFAULT_ZONE}
+      ZIPKIN_ENDPOINT: ${ZIPKIN_ENDPOINT}
+      SPRING_DATASOURCE_URL: ${SATELLITES_SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SATELLITES_SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SATELLITES_SPRING_DATASOURCE_PASSWORD}
+      MANAGEMENT_TRACING_ZIPKIN_ENDPOINT: ${MANAGEMENT_TRACING_ZIPKIN_ENDPOINT}
+      SPRING_ZIPKIN_TRACING_ENDPOINT: ${SPRING_ZIPKIN_TRACING_ENDPOINT}
+      ZIPKIN_DEFAULT: ${ZIPKIN_DEFAULT}
     depends_on:
       - keplereum-config-server
       - keplereum-discovery-server
@@ -164,9 +154,9 @@ services:
     image: postgres
     container_name: keplereum-user-db
     environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: user
+      POSTGRES_USER: ${USER_DB_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${USER_DB_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${USER_DB_POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -178,9 +168,9 @@ services:
     image: postgres
     container_name: keplereum-satellite-db
     environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: satellite
+      POSTGRES_USER: ${SATELLITE_DB_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${SATELLITE_DB_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${SATELLITE_DB_POSTGRES_DB}
     ports:
       - "5433:5432"
     volumes:
@@ -192,9 +182,9 @@ services:
     image: postgres
     container_name: keplereum-blockchain-db
     environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: blockchain
+      POSTGRES_USER: ${BLOCKCHAIN_DB_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${BLOCKCHAIN_DB_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${BLOCKCHAIN_DB_POSTGRES_DB}
     ports:
       - "5434:5432"
     volumes:
@@ -241,9 +231,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: admin123
-      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: ${GF_USERS_ALLOW_SIGN_UP}
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
@@ -252,7 +242,6 @@ services:
       - keplereum-microservices-net
     depends_on:
       - keplereum-prometheus
-
 
 volumes:
   keplereum-user-data:

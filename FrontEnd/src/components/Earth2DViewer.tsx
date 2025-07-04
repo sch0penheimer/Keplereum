@@ -18,15 +18,14 @@ const Earth2DViewer = () => {
   const animationIdRef = useRef<number>();
   const { satellites, selectedSatellite } = useSatelliteContext();
 
-  console.log("Earth2DViewer: Rendering with satellites:", satellites.length);
-  console.log("Earth2DViewer: Selected satellite:", selectedSatellite?.name);
-
   // Get current interpolated position for a satellite (same as 3D viewer)
   function getCurrentSatellitePosition(satellite: any, currentTime: number) {
     if (!satellite.orbitalData?.points3D || !satellite.orbitalData?.periodSeconds) return null;
+    const speedMultiplier = satellite.speedMultiplier ?? 1;
+    const adjustedTime = (currentTime * speedMultiplier) % satellite.orbitalData.periodSeconds;
     const points = satellite.orbitalData.points3D;
     const period = satellite.orbitalData.periodSeconds;
-    const normalizedTime = (currentTime % period) / period;
+    const normalizedTime = adjustedTime / period;
     const idx = Math.floor(normalizedTime * (points.length - 1));
     const nextIdx = (idx + 1) % points.length;
     const frac = (normalizedTime * (points.length - 1)) - idx;

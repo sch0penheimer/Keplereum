@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import { useSatelliteContext } from '@/contexts/SatelliteContext';
 import * as THREE from 'three';
 import TornadoAlert from './TornadoAlert';
+import { earthRadiusSceneUnits, earthRadius } from '@/utils/constants';
 
 const LeafletEarthMap = () => {
   const mapRef = useRef<L.Map | null>(null);
@@ -38,40 +39,40 @@ const LeafletEarthMap = () => {
   // Calculate current satellite position using the same timing as 3D viewer
   const getCurrentSatellitePosition = (satellite: any, currentTime: number) => {
     if (!satellite.orbitalData?.points3D || !satellite.orbitalData?.periodSeconds) return null;
-    
-    const normalizedTime = (currentTime % satellite.orbitalData.periodSeconds) / satellite.orbitalData.periodSeconds;
+    const speedMultiplier = satellite.speedMultiplier ?? 1;
+    const adjustedTime = (currentTime * speedMultiplier) % satellite.orbitalData.periodSeconds;
+    const normalizedTime = adjustedTime / satellite.orbitalData.periodSeconds;
     const index = Math.floor(normalizedTime * (satellite.orbitalData.points3D.length - 1));
     const nextIndex = (index + 1) % satellite.orbitalData.points3D.length;
     const fraction = (normalizedTime * (satellite.orbitalData.points3D.length - 1)) - index;
-    
     const currentPos = new THREE.Vector3();
     currentPos.lerpVectors(satellite.orbitalData.points3D[index], satellite.orbitalData.points3D[nextIndex], fraction);
-    
     return currentPos;
   };
 
   // Calculate dynamic sensor radius based on altitude (matching 3D behavior more accurately)
   const calculateDynamicSensorRadius = (satellite: any, currentPos: THREE.Vector3) => {
-    if (!satellite.sensorData?.active || !satellite.sensorData?.baseRadiusKm) return null;
-    
-    // Get current altitude (distance from Earth center minus Earth radius)
-    const earthRadius = 6371; // km
-    const currentAltitude = currentPos.length() - earthRadius;
-    
-    // Calculate dynamic scaling based on altitude - this matches the 3D behavior
-    // Higher altitude = larger sensor coverage, then scale up by 10x for visibility
-    const altitudeScaleFactor = Math.max(1, currentAltitude / 500); // Scale based on altitude above 500km baseline
-    const dynamicRadius = satellite.sensorData.baseRadiusKm * altitudeScaleFactor * 100; // 100x scale for visibility
-    
-    console.log(`Dynamic sensor calculation for ${satellite.name}:`, {
-      baseRadius: satellite.sensorData.baseRadiusKm,
-      altitude: currentAltitude,
-      scaleFactor: altitudeScaleFactor,
-      finalRadius: dynamicRadius,
-      active: satellite.sensorData.active
-    });
-    
-    return dynamicRadius;
+    if (!satellite.sensorData?.active) return null;
+    // Use the same parameters as 3D, but convert scene units to km
+    const sceneToKm = earthRadius / earthRadiusSceneUnits; // 6371 / 4
+    const earthRadiusKm = earthRadius; // 6371
+    // Get current altitude in km (distance from Earth's center minus Earth's radius)
+    const currentAltitude = Math.abs(currentPos.length() - earthRadiusKm);
+    // Calculate constant cone half-angle from max values (converted to km)
+    const maxBaseRadiusKm = (satellite.maxSensorBaseRadius) * sceneToKm / 5;
+    const maxHeightKm = (satellite.maxSensorHeight) * sceneToKm;
+    const coneAngle = Math.atan(maxBaseRadiusKm / maxHeightKm); // constant
+    // Use current altitude for intersection calculation
+    const h = currentAltitude;
+    const R = earthRadiusKm;
+    const theta = coneAngle;
+    if (h === 0) {
+      return null;
+    }
+    const numerator = R * Math.sin(theta);
+    const denominator = 1 - (R / (h + R)) * Math.cos(theta);
+    const groundRadius = denominator !== 0 ? numerator / denominator : 0;
+    return groundRadius;
   };
 
   // Create custom label icon
@@ -117,8 +118,6 @@ const LeafletEarthMap = () => {
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    console.log("LeafletEarthMap: Initializing map");
-
     mapRef.current = L.map(containerRef.current, {
       center: [0, 0],
       zoom: 2,
@@ -154,7 +153,6 @@ const LeafletEarthMap = () => {
     });
 
     return () => {
-      console.log("LeafletEarthMap: Cleaning up map");
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -220,7 +218,6 @@ const LeafletEarthMap = () => {
         if (satellite.sensorData?.active) {
           const dynamicRadius = calculateDynamicSensorRadius(satellite, currentPos);
           if (dynamicRadius && dynamicRadius > 0) {
-            console.log(`Creating/updating sensor circle for ${satellite.name} with radius ${dynamicRadius}km at [${lat}, ${lng}]`);
             
             let sensorCircle = sensorCirclesRef.current.get(satellite.id);
             if (!sensorCircle) {
@@ -238,7 +235,6 @@ const LeafletEarthMap = () => {
               sensorCircle.bindPopup(`${satellite.name} - Sensor Coverage: ${Math.round(dynamicRadius)}km`);
               
               sensorCirclesRef.current.set(satellite.id, sensorCircle);
-              console.log(`Added sensor circle for ${satellite.name} with radius ${dynamicRadius}km`);
             } else {
               sensorCircle.setLatLng(latLng);
               sensorCircle.setRadius(dynamicRadius * 1000);
@@ -250,7 +246,6 @@ const LeafletEarthMap = () => {
           // Remove sensor circle if sensor is not active
           const existingCircle = sensorCirclesRef.current.get(satellite.id);
           if (existingCircle) {
-            console.log(`Removing sensor circle for ${satellite.name} (inactive)`);
             mapRef.current!.removeLayer(existingCircle);
             sensorCirclesRef.current.delete(satellite.id);
           }

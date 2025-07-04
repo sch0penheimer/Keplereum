@@ -44,18 +44,11 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8761
-          env:
-            - name: EUREKA_SERVER_ADDRESS
-              valueFrom:
-                configMapKeyRef:
-                  name: eureka-cm
-                  key: eureka_service_address
-            - name: CONFIG_SERVER_URL
-              value: http://config-server:8888
-            
+          envFrom:
+          - secretRef:
+              name: keplereum-k8s-secrets
 
-
----                  
+---
 
 apiVersion: v1
 kind: Service

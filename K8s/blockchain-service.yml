@@ -23,16 +23,9 @@ spec:
           image: postgres:latest
           ports:
             - containerPort: 5432
-          env:
-            - name: POSTGRES_USER
-              value: blockchain_user
-            - name: POSTGRES_PASSWORD
-              value: blockchain_password
-            - name: POSTGRES_DB
-              value: blockchain
-          volumeMounts:
-            - name: blockchain-db-data
-              mountPath: /var/lib/postgresql/data
+          envFrom:
+          - secretRef:
+              name: keplereum-k8s-secrets
   volumeClaimTemplates:
     - metadata:
         name: blockchain-db-data
@@ -84,15 +77,9 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8091
-          env:
-            - name: CONFIG_SERVER_URL
-              value: http://config-server:8888
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://blockchain-db-svc:5432/blockchain
-            - name: SPRING_DATASOURCE_USERNAME
-              value: blockchain_user
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: blockchain_password
+          envFrom:
+          - secretRef:
+              name: keplereum-k8s-secrets
 ---
 apiVersion: v1
 kind: Service

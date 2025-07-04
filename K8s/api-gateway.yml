@@ -20,9 +20,9 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8222
-          env:
-            - name: CONFIG_SERVER_URL
-              value: http://config-server:8888
+          envFrom:
+          - secretRef:
+              name: keplereum-k8s-secrets
 
 ---
 apiVersion: v1

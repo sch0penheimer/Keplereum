@@ -1,5 +1,5 @@
 # Keplereum: Ethereum-based Decentralized Satellite Communication System
-> Last Updated: 1st July 2025
+> Last Updated: 4st July 2025
 
 ## Overview
 Keplereum is a decentralized satellite communication system built on Ethereum blockchain technology. It allows ground stations to track and manage their satellites, each through a dedicated private Ethereum Proof-of-Authority (PoA) blockchain. This architecture ensures secure, tamper-proof, and efficient transmission of satellite data.
@@ -17,12 +17,12 @@ At the core of Keplereum’s functionality is an **alert management system** dev
             <br /> <br />
             <a href="https://github.com/sch0penheimer" 
             title="GitHub">
-                    <img src="https://img.shields.io/badge/GitHub-0077B5?style=for-the-badge&logo=github&logoColor=white" height="13" />
+                <img src="https://img.shields.io/badge/GitHub-0077B5?style=flat&logo=github&logoColor=white" />
             </a>
             &nbsp;
             <a href="https://www.linkedin.com/in/haitam-bidiouane/" 
             title="LinkedIn">
-                    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="13" />
+                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white" />
             </a>
         </td>
         <td align="center" width="25%">
@@ -31,11 +31,11 @@ At the core of Keplereum’s functionality is an **alert management system** dev
             <span style="font-family: 'Fira Mono', 'Consolas', monospace; font-size: 0.75em; color: #43a2e2;">(<b>@</b> Mdn753)</span>
             <br /> <br />
             <a href="https://github.com/Mdn753" title="GitHub">                    
-                <img src="https://img.shields.io/badge/GitHub-0077B5?style=for-the-badge&logo=github&logoColor=white" height="13" />
+                <img src="https://img.shields.io/badge/GitHub-0077B5?style=flat&logo=github&logoColor=white" />
             </a>
             &nbsp;
             <a href="https://www.linkedin.com/in/el-moudni-yassine-064482333/" title="LinkedIn">
-                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="13" />
+                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white" />
             </a>
         </td>
         <td align="center" width="25%">
@@ -44,11 +44,11 @@ At the core of Keplereum’s functionality is an **alert management system** dev
             <span style="font-family: 'Fira Mono', 'Consolas', monospace; font-size: 0.75em; color: #43a2e2;">(<b>@</b> Mharfe23)</span>
             <br /> <br />
             <a href="https://github.com/Mharfe23" title="GitHub">
-                <img src="https://img.shields.io/badge/GitHub-0077B5?style=for-the-badge&logo=github&logoColor=white" height="13" />
+                <img src="https://img.shields.io/badge/GitHub-0077B5?style=flat&logo=github&logoColor=white" />
             </a>
             &nbsp;
             <a href="https://www.linkedin.com/in/mohammedfengiro/" title="LinkedIn">
-                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="13" />
+                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white" />
             </a>
         </td>
         <td align="center" width="25%">
@@ -57,19 +57,19 @@ At the core of Keplereum’s functionality is an **alert management system** dev
             <span style="font-family: 'Fira Mono', 'Consolas', monospace; font-size: 0.75em; color: #43a2e2;">(<b>@</b> WailYacoubi9)</span>
             <br /> <br />
             <a href="https://github.com/WailYacoubi9" title="GitHub">
-                <img src="https://img.shields.io/badge/GitHub-0077B5?style=for-the-badge&logo=github&logoColor=white" height="13" />
+                <img src="https://img.shields.io/badge/GitHub-0077B5?style=flat&logo=github&logoColor=white" />
             </a>
             &nbsp;
             <a href="https://www.linkedin.com/in/wail-yacoubi/" title="LinkedIn">
-                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" height="13" />
-            </a>
+                <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white" />
+             </a>
         </td>
     </tr>
 </table>
 
 ## Keplereum's Logo
-<div style="padding-top: 20px; text-align: center;">
-    <img src="./assets/keplereum_logo.svg" alt="Keplereum's Logo" width="600">
+<div align="center">
+    <img src="./assets/keplereum_logo.svg" alt="Keplereum's Logo" width="500">
 </div>
 
 ## **Table of Contents**
